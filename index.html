@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<meta name="color-scheme" content="light" />
 <title>언제모여 - 시간/메뉴 조율</title>
 <link rel="stylesheet" as="style" crossorigin
   href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
@@ -22,7 +23,8 @@
     --white: #FFFFFF;
   }
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; }
+  html,body{ margin:0; padding:0; color-scheme: light; }
+  input, select, textarea, button{ color-scheme: light; }
   body{
     background: var(--paper);
     color: var(--ink);
@@ -33,30 +35,30 @@
   #app{
     max-width: 480px;
     margin: 0 auto;
-    padding: 20px 16px 80px;
+    padding: 24px 18px 90px;
     min-height: 100vh;
   }
   @media (min-width: 768px){
-    #app{ max-width: 720px; padding: 40px 24px 100px; }
+    #app{ max-width: 720px; padding: 44px 26px 110px; }
   }
   @media (min-width: 1100px){
     #app{ max-width: 960px; }
   }
-  h1{ font-size: 23px; font-weight: 700; margin: 4px 0 4px; letter-spacing: -0.02em; }
-  h2{ font-size: 19px; font-weight: 700; margin: 0 0 12px; }
-  .sub{ color: var(--ink-soft); font-size: 15px; margin: 0 0 20px; }
+  h1{ font-size: 23px; font-weight: 700; margin: 4px 0 6px; letter-spacing: -0.02em; }
+  h2{ font-size: 19px; font-weight: 700; margin: 0 0 16px; }
+  .sub{ color: var(--ink-soft); font-size: 15px; margin: 0 0 22px; }
   .card{
     background: var(--white);
     border: 1px solid var(--line);
     border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 14px;
+    padding: 22px;
+    margin-bottom: 18px;
   }
-  label{ display:block; font-size: 15px; font-weight: 600; color: var(--ink); margin: 14px 0 6px; }
+  label{ display:block; font-size: 15px; font-weight: 600; color: var(--ink); margin: 20px 0 8px; }
   label:first-child{ margin-top:0; }
   input[type=text], input[type=date], input[type=time], input[type=datetime-local], input[type=url], input[type=number], select, textarea{
     width: 100%;
-    padding: 11px 12px;
+    padding: 13px 14px;
     border: 1px solid var(--line-strong);
     border-radius: 9px;
     font-size: 17px;
@@ -69,7 +71,7 @@
     outline: 2px solid var(--accent);
     outline-offset: 1px;
   }
-  .row{ display:flex; gap: 8px; }
+  .row{ display:flex; gap: 10px; }
   .row > *{ flex: 1; }
   .btn{
     display:inline-flex; align-items:center; justify-content:center;
@@ -137,6 +139,7 @@
 
   /* --- 시간 선택 스피너 (오전/오후 + 시:분 + 드롭다운) --- */
   .time-picker{ position: relative; }
+  .tp-field-wrap{ position: relative; display: inline-block; }
   .tp-ampm{ display:flex; gap: 6px; margin-bottom: 8px; }
   .tp-ampm-btn{
     border: 1px solid var(--line-strong); border-radius: 8px; background: var(--white);
@@ -145,18 +148,19 @@
   }
   .tp-ampm-btn.is-active{ background: var(--ink); color: var(--white); border-color: var(--ink); }
   .tp-hm{ display:flex; align-items:center; gap: 6px; font-size: 17px; font-weight: 700; }
-  .tp-field{
+  input.tp-field{
     border: 1.5px solid var(--line-strong); border-radius: 8px; background: var(--white);
     padding: 7px 12px; font-size: 17px; font-weight: 700; color: var(--ink);
-    cursor: pointer; font-family: inherit; width: 52px; text-align: center;
+    cursor: pointer; font-family: inherit; width: 52px !important; text-align: center;
   }
   .tp-field.is-open{ border-color: var(--accent); color: var(--accent-deep); }
   .tp-dropdown{
-    display:none; position:absolute; z-index: 20; margin-top: 4px;
+    display:none; position:absolute; z-index: 20; top: 100%; left: 0; margin-top: 4px;
     background: var(--white); border: 1px solid var(--line); border-radius: 10px;
     min-width: 60px; overflow: hidden;
     box-shadow: 0 4px 14px rgba(0,0,0,0.08);
   }
+  .tp-dropdown.open-up{ top: auto; bottom: 100%; margin-top: 0; margin-bottom: 4px; }
   .tp-dropdown-inner{ max-height: 160px; overflow-y: auto; }
   .tp-option{
     padding: 8px 14px; font-size: 16px; color: var(--ink); cursor: pointer; text-align:center;
@@ -171,7 +175,7 @@
   }
   .modal-panel{
     background: var(--white); border-radius: 16px; padding: 22px;
-    max-width: 360px; width: 100%; max-height: 85vh; overflow-y: auto;
+    max-width: 360px; width: 100%; max-height: 85vh; overflow-y: auto; overflow-x: hidden;
   }
   .modal-panel h2{ margin: 0 0 14px; }
   .modal-panel.modal-panel-wide{ max-width: 360px; }
@@ -194,6 +198,7 @@
   .vote-cal-day.is-candidate{ background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; }
   .vote-cal-day.is-voted{ box-shadow: inset 0 0 0 2px var(--accent); }
   .vote-cal-legend{ display:flex; gap: 14px; margin-top: 10px; font-size: 13.5px; color: var(--ink-soft); }
+  .vote-cal-hint{ margin-top: 10px; font-size: 12.5px; color: var(--ink-soft); line-height: 1.5; }
   .legend-dot{ display:inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; vertical-align: middle; background: var(--line); }
   .legend-dot.is-candidate{ background: var(--accent-soft); border: 1px solid var(--accent-deep); }
   .legend-dot.is-voted{ background: var(--white); box-shadow: inset 0 0 0 2px var(--accent); }
@@ -241,7 +246,7 @@
   .toast{ background: var(--accent-soft); color: var(--accent-deep); border-radius: 10px; padding: 12px 14px; font-size: 15px; margin: 10px 0; font-weight: 600; }
 
   /* --- room header --- */
-  .room-header{ position: relative; margin-bottom: 18px; padding-bottom: 14px; padding-right: 84px; border-bottom: 1px solid var(--line); }
+  .room-header{ position: relative; margin-bottom: 22px; padding-bottom: 18px; padding-right: 84px; border-bottom: 1px solid var(--line); }
   .header-copy-btn{
     position: absolute; top: 0; right: 0;
     background: var(--white); border: 1px solid var(--line-strong); border-radius: 8px;
@@ -263,7 +268,7 @@
     font-size: 14px; font-weight: 700; color: var(--accent-deep);
     background: var(--accent-soft); border: 1px solid var(--accent-soft); border-radius: 999px; padding: 4px 10px;
   }
-  .header-actions{ display:flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .header-actions{ display:flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 
   /* --- time-mode slot voting (탭형 로우, 얇은 진행바 + 실시간 인원수) --- */
   .slots-container{ display:flex; flex-direction: column; gap: 22px; }
@@ -292,10 +297,10 @@
   .slot-item.is-selected .slot-count{ color: var(--accent-deep); font-weight: 700; }
 
   /* --- menu-mode voting (모던 카드, 아이콘 없이 보더/배경으로 선택 표시) --- */
-  .options-grid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
+  .options-grid{ display:grid; grid-template-columns: 1fr; gap: 14px; }
   @media (min-width: 600px){ .options-grid{ grid-template-columns: 1fr 1fr; } }
   .option-card{
-    border:1px solid var(--line); border-radius:12px; padding: 16px;
+    border:1px solid var(--line); border-radius:12px; padding: 20px;
     cursor: pointer; transition: border-color .12s ease, background-color .12s ease;
   }
   .option-card.is-selected{ border-color: var(--accent); background: var(--accent-soft); }
@@ -320,27 +325,35 @@
     cursor:pointer; padding: 4px 6px 4px 0; font-family: inherit;
   }
   .top-bar-title{ font-size: 16px; font-weight: 700; color: var(--ink); }
+  .top-bar-action{
+    margin-left: auto; background: var(--white); border: 1px solid var(--line-strong);
+    border-radius: 8px; color: var(--ink); font-size: 13px; font-weight: 600;
+    padding: 6px 10px; cursor: pointer; font-family: inherit; white-space: nowrap;
+  }
+  .top-bar-action:hover{ border-color: var(--accent); color: var(--accent-deep); }
   .home-headline{ font-size: 27px; font-weight: 800; line-height: 1.32; letter-spacing: -0.02em; margin: 0 0 10px; }
   .home-sub{ font-size: 15.5px; color: var(--ink-soft); margin: 0 0 24px; line-height: 1.55; }
 
-  .mode-list{ display:flex; flex-direction:column; gap: 10px; }
-  .mode-list.has-form{ margin-bottom: 20px; }
+  .mode-list{ display:flex; flex-direction:column; gap: 14px; }
+  .mode-list.has-form{ margin-bottom: 24px; }
   .mode-card-row{
     text-align:left; width:100%; background: var(--white);
-    border: 1px solid var(--line); border-radius: 14px;
-    padding: 16px 18px; cursor: pointer; font-family: inherit;
+    border: 1px solid var(--line); border-radius: 16px;
+    padding: 20px 22px; cursor: pointer; font-family: inherit;
+    display:flex; align-items:center; justify-content:space-between; gap: 12px;
     transition: border-color .12s ease, background-color .12s ease;
   }
   .mode-card-row:hover{ border-color: var(--accent); }
   .mode-card-row.is-active{ border-color: var(--accent); background: var(--accent-soft); }
-  .mcr-top{ display:flex; align-items:center; gap: 8px; }
-  .mcr-title{ font-weight: 700; font-size: 17.5px; }
-  .mode-card-row.is-active .mcr-title{ color: var(--accent-deep); }
-  .mcr-badge{
-    font-size: 13px; font-weight: 700; color: var(--accent-deep);
-    background: var(--accent-soft); padding: 2px 8px; border-radius: 999px;
+  .mcr-content{ flex: 1; min-width: 0; }
+  .mcr-tag{
+    display:inline-block; background: var(--accent); color: var(--white);
+    font-size: 13px; font-weight: 700; padding: 3px 9px; border-radius: 999px; margin-bottom: 8px;
   }
-  .mcr-desc{ font-size: 14.5px; color: var(--ink-soft); margin-top: 4px; }
+  .mcr-title{ font-weight: 800; font-size: 19px; color: var(--ink); margin-bottom: 6px; }
+  .mode-card-row.is-active .mcr-title{ color: var(--accent-deep); }
+  .mcr-desc{ font-size: 14.5px; color: var(--ink-soft); line-height: 1.5; }
+  .mcr-arrow{ font-size: 19px; font-weight: 800; color: var(--ink); flex-shrink: 0; line-height: 1; }
 
   .recent-divider{ height: 1px; background: var(--line); margin: 26px 0 16px; }
   .recent-label{ font-size: 14px; color: var(--ink-soft); font-weight: 700; margin-bottom: 6px; }
@@ -365,9 +378,27 @@
   }
   .profile-btn span{ font-size: 14px; color: var(--ink); font-weight: 600; text-align:center; word-break: keep-all; }
   .profile-btn:disabled{ opacity: 0.35; cursor: not-allowed; }
+  .profile-btn-removable .avatar-circle{ transition: opacity .12s ease; }
+  .profile-btn-removable:hover .avatar-circle{ opacity: 0.55; }
+  .profile-btn-removable:hover span{ color: var(--danger); }
   .name-chip-row{ display:flex; flex-wrap:wrap; gap: 8px; }
   .name-chip{ display:inline-flex; align-items:center; gap: 5px; font-size: 14.5px; }
   .meta-with-avatar{ display:flex; align-items:center; gap: 6px; margin-top: 2px; }
+
+  /* --- 참여자 프로필 그룹 관리 모달 --- */
+  .profile-group-list{ display:flex; flex-direction:column; gap: 10px; }
+  .profile-group-row{
+    border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+    display:flex; flex-direction:column; gap: 12px;
+  }
+  .pg-info{ min-width: 0; }
+  .pg-name{ font-weight: 700; font-size: 16px; color: var(--ink); }
+  .pg-count{ font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+  .pg-actions{ display:flex; gap: 8px; justify-content: flex-end; }
+  .pg-actions .btn{ white-space: nowrap; width: auto; flex: 0 0 auto; padding-left: 14px; padding-right: 14px; }
+  .profile-group-editor{ margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .pg-code-line{ display:flex; align-items:center; gap: 8px; flex-wrap: wrap; font-size: 14px; color: var(--ink); }
+  .pg-code-line strong{ font-size: 16px; letter-spacing: 0.05em; color: var(--accent-deep); }
 
   /* --- 벌칙뽑기 · 순서정하기 (박스 연출) --- */
   .prize-box-wrap{ display:flex; justify-content:center; padding: 24px 0 8px; }
@@ -441,7 +472,7 @@
   }
   .result-date-title:first-child{ margin-top: 0; }
   .result-date-title .rd-count{ color: var(--accent); font-weight: 800; }
-  .result-item{ border:1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; position: relative; overflow: hidden; }
+  .result-item{ border:1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; position: relative; overflow: hidden; }
   .result-item .bar-bg{ position:absolute; left:0; top:0; bottom:0; background: var(--accent-soft); z-index:0; }
   .result-item .content{ position: relative; z-index: 1; display:flex; justify-content: space-between; align-items: center; gap: 10px; }
   .result-item .label{ font-size: 16.5px; font-weight: 600; }
@@ -686,9 +717,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 /* ---------------- CREATE PAGE ---------------- */
 const CREATE_MODES = [
-  { key: 'time', title: '시간 조율', badge: null, desc: '날짜 여러 개 + 시간 범위 → 슬롯 자동 생성' },
-  { key: 'menu', title: '메뉴 · 장소 결정', badge: null, desc: '후보를 올리고 표를 모아요 (참고 링크 첨부)' },
-  { key: 'ladder', title: '벌칙뽑기 · 순서정하기', badge: null, desc: '무작위로 순서를 정하거나 벌칙 당첨자를 뽑아요' },
+  { key: 'time', tag: '시간', title: '시간 조율', desc: '날짜 여러 개 + 시간 범위 → 슬롯 자동 생성' },
+  { key: 'menu', tag: '메뉴', title: '메뉴 · 장소 결정', desc: '후보를 올리고 표를 모아요 (참고 링크 첨부)' },
+  { key: 'ladder', tag: '뽑기', title: '벌칙뽑기 · 순서정하기', desc: '무작위로 순서를 정하거나 벌칙 당첨자를 뽑아요' },
 ];
 function renderCreate(mode){
   const isFiltered = !!mode;
@@ -697,6 +728,7 @@ function renderCreate(mode){
     <div class="top-bar">
       ${isFiltered ? `<button class="top-bar-back" id="home-back-btn" type="button">←</button>` : ''}
       <span class="top-bar-title">모임 정하기</span>
+      ${!isFiltered ? `<button type="button" class="top-bar-action" id="home-profile-group-btn">참여자 프로필 관리</button>` : ''}
     </div>
     ${!isFiltered ? `
       <h1 class="home-headline">언제 · 어디서 · 무엇을<br>한 번에 정하기</h1>
@@ -705,17 +737,20 @@ function renderCreate(mode){
     <div class="mode-list ${isFiltered ? 'has-form' : ''}" id="mode-grid">
       ${visibleModes.map(m => `
         <button class="mode-card-row ${mode === m.key ? 'is-active' : ''}" data-mode="${m.key}">
-          <div class="mcr-top">
-            <span class="mcr-title">${m.title}</span>
-            ${m.badge ? `<span class="mcr-badge">${m.badge}</span>` : ''}
+          <div class="mcr-content">
+            <span class="mcr-tag">${m.tag}</span>
+            <div class="mcr-title">${m.title}</div>
+            <div class="mcr-desc">${m.desc}</div>
           </div>
-          <div class="mcr-desc">${m.desc}</div>
+          <span class="mcr-arrow">›</span>
         </button>
       `).join('')}
     </div>
     <div id="create-form"></div>
     <div id="recent-rooms-section"></div>
   `;
+  const homeProfileBtn = document.getElementById('home-profile-group-btn');
+  if(homeProfileBtn) homeProfileBtn.addEventListener('click', ()=> openProfileGroupModal(null));
   document.querySelectorAll('.mode-card-row').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const clicked = btn.dataset.mode;
@@ -820,8 +855,15 @@ function renderCreateForm(mode){
           </select>
         </div>
         <label style="margin-top:20px;">참여자 프로필 미리 만들기 (선택)</label>
-        <textarea id="profile-bulk-input" rows="3" placeholder="예:&#10;지민&#10;현우&#10;서연"></textarea>
-        <div class="sub" style="margin:6px 0 0;">등록해두면 참여자가 목록에서 이름을 선택해서 답변해요. 비워두면 참여자가 직접 이름을 입력해요.</div>
+        <div class="sub" id="profile-group-summary" style="margin:0 0 8px;">선택된 그룹 없음</div>
+        <div class="row" style="gap:8px;">
+          <button type="button" class="btn btn-ghost btn-sm" id="open-profile-group-btn" style="flex:0 0 auto;">참여자 프로필 관리</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="clear-profile-group-btn" style="flex:0 0 auto; display:none;">선택 해제</button>
+        </div>
+        <label style="margin-top:14px;">이름 직접 추가 (그룹 없이, 입력 후 Enter)</label>
+        <input type="text" id="quick-profile-input" placeholder="이름 입력 후 Enter" />
+        <div class="chip-list" id="quick-profile-chips" style="margin-top:10px;"></div>
+        <div class="sub" style="margin:6px 0 0;">그룹을 선택하거나 이름을 직접 추가할 수 있어요 (둘 다 가능). 아무것도 안 하면 참여자가 직접 이름을 입력해요.</div>
         <div class="error-box" id="f-error" style="display:none;"></div>
         <button class="btn btn-primary" id="f-submit">방 만들기</button>
       </div>
@@ -835,6 +877,7 @@ function renderCreateForm(mode){
         document.querySelectorAll('#date-chips .chip').forEach(renderDateChipContent);
       });
     });
+    wireProfileGroupSection();
     currentDeadlinePicker = createDeadlinePickerController(defaultDeadline);
     const deadlineBtn = document.getElementById('deadline-trigger-btn');
     const refreshDeadlineBtn = () => { deadlineBtn.textContent = `마감 ${currentDeadlinePicker.getSummaryText()}`; };
@@ -874,13 +917,21 @@ function renderCreateForm(mode){
         <button class="btn btn-ghost btn-sm" id="opt-add" type="button">+ 메뉴 추가</button>
         <div class="sub" id="option-section-hint" style="margin:6px 0 0;">메뉴 후보를 안 정해도 돼요 — 참여자가 직접 텍스트로 메뉴를 적을 수도 있어요. 이름 없이 링크만 입력해도 돼요.</div>
         <label style="margin-top:20px;">참여자 프로필 미리 만들기 (선택)</label>
-        <textarea id="profile-bulk-input" rows="3" placeholder="예:&#10;지민&#10;현우&#10;서연"></textarea>
-        <div class="sub" style="margin:6px 0 0;">등록해두면 참여자가 목록에서 이름을 선택해서 답변해요. 비워두면 참여자가 직접 이름을 입력해요.</div>
+        <div class="sub" id="profile-group-summary" style="margin:0 0 8px;">선택된 그룹 없음</div>
+        <div class="row" style="gap:8px;">
+          <button type="button" class="btn btn-ghost btn-sm" id="open-profile-group-btn" style="flex:0 0 auto;">참여자 프로필 관리</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="clear-profile-group-btn" style="flex:0 0 auto; display:none;">선택 해제</button>
+        </div>
+        <label style="margin-top:14px;">이름 직접 추가 (그룹 없이, 입력 후 Enter)</label>
+        <input type="text" id="quick-profile-input" placeholder="이름 입력 후 Enter" />
+        <div class="chip-list" id="quick-profile-chips" style="margin-top:10px;"></div>
+        <div class="sub" style="margin:6px 0 0;">그룹을 선택하거나 이름을 직접 추가할 수 있어요 (둘 다 가능). 아무것도 안 하면 참여자가 직접 이름을 입력해요.</div>
         <div class="error-box" id="f-error" style="display:none;"></div>
         <button class="btn btn-primary" id="f-submit">방 만들기</button>
       </div>
     `;
     addOptionRow('', '메뉴명 (예: 크림파스타, 링크만 입력해도 OK)');
+    wireProfileGroupSection();
     currentDeadlinePicker = createDeadlinePickerController(defaultDeadline);
     const menuDeadlineBtn = document.getElementById('deadline-trigger-btn');
     const refreshMenuDeadlineBtn = () => { menuDeadlineBtn.textContent = `마감 ${currentDeadlinePicker.getSummaryText()}`; };
@@ -995,12 +1046,16 @@ function createDeadlinePickerController(defaultDate){
               <button type="button" class="tp-ampm-btn" data-value="PM">오후</button>
             </div>
             <div class="tp-hm">
-              <input type="text" inputmode="numeric" maxlength="2" class="tp-field" id="dl-hour-btn" />
+              <div class="tp-field-wrap">
+                <input type="text" inputmode="numeric" maxlength="2" class="tp-field" id="dl-hour-btn" />
+                <div class="tp-dropdown" id="dl-hour-dropdown"><div class="tp-dropdown-inner"></div></div>
+              </div>
               <span>:</span>
-              <input type="text" inputmode="numeric" maxlength="2" class="tp-field" id="dl-minute-btn" />
+              <div class="tp-field-wrap">
+                <input type="text" inputmode="numeric" maxlength="2" class="tp-field" id="dl-minute-btn" />
+                <div class="tp-dropdown" id="dl-minute-dropdown"><div class="tp-dropdown-inner"></div></div>
+              </div>
             </div>
-            <div class="tp-dropdown" id="dl-hour-dropdown"><div class="tp-dropdown-inner"></div></div>
-            <div class="tp-dropdown" id="dl-minute-dropdown"><div class="tp-dropdown-inner"></div></div>
           </div>
         </div>
       </div>
@@ -1117,19 +1172,24 @@ function createDeadlinePickerController(defaultDate){
     });
     const hourInput = document.getElementById('dl-hour-btn');
     const minuteInput = document.getElementById('dl-minute-btn');
+    function positionDropdown(fieldEl, ddEl){
+      const rect = fieldEl.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      ddEl.classList.toggle('open-up', spaceBelow < 190);
+    }
     hourInput.addEventListener('click', (e)=>{
       e.stopPropagation();
       const dd = document.getElementById('dl-hour-dropdown');
       const willOpen = dd.style.display !== 'block';
       closeDropdowns();
-      if(willOpen){ buildHourOptions(); dd.style.display = 'block'; hourInput.classList.add('is-open'); }
+      if(willOpen){ buildHourOptions(); positionDropdown(hourInput, dd); dd.style.display = 'block'; hourInput.classList.add('is-open'); }
     });
     minuteInput.addEventListener('click', (e)=>{
       e.stopPropagation();
       const dd = document.getElementById('dl-minute-dropdown');
       const willOpen = dd.style.display !== 'block';
       closeDropdowns();
-      if(willOpen){ buildMinuteOptions(); dd.style.display = 'block'; minuteInput.classList.add('is-open'); }
+      if(willOpen){ buildMinuteOptions(); positionDropdown(minuteInput, dd); dd.style.display = 'block'; minuteInput.classList.add('is-open'); }
     });
     hourInput.addEventListener('input', ()=>{ hourInput.value = hourInput.value.replace(/[^0-9]/g, '').slice(0, 2); });
     minuteInput.addEventListener('input', ()=>{ minuteInput.value = minuteInput.value.replace(/[^0-9]/g, '').slice(0, 2); });
@@ -1359,10 +1419,260 @@ function generateOwnerToken(){
   return 'tok-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
+/* ---------------- 참여자 프로필 그룹 (Supabase 저장, 코드로 기기 간 재사용) ---------------- */
+function getCreatorCode(){
+  let code = localStorage.getItem('schedCreatorCode');
+  if(!code){
+    code = generateShortCode();
+    localStorage.setItem('schedCreatorCode', code);
+  }
+  return code;
+}
+function generateShortCode(len = 8){
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // 헷갈리는 0/O, 1/I 제외
+  let out = '';
+  for(let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  return out;
+}
+
+let currentProfileGroupMembers = [];
+let currentQuickProfileNames = [];
+
+function renderQuickProfileChips(){
+  const list = document.getElementById('quick-profile-chips');
+  if(!list) return;
+  list.className = 'profile-grid';
+  const colorMap = buildAvatarColorMap(currentQuickProfileNames);
+  list.innerHTML = currentQuickProfileNames.map(name => `
+    <button type="button" class="profile-btn profile-btn-removable" data-qname="${escapeHtml(name)}" title="눌러서 삭제">
+      ${avatarHtml(name, 46, colorMap)}
+      <span>${escapeHtml(name)}</span>
+    </button>
+  `).join('');
+  list.querySelectorAll('.profile-btn[data-qname]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      currentQuickProfileNames = currentQuickProfileNames.filter(n => n !== btn.dataset.qname);
+      renderQuickProfileChips();
+    });
+  });
+}
+
+function wireProfileGroupSection(){
+  currentProfileGroupMembers = [];
+  currentQuickProfileNames = [];
+  const openBtn = document.getElementById('open-profile-group-btn');
+  const clearBtn = document.getElementById('clear-profile-group-btn');
+  const summary = document.getElementById('profile-group-summary');
+  if(!openBtn) return;
+  openBtn.addEventListener('click', ()=>{
+    openProfileGroupModal((group)=>{
+      currentProfileGroupMembers = [...group.members];
+      summary.textContent = `선택된 그룹: ${group.name} (${group.members.length}명)`;
+      clearBtn.style.display = 'inline-flex';
+    });
+  });
+  clearBtn.addEventListener('click', ()=>{
+    currentProfileGroupMembers = [];
+    summary.textContent = '선택된 그룹 없음';
+    clearBtn.style.display = 'none';
+  });
+  const quickInput = document.getElementById('quick-profile-input');
+  if(quickInput){
+    quickInput.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        const val = quickInput.value.trim();
+        if(val && !currentQuickProfileNames.includes(val)) currentQuickProfileNames.push(val);
+        quickInput.value = '';
+        renderQuickProfileChips();
+      }
+    });
+  }
+}
+
+async function openProfileGroupModal(onApply){
+  const client = getClient();
+  let myCode = getCreatorCode();
+  let groups = [];
+  let editingId = null; // 'new' 또는 group.id
+  let draftName = '';
+  let draftMembers = [];
+  let showCodeSwitch = false;
+  let loading = true;
+
+  async function loadGroups(){
+    loading = true;
+    render();
+    const { data } = await client.from('profile_groups').select().eq('creator_code', myCode).order('created_at', { ascending: true });
+    groups = (data || []).map(g => ({ ...g, members: Array.isArray(g.members) ? g.members : [] }));
+    loading = false;
+    render();
+  }
+
+  function buildHtml(){
+    return `
+      <h2>참여자 프로필 관리</h2>
+      <div class="pg-code-line">
+        내 코드 <strong>${escapeHtml(myCode)}</strong>
+        <button type="button" class="btn btn-ghost btn-sm" id="pg-copy-code" style="margin-top:0;">복사</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="pg-switch-code" style="margin-top:0;">다른 기기 코드 사용</button>
+      </div>
+      <div class="sub" style="margin:4px 0 14px;">이 코드를 다른 기기에서 입력하면 같은 그룹을 그대로 불러올 수 있어요.</div>
+      ${showCodeSwitch ? `
+        <div class="row" style="gap:8px; margin-bottom:14px;">
+          <input type="text" id="pg-code-input" placeholder="다른 기기의 코드 입력" style="flex:1;" />
+          <button type="button" class="btn btn-primary btn-sm" id="pg-code-apply" style="margin-top:0; flex:0 0 auto;">적용</button>
+        </div>
+      ` : ''}
+      ${loading ? `<div class="loading" style="padding:20px 0;">불러오는 중...</div>` : `
+        <div class="profile-group-list">
+          ${groups.length === 0 ? `<div class="sub" style="margin:0 0 14px;">저장된 그룹이 없어요.</div>` : groups.map(g => `
+            <div class="profile-group-row">
+              <div class="pg-info">
+                <div class="pg-name">${escapeHtml(g.name)}</div>
+                <div class="pg-count">${g.members.length}명 · ${g.members.slice(0,3).map(escapeHtml).join(', ')}${g.members.length > 3 ? ' 외' : ''}</div>
+              </div>
+              <div class="pg-actions">
+                ${onApply ? `<button type="button" class="btn btn-accent btn-sm" data-action="use" data-gid="${g.id}" style="margin-top:0;">사용하기</button>` : ''}
+                <button type="button" class="btn btn-ghost btn-sm" data-action="edit" data-gid="${g.id}" style="margin-top:0;">수정</button>
+                <button type="button" class="btn btn-danger-ghost btn-sm" data-action="delete" data-gid="${g.id}" style="margin-top:0;">삭제</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        ${editingId ? `
+          <div class="profile-group-editor">
+            <label>그룹 이름</label>
+            <input type="text" id="pg-name-input" value="${escapeHtml(draftName)}" placeholder="예: 우리팀" />
+            <label>참여자 추가 (이름 입력 후 Enter)</label>
+            <input type="text" id="pg-member-input" placeholder="이름 입력 후 Enter" />
+            <div class="profile-grid" id="pg-member-chips" style="margin-top:10px;">
+              ${draftMembers.map(name => `
+                <button type="button" class="profile-btn profile-btn-removable" data-remove="${escapeHtml(name)}" title="눌러서 삭제">
+                  ${avatarHtml(name, 46, buildAvatarColorMap(draftMembers))}
+                  <span>${escapeHtml(name)}</span>
+                </button>
+              `).join('')}
+            </div>
+            <div class="row" style="gap:8px; margin-top:16px;">
+              <button type="button" class="btn btn-ghost" id="pg-cancel" style="margin-top:0;">취소</button>
+              <button type="button" class="btn btn-primary" id="pg-save" style="margin-top:0;">저장</button>
+            </div>
+          </div>
+        ` : `
+          <button type="button" class="add-option-row" id="pg-new-btn" style="margin-top:14px;">+ 새 그룹 만들기</button>
+        `}
+      `}
+    `;
+  }
+
+  function render(focusMemberInput){
+    const overlay = showModal(buildHtml());
+    const panelEl = overlay.querySelector('.modal-panel');
+    if(panelEl) panelEl.classList.add('modal-panel-wide');
+    attachEvents();
+    if(focusMemberInput){
+      const el = document.getElementById('pg-member-input');
+      if(el) el.focus();
+    }
+  }
+
+  function attachEvents(){
+    const copyBtn = document.getElementById('pg-copy-code');
+    if(copyBtn) copyBtn.addEventListener('click', (e) => copyToClipboard(myCode, e.target));
+    const switchBtn = document.getElementById('pg-switch-code');
+    if(switchBtn) switchBtn.addEventListener('click', ()=>{ showCodeSwitch = !showCodeSwitch; render(); });
+    const codeApplyBtn = document.getElementById('pg-code-apply');
+    if(codeApplyBtn){
+      codeApplyBtn.addEventListener('click', async ()=>{
+        const val = document.getElementById('pg-code-input').value.trim().toUpperCase();
+        if(!val){ showAlertModal('코드를 입력해주세요.'); return; }
+        myCode = val;
+        localStorage.setItem('schedCreatorCode', myCode);
+        showCodeSwitch = false;
+        await loadGroups();
+      });
+    }
+    if(loading) return;
+    document.querySelectorAll('[data-action="use"]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const g = groups.find(x => x.id === btn.dataset.gid);
+        closeModal();
+        if(g && onApply) onApply(g);
+      });
+    });
+    document.querySelectorAll('[data-action="edit"]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const g = groups.find(x => x.id === btn.dataset.gid);
+        if(!g) return;
+        editingId = g.id; draftName = g.name; draftMembers = [...g.members];
+        render();
+      });
+    });
+    document.querySelectorAll('[data-action="delete"]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const g = groups.find(x => x.id === btn.dataset.gid);
+        if(!g) return;
+        showConfirmModal(`"${g.name}" 그룹을 삭제할까요?`, async ()=>{
+          await client.from('profile_groups').delete().eq('id', g.id);
+          await loadGroups();
+        });
+      });
+    });
+    const newBtn = document.getElementById('pg-new-btn');
+    if(newBtn) newBtn.addEventListener('click', ()=>{
+      editingId = 'new'; draftName = ''; draftMembers = [];
+      render(true);
+    });
+    const memberInput = document.getElementById('pg-member-input');
+    if(memberInput){
+      memberInput.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          const val = memberInput.value.trim();
+          if(val && !draftMembers.includes(val)) draftMembers.push(val);
+          const nameInput = document.getElementById('pg-name-input');
+          if(nameInput) draftName = nameInput.value;
+          render(true);
+        }
+      });
+    }
+    document.querySelectorAll('.profile-btn[data-remove]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        draftMembers = draftMembers.filter(n => n !== btn.dataset.remove);
+        const nameInput = document.getElementById('pg-name-input');
+        if(nameInput) draftName = nameInput.value;
+        render(true);
+      });
+    });
+    const cancelBtn = document.getElementById('pg-cancel');
+    if(cancelBtn) cancelBtn.addEventListener('click', ()=>{ editingId = null; render(); });
+    const saveBtn = document.getElementById('pg-save');
+    if(saveBtn){
+      saveBtn.addEventListener('click', async ()=>{
+        const nameInput = document.getElementById('pg-name-input');
+        const name = nameInput.value.trim();
+        if(!name){ showAlertModal('그룹 이름을 입력해주세요.'); return; }
+        if(draftMembers.length === 0){ showAlertModal('참여자를 한 명 이상 추가해주세요.'); return; }
+        saveBtn.disabled = true; saveBtn.textContent = '저장 중...';
+        if(editingId === 'new'){
+          const { error } = await client.from('profile_groups').insert({ creator_code: myCode, name, members: draftMembers });
+          if(error){ showAlertModal('저장 실패: ' + error.message); saveBtn.disabled = false; saveBtn.textContent = '저장'; return; }
+        } else {
+          const { error } = await client.from('profile_groups').update({ name, members: draftMembers }).eq('id', editingId);
+          if(error){ showAlertModal('저장 실패: ' + error.message); saveBtn.disabled = false; saveBtn.textContent = '저장'; return; }
+        }
+        editingId = null;
+        await loadGroups();
+      });
+    }
+  }
+
+  await loadGroups();
+}
+
 async function createPreProfiles(client, roomId){
-  const input = document.getElementById('profile-bulk-input');
-  if(!input) return;
-  const names = [...new Set(input.value.split('\n').map(s => s.trim()).filter(Boolean))];
+  const names = [...new Set([...currentProfileGroupMembers, ...currentQuickProfileNames])];
   if(names.length === 0) return;
   try{
     await client.from('participants').insert(
@@ -1769,6 +2079,7 @@ async function renderVoteForm(room, items, participant){
         <span><i class="legend-dot is-candidate"></i>후보 날짜</span>
         <span><i class="legend-dot is-voted"></i>내가 투표함</span>
       </div>
+      <div class="vote-cal-hint">후보 날짜 이외의 날짜를 선택하면 후보로 추가할 수 있어요.</div>
     `;
   }
 
@@ -1882,28 +2193,10 @@ async function renderVoteForm(room, items, participant){
     ${isTime ? `<div class="calendar-wrap" id="vote-calendar-wrap" style="margin:16px auto 0;">${buildVoteCalendarHtml()}</div>` : ''}
     <div id="toast-area"></div>
     <div id="vote-body" style="margin-top:16px;">${renderBody()}</div>
-    ${isTime ? `
-      <button class="add-option-row" id="add-slot-btn" type="button" style="margin-top:12px;">+ 날짜/시간 추가하기</button>
-      <div id="add-slot-form" style="display:none; margin-top:10px;">
-        <div class="row">
-          <input type="date" id="add-slot-date" />
-        </div>
-        ${hasTimeSlots ? `
-          <div class="row" style="margin-top:8px;">
-            <input type="time" id="add-slot-time-from" value="19:00" />
-            <input type="time" id="add-slot-time-to" value="21:00" />
-          </div>
-        ` : ''}
-        <div class="row" style="margin-top:8px; gap:8px;">
-          <button type="button" class="btn btn-ghost btn-sm" id="add-slot-cancel">취소</button>
-          <button type="button" class="btn btn-primary btn-sm" id="add-slot-confirm" style="margin-top:0;">추가</button>
-        </div>
-      </div>
-    ` : ''}
     ${!isTime ? '<div class="tie-hint">동점이면 방장이 최종 조율해요</div>' : ''}
-    <label style="margin-top:20px;">${isTime ? '원하는 날짜/시간을 직접 적어주세요' : (room.decide_target === 'place' ? '원하는 장소를 직접 적어주세요' : '원하는 메뉴를 직접 적어주세요')} (선택)</label>
+    <label style="margin-top:20px;">${isTime ? '다른 요구사항이나 특이사항이 있으면 적어주세요' : (room.decide_target === 'place' ? '원하는 장소를 직접 적어주세요' : '원하는 메뉴를 직접 적어주세요')} (선택)</label>
     <input type="text" id="free-text-input"
-      placeholder="${isTime ? '예: 8/26 저녁 7시가 더 편해요' : (room.decide_target === 'place' ? '예: 우리 동네 파스타집 어때요' : '예: 크림파스타 먹고 싶어요')}"
+      placeholder="${isTime ? '예: 저녁 7시 이후면 아무 때나 괜찮아요' : (room.decide_target === 'place' ? '예: 우리 동네 파스타집 어때요' : '예: 크림파스타 먹고 싶어요')}"
       value="${escapeHtml(participant.free_text || '')}" />
     <button class="btn btn-primary" id="vote-submit">${(selected.size > 0 || participant.free_text) ? '수정하기' : '제출하기'}</button>
   `;
@@ -2006,44 +2299,6 @@ async function renderVoteForm(room, items, participant){
           attachRowEvents();
         }
       });
-    });
-  }
-
-  const addSlotBtn = document.getElementById('add-slot-btn');
-  if(addSlotBtn){
-    const addSlotForm = document.getElementById('add-slot-form');
-    addSlotBtn.addEventListener('click', ()=>{
-      addSlotForm.style.display = 'block';
-      addSlotBtn.style.display = 'none';
-    });
-    document.getElementById('add-slot-cancel').addEventListener('click', ()=>{
-      addSlotForm.style.display = 'none';
-      addSlotBtn.style.display = 'block';
-    });
-    document.getElementById('add-slot-confirm').addEventListener('click', async ()=>{
-      const dateVal = document.getElementById('add-slot-date').value;
-      if(!dateVal){ showAlertModal('날짜를 선택해주세요.'); return; }
-      let newSlots;
-      if(hasTimeSlots){
-        const fromVal = document.getElementById('add-slot-time-from').value;
-        const toVal = document.getElementById('add-slot-time-to').value;
-        if(!fromVal || !toVal){ showAlertModal('시작/종료 시간을 선택해주세요.'); return; }
-        if(fromVal >= toVal){ showAlertModal('종료 시간이 시작 시간보다 늦어야 해요.'); return; }
-        newSlots = generateTimeSlots([dateVal], fromVal, toVal, 30);
-      } else {
-        newSlots = generateDateOnlySlots([dateVal]);
-      }
-      const existingKeys = new Set(items.map(it => `${it.slot_date}|${it.slot_time}`));
-      newSlots = newSlots.filter(s => !existingKeys.has(`${s.slot_date}|${s.slot_time}`));
-      if(newSlots.length === 0){ showAlertModal('이미 있는 시간대예요.'); return; }
-      const payload = newSlots.map((s, i) => ({ room_id: room.id, ...s, sort_order: items.length + i }));
-      const { data: newItems, error } = await client.from('items').insert(payload).select();
-      if(error){ showAlertModal('추가 실패: ' + error.message); return; }
-      newItems.forEach(ni => { items.push(ni); countMap[ni.id] = 0; });
-      document.getElementById('vote-body').innerHTML = renderBody();
-      attachRowEvents();
-      addSlotForm.style.display = 'none';
-      addSlotBtn.style.display = 'block';
     });
   }
 
