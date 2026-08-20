@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>언제모여 - 시간/메뉴 조율</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --paper: #FFFFFF;
+    --ink: #17181C;
+    --ink-soft: #8B8B92;
+    --ink-faint: #B8B8BE;
+    --accent: #E8542F;
+    --accent-soft: #FCEAE3;
+    --accent-deep: #C7431F;
+    --line: #EAE8E4;
+    --line-strong: #D8D6D1;
+    --danger: #C7431F;
+    --white: #FFFFFF;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  #app{
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 16px 80px;
+    min-height: 100vh;
+  }
+  @media (min-width: 768px){
+    #app{ max-width: 720px; padding: 40px 24px 100px; }
+  }
+  @media (min-width: 1100px){
+    #app{ max-width: 960px; }
+  }
+  h1{ font-size: 21px; font-weight: 700; margin: 4px 0 4px; letter-spacing: -0.02em; }
+  h2{ font-size: 17px; font-weight: 700; margin: 0 0 12px; }
+  .sub{ color: var(--ink-soft); font-size: 13px; margin: 0 0 20px; }
+  .card{
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  label{ display:block; font-size: 13px; font-weight: 600; color: var(--ink); margin: 14px 0 6px; }
+  label:first-child{ margin-top:0; }
+  input[type=text], input[type=date], input[type=time], input[type=datetime-local], input[type=url], input[type=number], select, textarea{
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: 9px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--white);
+    color: var(--ink);
+  }
+  textarea{ resize: vertical; }
+  input:focus, select:focus, button:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  .row{ display:flex; gap: 8px; }
+  .row > *{ flex: 1; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-primary{ background: var(--ink); color: var(--white); width: 100%; margin-top: 18px; }
+  .btn-primary:disabled{ background: var(--ink-faint); cursor: not-allowed; }
+  .btn-accent{ background: var(--accent); color: var(--white); width: 100%; margin-top: 18px; }
+  .btn-accent:disabled{ background: var(--ink-faint); cursor: not-allowed; }
+  .btn-ghost{ background: var(--white); color: var(--ink); border: 1px solid var(--line-strong); }
+  .btn-outline-accent{ background: var(--white); color: var(--accent-deep); border: 1.5px solid var(--accent); }
+  .btn-outline-accent:hover{ background: var(--accent-soft); }
+  .btn-sm{ padding: 7px 12px; font-size: 13px; border-radius: 8px; }
+  .btn-danger-ghost{ background: transparent; color: var(--danger); border: 1px solid #EFC9BC; }
+
+  .chip-list{ display:flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip{
+    display:flex; align-items:center; gap: 8px;
+    background: var(--accent-soft); color: var(--accent-deep);
+    padding: 6px 8px 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  }
+  .chip .chip-remove{
+    background:none; border:none; color: var(--accent-deep); cursor:pointer;
+    font-size: 12px; font-weight: 700; line-height:1; padding: 4px 6px; font-family: inherit;
+  }
+  .chip.chip-datetime{
+    border-radius: 12px; padding: 8px 10px; width: 100%;
+  }
+  .chip-datetime .chip-date-label{ flex: 0 0 auto; min-width: 34px; }
+  .chip-datetime input[type=time]{
+    width: auto; flex: 1; min-width: 0; padding: 4px 6px; font-size: 12.5px;
+    border-radius: 6px; background: var(--white);
+  }
+
+  /* --- 세그먼트 컨트롤 (선택방식) --- */
+  .segmented{
+    display:flex; border: 1px solid var(--line-strong); border-radius: 10px; padding: 3px; gap: 3px;
+  }
+  .segmented-btn{
+    flex: 1; border: none; background: transparent; border-radius: 8px;
+    padding: 10px 8px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft);
+    cursor: pointer; font-family: inherit; transition: background-color .12s ease, color .12s ease;
+  }
+  .segmented-btn.is-active{ background: var(--accent); color: var(--white); }
+
+  /* --- 커스텀 캘린더 (컴팩트, 정사각형 형태) --- */
+  .date-picker-row{ display:flex; gap: 14px; align-items:flex-start; flex-wrap: wrap; margin-top: 10px; }
+  .calendar-wrap{
+    position: relative;
+    width: 240px; max-width: 100%;
+    border: 1px solid var(--line); border-radius: 12px; padding: 14px;
+    flex: 0 0 auto;
+  }
+  .selected-dates-col{ flex: 1; min-width: 130px; padding-top: 4px; }
+  .selected-dates-col .label-inline{ font-size: 12px; font-weight: 700; color: var(--ink-soft); margin-bottom: 8px; }
+  .dl-selected-date-line{ display:flex; align-items:center; gap: 8px; }
+  .dl-selected-date-line .label-inline{ font-size: 12px; font-weight: 700; color: var(--ink-soft); }
+  .dl-selected-date-line #dl-selected-date{ font-weight: 700; font-size: 14px; }
+
+  /* --- 시간 선택 스피너 (오전/오후 + 시:분 + 드롭다운) --- */
+  .time-picker{ position: relative; }
+  .tp-ampm{ display:flex; gap: 6px; margin-bottom: 8px; }
+  .tp-ampm-btn{
+    border: 1px solid var(--line-strong); border-radius: 8px; background: var(--white);
+    color: var(--ink-soft); font-size: 12.5px; font-weight: 600; padding: 6px 10px;
+    cursor: pointer; font-family: inherit;
+  }
+  .tp-ampm-btn.is-active{ background: var(--ink); color: var(--white); border-color: var(--ink); }
+  .tp-hm{ display:flex; align-items:center; gap: 6px; font-size: 15px; font-weight: 700; }
+  .tp-field{
+    border: 1.5px solid var(--line-strong); border-radius: 8px; background: var(--white);
+    padding: 7px 12px; font-size: 15px; font-weight: 700; color: var(--ink);
+    cursor: pointer; font-family: inherit; width: 52px; text-align: center;
+  }
+  .tp-field.is-open{ border-color: var(--accent); color: var(--accent-deep); }
+  .tp-dropdown{
+    display:none; position:absolute; z-index: 20; margin-top: 4px;
+    background: var(--white); border: 1px solid var(--line); border-radius: 10px;
+    min-width: 60px; overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  }
+  .tp-dropdown-inner{ max-height: 160px; overflow-y: auto; }
+  .tp-option{
+    padding: 8px 14px; font-size: 14px; color: var(--ink); cursor: pointer; text-align:center;
+  }
+  .tp-option:hover{ background: var(--line); }
+  .tp-option.is-active{ color: var(--accent-deep); font-weight: 700; background: var(--accent-soft); }
+
+  /* --- 공용 모달 --- */
+  .modal-overlay{
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200;
+    display:flex; align-items:center; justify-content:center; padding: 20px;
+  }
+  .modal-panel{
+    background: var(--white); border-radius: 16px; padding: 22px;
+    max-width: 360px; width: 100%; max-height: 85vh; overflow-y: auto;
+  }
+  .modal-panel h2{ margin: 0 0 14px; }
+
+  /* --- 투표페이지 후보 캘린더 --- */
+  .vote-cal-day{
+    aspect-ratio: 1; border: none; border-radius: 6px; padding: 0;
+    display:flex; align-items:center; justify-content:center; font-size: 11.5px; font-weight: 600;
+    cursor: pointer; font-family: inherit; -webkit-appearance:none; appearance:none;
+    background: none; color: var(--ink);
+  }
+  .vote-cal-day:hover:not(:disabled){ background: var(--line); }
+  .vote-cal-day.is-empty{ visibility: hidden; cursor:default; }
+  .vote-cal-day.is-disabled{ color: var(--ink-faint); cursor: not-allowed; opacity: 0.4; }
+  .vote-cal-day.is-candidate{ background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; }
+  .vote-cal-day.is-voted{ box-shadow: inset 0 0 0 2px var(--accent); }
+  .vote-cal-legend{ display:flex; gap: 14px; margin-top: 10px; font-size: 11.5px; color: var(--ink-soft); }
+  .legend-dot{ display:inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; vertical-align: middle; background: var(--line); }
+  .legend-dot.is-candidate{ background: var(--accent-soft); border: 1px solid var(--accent-deep); }
+  .legend-dot.is-voted{ background: var(--white); box-shadow: inset 0 0 0 2px var(--accent); }
+  .modal-slot-row{
+    display:flex; align-items:center; gap: 10px; padding: 10px 4px;
+    border-bottom: 1px solid var(--line); font-size: 14.5px; cursor: pointer;
+  }
+  .modal-slot-row:last-child{ border-bottom: none; }
+  .modal-slot-row input[type=checkbox]{ width: 20px; height: 20px; accent-color: var(--accent); flex-shrink:0; }
+  .calendar-header{ display:flex; align-items:center; justify-content: space-between; margin-bottom: 10px; }
+  .calendar-header span{ font-weight: 700; font-size: 13px; }
+  .cal-nav{
+    background:none; border: 1px solid var(--line-strong); border-radius: 7px; padding: 4px 8px;
+    font-size: 11.5px; font-weight: 600; color: var(--ink-soft); cursor:pointer; font-family: inherit;
+  }
+  .cal-nav:hover:not(:disabled){ border-color: var(--accent); color: var(--accent); }
+  .cal-nav:disabled{ opacity: 0.35; cursor: not-allowed; }
+  .calendar-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cal-day{
+    aspect-ratio: 1; border: none; background: none; border-radius: 6px; padding: 0;
+    -webkit-appearance: none; appearance: none;
+    font-size: 11.5px; color: var(--ink); cursor: pointer; font-family: inherit;
+  }
+  .cal-day:hover:not(:disabled){ background: var(--line); }
+  .cal-day.is-empty{ visibility: hidden; cursor: default; }
+  .cal-day.is-disabled{ color: var(--ink-faint); cursor: not-allowed; opacity: 0.4; }
+  .cal-day.is-sun{ color: var(--accent); }
+  .cal-day.is-sun.is-disabled{ color: #F0C4B8; }
+  .cal-day.is-selected{ background: var(--accent); color: var(--white); font-weight: 700; }
+
+  .option-row{ display:flex; gap: 8px; margin-bottom: 8px; align-items:center; }
+  .option-row input{ flex: 1; }
+
+  .link-row{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    margin: 16px 0;
+    display:flex; gap: 10px; align-items:center; justify-content: space-between; flex-wrap: wrap;
+  }
+  .link-row code{ font-size: 12px; word-break: break-all; color: var(--ink-soft); }
+
+  .error-box{ background: var(--accent-soft); color: var(--danger); border-radius: 10px; padding: 12px 14px; font-size: 13px; margin: 10px 0; }
+  .toast{ background: var(--accent-soft); color: var(--accent-deep); border-radius: 10px; padding: 12px 14px; font-size: 13px; margin: 10px 0; font-weight: 600; }
+
+  /* --- room header --- */
+  .room-header{ position: relative; margin-bottom: 18px; padding-bottom: 14px; padding-right: 84px; border-bottom: 1px solid var(--line); }
+  .header-copy-btn{
+    position: absolute; top: 0; right: 0;
+    background: var(--white); border: 1px solid var(--line-strong); border-radius: 8px;
+    color: var(--ink); font-size: 12px; font-weight: 600; padding: 6px 10px;
+    cursor: pointer; font-family: inherit;
+  }
+  .header-copy-btn:hover{ border-color: var(--accent); color: var(--accent-deep); }
+  .header-top{ display:flex; align-items:center; justify-content: space-between; }
+  .eyebrow{ font-size: 12px; font-weight: 700; color: var(--ink-soft); letter-spacing: .01em; }
+  .deadline-badge{ font-size: 12.5px; font-weight: 800; color: var(--accent); }
+  .deadline-badge.is-over{ color: var(--ink-soft); }
+  .room-header .meta{ font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .place-badge{ font-size: 12.5px; color: var(--accent-deep); font-weight: 600; margin-top: 4px; }
+  .badge-row{ display:flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .pill-badge{
+    font-size: 12px; font-weight: 700; color: var(--accent-deep);
+    background: var(--accent-soft); border: 1px solid var(--accent-soft); border-radius: 999px; padding: 4px 10px;
+  }
+  .header-actions{ display:flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+  /* --- time-mode slot voting (탭형 로우, 얇은 진행바 + 실시간 인원수) --- */
+  .slots-container{ display:flex; flex-direction: column; gap: 22px; }
+  @media (min-width: 768px){
+    .slots-container{ flex-direction: row; overflow-x: auto; gap: 16px; padding-bottom: 8px; }
+    .date-col{ flex: 0 0 170px; }
+  }
+  .date-col-title{
+    font-weight: 700; font-size: 13.5px; margin-bottom: 8px; color: var(--ink-soft);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .slot-item{
+    position: relative; overflow: hidden;
+    display:flex; align-items:center; justify-content: space-between; gap: 10px;
+    padding: 11px 12px; border-bottom: 1px solid var(--line); border-radius: 8px;
+    cursor: pointer; user-select: none; transition: background-color .1s ease;
+  }
+  .slot-item .slot-item-bar{
+    position:absolute; left:0; top:0; bottom:0; z-index:0;
+    background: var(--line); width: 2px;
+  }
+  .slot-item .slot-time, .slot-item .slot-count{ position: relative; z-index: 1; font-size: 14.5px; }
+  .slot-item .slot-count{ font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .slot-item.is-selected{ background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; }
+  .slot-item.is-selected .slot-item-bar{ background: #F5C7B6; }
+  .slot-item.is-selected .slot-count{ color: var(--accent-deep); font-weight: 700; }
+
+  /* --- menu-mode voting (모던 카드, 아이콘 없이 보더/배경으로 선택 표시) --- */
+  .options-grid{ display:grid; grid-template-columns: 1fr; gap: 10px; }
+  @media (min-width: 600px){ .options-grid{ grid-template-columns: 1fr 1fr; } }
+  .option-card{
+    border:1px solid var(--line); border-radius:12px; padding: 16px;
+    cursor: pointer; transition: border-color .12s ease, background-color .12s ease;
+  }
+  .option-card.is-selected{ border-color: var(--accent); background: var(--accent-soft); }
+  .option-card .opt-name{ font-weight: 700; font-size: 15px; }
+  .option-card.is-selected .opt-name{ color: var(--accent-deep); }
+  .option-card .opt-meta{ font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .option-card .opt-bar-track{ height: 4px; background: var(--line); border-radius: 999px; margin-top: 10px; overflow:hidden; }
+  .option-card .opt-bar-fill{ height: 100%; background: var(--accent); border-radius: 999px; }
+  .option-card .opt-foot{ display:flex; justify-content: space-between; align-items:center; margin-top: 6px; }
+  .option-card .opt-count{ font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .option-card a{ color: var(--accent); font-size: 12.5px; text-decoration: none; }
+  .option-card a:hover{ text-decoration: underline; }
+  .add-option-row{
+    border: 1.5px dashed var(--line-strong); border-radius: 12px; padding: 13px;
+    text-align:center; color: var(--ink-soft); font-size: 13.5px; font-weight: 600; cursor: pointer;
+    background: none; width: 100%; font-family: inherit; margin-top: 14px;
+  }
+  .add-option-row:hover{ border-color: var(--accent); color: var(--accent); }
+  .top-bar{ display:flex; align-items:center; gap:10px; margin-bottom: 26px; }
+  .top-bar-back{
+    background:none; border:none; font-size:18px; line-height:1; color: var(--ink);
+    cursor:pointer; padding: 4px 6px 4px 0; font-family: inherit;
+  }
+  .top-bar-title{ font-size: 14px; font-weight: 700; color: var(--ink); }
+  .home-headline{ font-size: 25px; font-weight: 800; line-height: 1.32; letter-spacing: -0.02em; margin: 0 0 10px; }
+  .home-sub{ font-size: 13.5px; color: var(--ink-soft); margin: 0 0 24px; line-height: 1.55; }
+
+  .mode-list{ display:flex; flex-direction:column; gap: 10px; }
+  .mode-list.has-form{ margin-bottom: 20px; }
+  .mode-card-row{
+    text-align:left; width:100%; background: var(--white);
+    border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 18px; cursor: pointer; font-family: inherit;
+    transition: border-color .12s ease, background-color .12s ease;
+  }
+  .mode-card-row:hover{ border-color: var(--accent); }
+  .mode-card-row.is-active{ border-color: var(--accent); background: var(--accent-soft); }
+  .mcr-top{ display:flex; align-items:center; gap: 8px; }
+  .mcr-title{ font-weight: 700; font-size: 15.5px; }
+  .mode-card-row.is-active .mcr-title{ color: var(--accent-deep); }
+  .mcr-badge{
+    font-size: 11px; font-weight: 700; color: var(--accent-deep);
+    background: var(--accent-soft); padding: 2px 8px; border-radius: 999px;
+  }
+  .mcr-desc{ font-size: 12.5px; color: var(--ink-soft); margin-top: 4px; }
+
+  .recent-divider{ height: 1px; background: var(--line); margin: 26px 0 16px; }
+  .recent-label{ font-size: 12px; color: var(--ink-soft); font-weight: 700; margin-bottom: 6px; }
+  .recent-item{ display:block; text-decoration:none; color:inherit; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .recent-item:last-child{ border-bottom:none; }
+  .recent-item-top{ display:flex; align-items:center; gap: 8px; }
+  .recent-item-title{ font-weight: 700; font-size: 14.5px; color: var(--ink); }
+  .recent-item-badge{ font-size: 11.5px; font-weight: 800; color: var(--accent); }
+  .recent-item-sub{ font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+
+  .tie-hint{ font-size: 12.5px; color: var(--ink-soft); margin-top: 14px; text-align: center; }
+
+  /* --- 구글 스타일 랜덤컬러 아바타 --- */
+  .avatar-circle{
+    border-radius: 50%; display:inline-flex; align-items:center; justify-content:center;
+    color: #fff; font-weight: 800; flex-shrink: 0; font-family: inherit; line-height: 1;
+  }
+  .profile-grid{ display:flex; flex-wrap:wrap; gap: 14px; margin-top: 12px; }
+  .profile-btn{
+    display:flex; flex-direction:column; align-items:center; gap: 6px;
+    background:none; border:none; cursor:pointer; font-family:inherit; width: 68px; padding: 0;
+  }
+  .profile-btn span{ font-size: 12px; color: var(--ink); font-weight: 600; text-align:center; word-break: keep-all; }
+  .profile-btn:disabled{ opacity: 0.35; cursor: not-allowed; }
+  .name-chip-row{ display:flex; flex-wrap:wrap; gap: 8px; }
+  .name-chip{ display:inline-flex; align-items:center; gap: 5px; font-size: 12.5px; }
+  .meta-with-avatar{ display:flex; align-items:center; gap: 6px; margin-top: 2px; }
+
+  /* --- 벌칙뽑기 · 순서정하기 (박스 연출) --- */
+  .prize-box-wrap{ display:flex; justify-content:center; padding: 24px 0 8px; }
+  .prize-box{
+    width: 130px; height: 130px; border-radius: 20px;
+    background: var(--ink); display:flex; align-items:center; justify-content:center;
+    position: relative; padding: 10px;
+  }
+  .prize-box.is-shaking{ animation: pbx-shake 0.9s ease-in-out; }
+  .prize-box-face{ color: var(--white); font-size: 42px; font-weight: 800; }
+  .prize-box-name{
+    color: var(--white); font-size: 21px; font-weight: 700; text-align:center;
+    word-break: keep-all; line-height: 1.3; letter-spacing: -0.02em;
+  }
+  .prize-box-pop{ animation: pbx-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .prize-winner-label{
+    font-size: 13px; font-weight: 700; color: var(--accent-deep); margin-top: 14px;
+  }
+  .ladder-rest-list{ margin-top: 18px; text-align:left; }
+  @keyframes pbx-shake{
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-7px) rotate(-3deg); }
+    20%, 40%, 60%, 80% { transform: translateX(7px) rotate(3deg); }
+  }
+  @keyframes pbx-pop{
+    0% { transform: scale(0.2); opacity: 0; }
+    65% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* --- results --- */
+  .confirmed-banner{
+    background: var(--ink); color: var(--white); border-radius: 12px;
+    padding: 16px; margin-bottom: 16px; text-align:center;
+  }
+  .confirmed-banner .cb-label{ font-size: 12px; color: #C7C7CC; font-weight:600; margin-bottom: 4px; }
+  .confirmed-banner .cb-value{ font-size: 19px; font-weight: 800; }
+
+  /* --- 시간조율 결과 캘린더 --- */
+  .result-best-date-banner{
+    background: var(--accent-soft); color: var(--accent-deep); border-radius: 10px;
+    padding: 12px 14px; font-size: 13.5px; font-weight: 600; margin-bottom: 16px; text-align:center;
+  }
+  .result-best-date-banner strong{ font-size: 15px; font-weight: 800; }
+  .result-calendar-block{ margin: 0 auto 18px; width: 240px; max-width: 100%; }
+  .result-calendar-title{ font-weight: 700; font-size: 13.5px; margin-bottom: 8px; color: var(--ink-soft); }
+  .result-calendar-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .result-cal-day{
+    aspect-ratio: 1; border: none; border-radius: 6px; padding: 1px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap: 1px;
+    cursor: pointer; font-family: inherit; -webkit-appearance:none; appearance:none;
+  }
+  .result-cal-day.is-empty{ visibility:hidden; cursor:default; }
+  .result-cal-day:not(.has-data){ color: var(--ink-faint); cursor: default; }
+  .result-cal-day .rcd-day{ font-size: 11.5px; font-weight: 700; }
+  .result-cal-day .rcd-count{ font-size: 8px; font-weight: 800; }
+  .result-cal-day.is-selected{ outline: 2px solid var(--ink); outline-offset: 1px; }
+
+  .result-date-title{
+    font-weight: 700; font-size: 13px; margin: 20px 0 8px; color: var(--white);
+    background: var(--ink); display:inline-flex; align-items:center; gap: 8px;
+    padding: 5px 12px; border-radius: 999px;
+  }
+  .result-date-title:first-child{ margin-top: 0; }
+  .result-date-title .rd-count{ color: var(--accent); font-weight: 800; }
+  .result-item{ border:1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; position: relative; overflow: hidden; }
+  .result-item .bar-bg{ position:absolute; left:0; top:0; bottom:0; background: var(--accent-soft); z-index:0; }
+  .result-item .content{ position: relative; z-index: 1; display:flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .result-item .label{ font-size: 14.5px; font-weight: 600; }
+  .result-item .count{ font-size: 13px; color: var(--accent-deep); font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .result-item .names{ position: relative; z-index:1; font-size: 12.5px; color: var(--ink-soft); margin-top: 8px; display:none; }
+  .result-item.expanded .names{ display:block; }
+  .result-item.is-top{ background: var(--accent); border-color: var(--accent); }
+  .result-item.is-top .bar-bg{ display:none; }
+  .result-item.is-top .label, .result-item.is-top .count{ color: var(--white); }
+  .result-item.is-top .names{ color: rgba(255,255,255,.85); }
+  .result-item.is-confirm-selected{ outline: 2px solid var(--ink); outline-offset: 2px; }
+  .stamp-badge{
+    display:inline-flex; align-items:center; gap:4px;
+    background: rgba(255,255,255,.22); color: var(--white);
+    font-size: 11px; font-weight: 800;
+    padding: 2px 8px; border-radius: 999px;
+    margin-left: 8px;
+  }
+  .empty-state{ text-align:center; color: var(--ink-soft); font-size: 13.5px; padding: 40px 10px; }
+  .loading{ text-align:center; color: var(--ink-soft); padding: 60px 10px; font-size: 14px; }
+  a.plain{ color: var(--accent); font-size: 13px; text-decoration: none; font-weight: 600; }
+  a.plain:hover{ text-decoration: underline; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =========================================================
+   설정: Supabase 프로젝트 URL / anon key 를 여기에 채워넣으세요.
+   Supabase 대시보드 > Project Settings > API 에서 확인 가능.
+   ========================================================= */
+const SUPABASE_URL = "https://drytifyhuwvocksewfcx.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyeXRpZnlodXd2b2Nrc2V3ZmN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzNjU2MDgsImV4cCI6MjA5ODk0MTYwOH0.R0LhaanpGr1uvVLj31MmfDGxLs2vmSZufeUEQO8nl34";
+
+let sb = null;
+function getClient(){
+  if(!sb){
+    if(!window.supabase || SUPABASE_URL.includes("YOUR_SUPABASE")){
+      return null;
+    }
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+  return sb;
+}
+
+const app = document.getElementById('app');
+
+/* ---------------- 공용 모달 ---------------- */
+function showModal(contentHtml){
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'generic-modal-overlay';
+  overlay.innerHTML = `<div class="modal-panel">${contentHtml}</div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeModal(); });
+  return overlay;
+}
+function closeModal(){
+  const overlay = document.getElementById('generic-modal-overlay');
+  if(overlay) overlay.remove();
+}
+function showConfirmModal(message, onConfirm){
+  const overlay = showModal(`
+    <p style="font-size:14.5px; margin:0 0 18px; line-height:1.5;">${escapeHtml(message)}</p>
+    <div class="row" style="gap:8px;">
+      <button type="button" class="btn btn-ghost" id="modal-no" style="margin-top:0;">아니오</button>
+      <button type="button" class="btn btn-primary" id="modal-yes" style="margin-top:0;">예</button>
+    </div>
+  `);
+  overlay.querySelector('#modal-no').addEventListener('click', closeModal);
+  overlay.querySelector('#modal-yes').addEventListener('click', ()=>{ closeModal(); onConfirm(); });
+}
+
+// 날짜/시간 input을 클릭하면 어디를 눌러도 피커가 열리도록 (아이콘만 반응하는 기본 동작 보완)
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('input[type="date"], input[type="time"], input[type="datetime-local"]');
+  if(el && typeof el.showPicker === 'function'){
+    try{ el.showPicker(); }catch(err){ /* 지원 안 하는 브라우저는 기본 동작으로 폴백 */ }
+  }
+});
+
+function escapeHtml(str){
+  return String(str ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[c]));
+}
+const AVATAR_COLORS = ['#E8542F','#2F5D50','#4C6EF5','#F59F00','#12B886','#E64980','#7048E8','#1098AD','#D9480F','#5C7CFA'];
+function avatarColorFromName(name){
+  let hash = 0;
+  const str = String(name || '');
+  for(let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+// 같은 방 안에서는 이름별로 색이 겹치지 않도록, 등장 순서대로 팔레트를 순차 배정
+function buildAvatarColorMap(names){
+  const map = {};
+  let i = 0;
+  for(const n of names){
+    if(!(n in map)){
+      map[n] = AVATAR_COLORS[i % AVATAR_COLORS.length];
+      i++;
+    }
+  }
+  return map;
+}
+function avatarHtml(name, size = 32, colorMap = null){
+  const color = (colorMap && colorMap[name]) || avatarColorFromName(name);
+  const initial = String(name || '?').trim().charAt(0).toUpperCase() || '?';
+  return `<span class="avatar-circle" style="width:${size}px;height:${size}px;background:${color};font-size:${Math.round(size * 0.42)}px;">${escapeHtml(initial)}</span>`;
+}
+function fmtDateTimeLocal(d){
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function roundToNext10Min(d){
+  const rounded = new Date(d);
+  rounded.setSeconds(0, 0);
+  rounded.setMinutes(Math.ceil(rounded.getMinutes() / 10) * 10);
+  return rounded;
+}
+function fmtDeadline(iso){
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}.${pad(d.getMonth()+1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())} 마감`;
+}
+function dDayLabel(iso){
+  const now = new Date();
+  const dl = new Date(iso);
+  const pad = n => String(n).padStart(2, '0');
+  const timeStr = `${pad(dl.getHours())}:${pad(dl.getMinutes())}`;
+  if(dl <= now) return '마감됨';
+  const days = Math.ceil((dl - now) / (24*3600*1000));
+  return days <= 0 ? `마감 오늘 ${timeStr}` : `마감 D-${days} ${timeStr}`;
+}
+function roomHeaderHtml(room, { metaExtra = '', badges = '' } = {}){
+  const isLadder = room.room_type === 'ladder';
+  const isOver = !isLadder && new Date() > new Date(room.deadline);
+  const eyebrow = room.room_type === 'time' ? '시간 조율' : isLadder ? '벌칙뽑기 · 순서정하기' : (room.decide_target === 'place' ? '장소 결정' : '메뉴 결정');
+  return `
+    <div class="room-header">
+      <button type="button" class="header-copy-btn" id="header-copy-btn">링크 복사</button>
+      <div class="header-top">
+        <div class="eyebrow">${eyebrow}</div>
+        ${isLadder ? '' : `<div class="deadline-badge ${isOver ? 'is-over' : ''}">${dDayLabel(room.deadline)}</div>`}
+      </div>
+      <h1>${escapeHtml(room.title)}</h1>
+      ${room.room_type === 'menu' && room.place_name ? `<div class="place-badge">장소 · ${escapeHtml(room.place_name)}</div>` : ''}
+      <div class="meta">${metaExtra}</div>
+      ${badges}
+    </div>
+  `;
+}
+function attachHeaderCopyBtn(room){
+  const btn = document.getElementById('header-copy-btn');
+  if(btn) btn.addEventListener('click', (e)=> copyToClipboard(shareUrl(room.id), e.target));
+}
+function shareUrl(roomId){
+  return `${location.origin}${location.pathname}#/room/${roomId}`;
+}
+async function copyToClipboard(text, btn){
+  try{
+    await navigator.clipboard.writeText(text);
+    if(btn){ const old = btn.textContent; btn.textContent = '복사됨!'; setTimeout(()=>btn.textContent = old, 1500); }
+  }catch(e){
+    prompt('아래 링크를 복사하세요', text);
+  }
+}
+
+/* ---------------- ROUTER ---------------- */
+function route(){
+  const hash = location.hash.replace(/^#\/?/, '');
+  const parts = hash.split('/').filter(Boolean);
+  window.scrollTo(0,0);
+  if(parts[0] === 'room' && parts[1]){
+    if(parts[2] === 'results') renderResults(parts[1], false);
+    else if(parts[2] === 'manage') renderManage(parts[1]);
+    else renderRoom(parts[1]);
+  } else if(parts[0] === 'create' && parts[1]){
+    renderCreate(parts[1]);
+  } else {
+    renderCreate(null);
+  }
+}
+window.addEventListener('hashchange', route);
+window.addEventListener('DOMContentLoaded', () => {
+  if(!getClient()){
+    app.innerHTML = `
+      <h1>설정이 필요해요</h1>
+      <p class="sub">index.html 상단의 SUPABASE_URL / SUPABASE_ANON_KEY 값을 채워주세요.</p>
+      <div class="card">
+        <p style="font-size:13px; color:var(--ink-soft)">
+          1. Supabase 프로젝트 생성<br>
+          2. SQL Editor에서 schema.sql 실행<br>
+          3. Project Settings &gt; API 에서 URL, anon key 복사<br>
+          4. 이 파일 상단 두 변수에 붙여넣기
+        </p>
+      </div>`;
+    return;
+  }
+  route();
+});
+
+/* ---------------- CREATE PAGE ---------------- */
+const CREATE_MODES = [
+  { key: 'time', title: '시간 조율', badge: null, desc: '날짜 여러 개 + 시간 범위 → 슬롯 자동 생성' },
+  { key: 'menu', title: '메뉴 · 장소 결정', badge: null, desc: '후보를 올리고 표를 모아요 (참고 링크 첨부)' },
+  { key: 'ladder', title: '벌칙뽑기 · 순서정하기', badge: null, desc: '무작위로 순서를 정하거나 벌칙 당첨자를 뽑아요' },
+];
+function renderCreate(mode){
+  const isFiltered = !!mode;
+  const visibleModes = isFiltered ? CREATE_MODES.filter(m => m.key === mode) : CREATE_MODES;
+  app.innerHTML = `
+    <div class="top-bar">
+      ${isFiltered ? `<button class="top-bar-back" id="home-back-btn" type="button">←</button>` : ''}
+      <span class="top-bar-title">모임 정하기</span>
+    </div>
+    ${!isFiltered ? `
+      <h1 class="home-headline">언제 · 어디서 · 무엇을<br>한 번에 정하기</h1>
+      <p class="home-sub">방을 만들고 링크만 보내면 됩니다. 로그인 없이 이름만 적고 참여해요.</p>
+    ` : ''}
+    <div class="mode-list ${isFiltered ? 'has-form' : ''}" id="mode-grid">
+      ${visibleModes.map(m => `
+        <button class="mode-card-row ${mode === m.key ? 'is-active' : ''}" data-mode="${m.key}">
+          <div class="mcr-top">
+            <span class="mcr-title">${m.title}</span>
+            ${m.badge ? `<span class="mcr-badge">${m.badge}</span>` : ''}
+          </div>
+          <div class="mcr-desc">${m.desc}</div>
+        </button>
+      `).join('')}
+    </div>
+    <div id="create-form"></div>
+    <div id="recent-rooms-section"></div>
+  `;
+  document.querySelectorAll('.mode-card-row').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const clicked = btn.dataset.mode;
+      location.hash = (mode === clicked) ? '#/create' : `#/create/${clicked}`;
+    });
+  });
+  const backBtn = document.getElementById('home-back-btn');
+  if(backBtn) backBtn.addEventListener('click', ()=>{ location.hash = '#/create'; });
+
+  if(isFiltered){
+    renderCreateForm(mode);
+  } else {
+    loadRecentRooms();
+  }
+}
+
+/* --- 최근 방 (로그인 없이 로컬스토리지 기반 히스토리) --- */
+function addRecentRoom(roomId){
+  const key = 'schedRecentRoomIds';
+  let ids = [];
+  try{ ids = JSON.parse(localStorage.getItem(key) || '[]'); }catch(e){ ids = []; }
+  ids = ids.filter(id => id !== roomId);
+  ids.unshift(roomId);
+  localStorage.setItem(key, JSON.stringify(ids.slice(0, 5)));
+}
+function getRecentRoomIds(){
+  try{ return JSON.parse(localStorage.getItem('schedRecentRoomIds') || '[]'); }catch(e){ return []; }
+}
+async function loadRecentRooms(){
+  const section = document.getElementById('recent-rooms-section');
+  const ids = getRecentRoomIds();
+  if(!section || ids.length === 0) return;
+  const client = getClient();
+  const { data: rooms } = await client.from('rooms').select().in('id', ids);
+  if(!rooms || rooms.length === 0) return;
+  const { data: participants } = await client.from('participants').select('room_id').in('room_id', ids);
+  const countByRoom = {};
+  for(const p of participants || []) countByRoom[p.room_id] = (countByRoom[p.room_id] || 0) + 1;
+  const roomById = Object.fromEntries(rooms.map(r => [r.id, r]));
+  const ordered = ids.map(id => roomById[id]).filter(Boolean);
+  const modeLabel = t => t === 'time' ? '시간 조율' : t === 'ladder' ? '벌칙뽑기 · 순서정하기' : '메뉴·장소 결정';
+  section.innerHTML = `
+    <div class="recent-divider"></div>
+    <div class="recent-label">최근 방</div>
+    ${ordered.map(r => {
+      const isLadder = r.room_type === 'ladder';
+      return `
+        <a class="recent-item" href="#/room/${r.id}${isLadder ? '' : '/results'}">
+          <div class="recent-item-top">
+            <span class="recent-item-title">${escapeHtml(r.title)}</span>
+            ${isLadder ? '' : `<span class="recent-item-badge">${dDayLabel(r.deadline)}</span>`}
+          </div>
+          <div class="recent-item-sub">${isLadder ? `${countByRoom[r.id] || 0}명 참여` : `${modeLabel(r.room_type)} · ${countByRoom[r.id] || 0}명 응답`}</div>
+        </a>
+      `;
+    }).join('')}
+  `;
+}
+
+function renderCreateForm(mode){
+  const container = document.getElementById('create-form');
+  const defaultDeadline = roundToNext10Min(new Date());
+  if(mode === 'time'){
+    container.innerHTML = `
+      <div class="card">
+        <h2>시간 조율 방 만들기</h2>
+        <label>제목</label>
+        <div class="row" style="gap:8px;">
+          <input type="text" id="f-title" placeholder="예: 8월 정기모임" style="flex:1;" />
+          <button type="button" class="btn btn-ghost btn-sm" id="deadline-trigger-btn" style="flex:0 0 auto; white-space:nowrap;"></button>
+        </div>
+        <label>선택 방식</label>
+        <div class="segmented">
+          <button type="button" class="segmented-btn is-active" data-value="dateonly">날짜만 선택</button>
+          <button type="button" class="segmented-btn" data-value="datetime">날짜+시간대 선택</button>
+        </div>
+        <label>후보 날짜 추가</label>
+        <div class="date-picker-row">
+          <div class="calendar-wrap" id="calendar-wrap">
+            <div class="calendar-header">
+              <button type="button" class="cal-nav" id="cal-prev">이전달</button>
+              <span id="cal-month-label"></span>
+              <button type="button" class="cal-nav" id="cal-next">다음달</button>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+          </div>
+          <div class="selected-dates-col">
+            <div class="label-inline">선택된 날짜</div>
+            <div class="chip-list" id="date-chips" style="margin-top:0;"></div>
+          </div>
+        </div>
+        <div id="time-range-wrap" style="margin-top:20px; display:none;">
+          <label>기본 시간 범위 (날짜별로 아래에서 개별 조정 가능)</label>
+          <div class="row">
+            <input type="time" id="f-start" value="09:00" />
+            <input type="time" id="f-end" value="21:00" />
+          </div>
+          <label>슬롯 단위</label>
+          <select id="f-interval">
+            <option value="30" selected>30분</option>
+            <option value="60">1시간</option>
+          </select>
+        </div>
+        <label style="margin-top:20px;">참여자 프로필 미리 만들기 (선택)</label>
+        <textarea id="profile-bulk-input" rows="3" placeholder="예:&#10;지민&#10;현우&#10;서연"></textarea>
+        <div class="sub" style="margin:6px 0 0;">등록해두면 참여자가 목록에서 이름을 선택해서 답변해요. 비워두면 참여자가 직접 이름을 입력해요.</div>
+        <div class="error-box" id="f-error" style="display:none;"></div>
+        <button class="btn btn-primary" id="f-submit">방 만들기</button>
+      </div>
+    `;
+    document.querySelectorAll('.segmented-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        document.getElementById('time-range-wrap').style.display =
+          btn.dataset.value === 'dateonly' ? 'none' : 'block';
+        document.querySelectorAll('#date-chips .chip').forEach(renderDateChipContent);
+      });
+    });
+    currentDeadlinePicker = createDeadlinePickerController(defaultDeadline);
+    const deadlineBtn = document.getElementById('deadline-trigger-btn');
+    const refreshDeadlineBtn = () => { deadlineBtn.textContent = `마감 ${currentDeadlinePicker.getSummaryText()}`; };
+    refreshDeadlineBtn();
+    deadlineBtn.addEventListener('click', () => currentDeadlinePicker.openModal(refreshDeadlineBtn));
+    calendarViewDate = new Date();
+    renderCalendar();
+    document.getElementById('cal-prev').addEventListener('click', ()=>{
+      calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
+      renderCalendar();
+    });
+    document.getElementById('cal-next').addEventListener('click', ()=>{
+      calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
+      renderCalendar();
+    });
+    document.getElementById('f-submit').addEventListener('click', submitTimeRoom);
+  } else if(mode === 'menu'){
+    container.innerHTML = `
+      <div class="card">
+        <h2>메뉴·장소 결정 방 만들기</h2>
+        <label>제목</label>
+        <div class="row" style="gap:8px;">
+          <input type="text" id="f-title" placeholder="예: 회식 메뉴 투표" style="flex:1;" />
+          <button type="button" class="btn btn-ghost btn-sm" id="deadline-trigger-btn" style="flex:0 0 auto; white-space:nowrap;"></button>
+        </div>
+        <label>무엇을 정할까요?</label>
+        <div class="segmented">
+          <button type="button" class="segmented-btn is-active" data-value="menu">메뉴만 정하기</button>
+          <button type="button" class="segmented-btn" data-value="place">장소만 정하기</button>
+        </div>
+        <div id="place-field-wrap">
+          <label>장소 (선택)</label>
+          <input type="text" id="f-place" placeholder="예: OO 파스타집 (장소는 고정, 메뉴만 투표)" />
+        </div>
+        <label style="margin-top:20px;" id="option-section-label">메뉴 후보 (선택)</label>
+        <div id="option-rows"></div>
+        <button class="btn btn-ghost btn-sm" id="opt-add" type="button">+ 메뉴 추가</button>
+        <div class="sub" id="option-section-hint" style="margin:6px 0 0;">메뉴 후보를 안 정해도 돼요 — 참여자가 직접 텍스트로 메뉴를 적을 수도 있어요. 이름 없이 링크만 입력해도 돼요.</div>
+        <label style="margin-top:20px;">참여자 프로필 미리 만들기 (선택)</label>
+        <textarea id="profile-bulk-input" rows="3" placeholder="예:&#10;지민&#10;현우&#10;서연"></textarea>
+        <div class="sub" style="margin:6px 0 0;">등록해두면 참여자가 목록에서 이름을 선택해서 답변해요. 비워두면 참여자가 직접 이름을 입력해요.</div>
+        <div class="error-box" id="f-error" style="display:none;"></div>
+        <button class="btn btn-primary" id="f-submit">방 만들기</button>
+      </div>
+    `;
+    addOptionRow('', '메뉴명 (예: 크림파스타, 링크만 입력해도 OK)');
+    currentDeadlinePicker = createDeadlinePickerController(defaultDeadline);
+    const menuDeadlineBtn = document.getElementById('deadline-trigger-btn');
+    const refreshMenuDeadlineBtn = () => { menuDeadlineBtn.textContent = `마감 ${currentDeadlinePicker.getSummaryText()}`; };
+    refreshMenuDeadlineBtn();
+    menuDeadlineBtn.addEventListener('click', () => currentDeadlinePicker.openModal(refreshMenuDeadlineBtn));
+    document.getElementById('opt-add').addEventListener('click', ()=>{
+      const target = document.querySelector('#create-form .segmented-btn.is-active')?.dataset.value || 'menu';
+      addOptionRow('', target === 'place' ? '장소명 (예: OO파스타집, 링크만 입력해도 OK)' : '메뉴명 (예: 크림파스타, 링크만 입력해도 OK)');
+    });
+    document.querySelectorAll('#create-form .segmented-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('#create-form .segmented-btn').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        const isPlace = btn.dataset.value === 'place';
+        document.getElementById('place-field-wrap').style.display = isPlace ? 'none' : 'block';
+        document.getElementById('option-section-label').textContent = isPlace ? '장소 후보 (선택)' : '메뉴 후보 (선택)';
+        document.getElementById('option-section-hint').textContent = isPlace
+          ? '장소 후보를 안 정해도 돼요 — 참여자가 직접 텍스트로 장소를 적을 수도 있어요. 이름 없이 링크만 입력해도 돼요.'
+          : '메뉴 후보를 안 정해도 돼요 — 참여자가 직접 텍스트로 메뉴를 적을 수도 있어요. 이름 없이 링크만 입력해도 돼요.';
+        document.getElementById('opt-add').textContent = isPlace ? '+ 장소 추가' : '+ 메뉴 추가';
+      });
+    });
+    document.getElementById('f-submit').addEventListener('click', submitMenuRoom);
+  } else {
+    container.innerHTML = `
+      <div class="card">
+        <h2>벌칙뽑기 · 순서정하기 방 만들기</h2>
+        <label>제목</label>
+        <input type="text" id="f-title" placeholder="예: 오늘 커피 사는 사람 뽑기" />
+        <label>인원수로 빈 칸 만들기</label>
+        <div class="row">
+          <input type="number" id="ladder-count-input" min="2" max="20" value="4" />
+          <button type="button" class="btn btn-ghost btn-sm" id="ladder-count-apply" style="flex:0 0 auto;">칸 만들기</button>
+        </div>
+        <label>참여자 정보 한 번에 입력 (줄바꿈으로 구분)</label>
+        <textarea id="ladder-bulk-input" rows="4" placeholder="예:&#10;지민&#10;현우&#10;서연&#10;도윤"></textarea>
+        <button type="button" class="btn btn-ghost btn-sm" id="ladder-bulk-apply" style="margin-top:8px;">일괄 입력</button>
+        <div id="ladder-options-wrap" style="display:none;">
+          <label>후보 항목</label>
+          <div id="option-rows"></div>
+          <button class="btn btn-ghost btn-sm" id="opt-add" type="button">+ 항목 추가</button>
+        </div>
+        <div class="error-box" id="f-error" style="display:none;"></div>
+        <button class="btn btn-primary" id="f-submit">방 만들기</button>
+      </div>
+    `;
+    document.getElementById('opt-add').addEventListener('click', ()=> addOptionRow('', '예: 참여자 이름', false));
+    document.getElementById('ladder-count-apply').addEventListener('click', ()=>{
+      const n = Math.max(2, Math.min(20, parseInt(document.getElementById('ladder-count-input').value, 10) || 2));
+      document.getElementById('option-rows').innerHTML = '';
+      for(let i = 0; i < n; i++) addOptionRow('', '예: 참여자 이름', false);
+      document.getElementById('ladder-options-wrap').style.display = 'block';
+    });
+    document.getElementById('ladder-bulk-apply').addEventListener('click', ()=>{
+      const lines = document.getElementById('ladder-bulk-input').value.split('\n').map(s => s.trim()).filter(Boolean);
+      if(lines.length < 2){ alert('2명 이상 입력해주세요.'); return; }
+      document.getElementById('option-rows').innerHTML = '';
+      lines.forEach(name => addOptionRow(name, '예: 참여자 이름', false));
+      document.getElementById('ladder-options-wrap').style.display = 'block';
+    });
+    document.getElementById('f-submit').addEventListener('click', submitLadderRoom);
+  }
+}
+
+function fmtDateStr(d){
+  const pad = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+let calendarViewDate = new Date();
+
+/* ---------------- 마감일시 커스텀 피커 (모달: 달력 + 오전/오후 시:분 스피너) ---------------- */
+let currentDeadlinePicker = null;
+
+function createDeadlinePickerController(defaultDate){
+  let selectedDateStr = fmtDateStr(defaultDate);
+  let hour24 = defaultDate.getHours();
+  let minute = defaultDate.getMinutes();
+  let viewDate = new Date(defaultDate.getFullYear(), defaultDate.getMonth(), 1);
+
+  function getISOString(){
+    const [y, m, d] = selectedDateStr.split('-').map(Number);
+    return new Date(y, m - 1, d, hour24, minute, 0, 0).toISOString();
+  }
+  function getSummaryText(){
+    const [y, m, d] = selectedDateStr.split('-');
+    const ampmLabel = hour24 < 12 ? '오전' : '오후';
+    let h12 = hour24 % 12; if(h12 === 0) h12 = 12;
+    return `${Number(m)}/${Number(d)} ${ampmLabel} ${h12}:${String(minute).padStart(2, '0')}`;
+  }
+
+  function openModal(onApply){
+    const overlay = showModal(`
+      <h2>마감일시 선택</h2>
+      <div class="dl-selected-date-line">
+        <span class="label-inline">선택된 날짜</span>
+        <span id="dl-selected-date"></span>
+      </div>
+      <div class="date-picker-row" style="margin-top:10px;">
+        <div class="calendar-wrap" id="dl-cal-wrap">
+          <div class="calendar-header">
+            <button type="button" class="cal-nav" id="dl-cal-prev">이전달</button>
+            <span id="dl-cal-month-label"></span>
+            <button type="button" class="cal-nav" id="dl-cal-next">다음달</button>
+          </div>
+          <div class="calendar-grid" id="dl-cal-grid"></div>
+        </div>
+        <div class="selected-dates-col">
+          <div class="label-inline">시간</div>
+          <div class="time-picker">
+            <div class="tp-ampm">
+              <button type="button" class="tp-ampm-btn" data-value="AM">오전</button>
+              <button type="button" class="tp-ampm-btn" data-value="PM">오후</button>
+            </div>
+            <div class="tp-hm">
+              <input type="text" inputmode="numeric" maxlength="2" class="tp-field" id="dl-hour-btn" />
+              <span>:</span>
+              <input type="text" inputmode="numeric" maxlength="2" class="tp-field" id="dl-minute-btn" />
+            </div>
+            <div class="tp-dropdown" id="dl-hour-dropdown"><div class="tp-dropdown-inner"></div></div>
+            <div class="tp-dropdown" id="dl-minute-dropdown"><div class="tp-dropdown-inner"></div></div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-primary" id="dl-modal-confirm" style="margin-top:20px;">확인</button>
+    `);
+
+    function renderCal(){
+      const grid = document.getElementById('dl-cal-grid');
+      if(!grid) return;
+      const year = viewDate.getFullYear(), month = viewDate.getMonth();
+      document.getElementById('dl-cal-month-label').textContent = `${year}년 ${month + 1}월`;
+      const now = new Date();
+      document.getElementById('dl-cal-prev').disabled = (year === now.getFullYear() && month === now.getMonth());
+      const firstDay = new Date(year, month, 1);
+      const startOffset = firstDay.getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const todayStr = fmtDateStr(now);
+      let cells = '';
+      for(let i = 0; i < startOffset; i++) cells += `<div class="cal-day is-empty"></div>`;
+      for(let d = 1; d <= daysInMonth; d++){
+        const dateObj = new Date(year, month, d);
+        const dateStr = fmtDateStr(dateObj);
+        const dow = dateObj.getDay();
+        const isPast = dateStr < todayStr;
+        const isSel = dateStr === selectedDateStr;
+        let cls = 'cal-day';
+        if(isPast) cls += ' is-disabled';
+        if(isSel) cls += ' is-selected';
+        if(dow === 0) cls += ' is-sun';
+        cells += `<button type="button" class="${cls}" data-date="${dateStr}" ${isPast ? 'disabled' : ''}>${d}</button>`;
+      }
+      grid.innerHTML = cells;
+      grid.querySelectorAll('.cal-day[data-date]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          selectedDateStr = btn.dataset.date;
+          renderCal();
+          updateSelectedLabel();
+        });
+      });
+    }
+    function updateSelectedLabel(){
+      const [y, m, d] = selectedDateStr.split('-');
+      document.getElementById('dl-selected-date').textContent = `${y}.${m}.${d}`;
+    }
+    function closeDropdowns(){
+      document.getElementById('dl-hour-dropdown').style.display = 'none';
+      document.getElementById('dl-minute-dropdown').style.display = 'none';
+      document.getElementById('dl-hour-btn').classList.remove('is-open');
+      document.getElementById('dl-minute-btn').classList.remove('is-open');
+    }
+    function updateTimeButtons(){
+      const isPM = hour24 >= 12;
+      overlay.querySelectorAll('.tp-ampm-btn').forEach(b=>{
+        b.classList.toggle('is-active', (b.dataset.value === 'PM') === isPM);
+      });
+      let h12 = hour24 % 12; if(h12 === 0) h12 = 12;
+      document.getElementById('dl-hour-btn').value = h12;
+      document.getElementById('dl-minute-btn').value = String(minute).padStart(2, '0');
+    }
+    function buildHourOptions(){
+      const dd = document.getElementById('dl-hour-dropdown').querySelector('.tp-dropdown-inner');
+      let h12 = hour24 % 12; if(h12 === 0) h12 = 12;
+      dd.innerHTML = Array.from({ length: 12 }, (_, i) => i + 1)
+        .map(h => `<div class="tp-option ${h === h12 ? 'is-active' : ''}" data-value="${h}">${h}</div>`).join('');
+      dd.querySelectorAll('.tp-option').forEach(opt=>{
+        opt.addEventListener('click', ()=>{
+          const h = parseInt(opt.dataset.value, 10);
+          const isPM = hour24 >= 12;
+          hour24 = isPM ? (h % 12) + 12 : (h % 12);
+          updateTimeButtons();
+          closeDropdowns();
+        });
+      });
+    }
+    function buildMinuteOptions(){
+      const dd = document.getElementById('dl-minute-dropdown').querySelector('.tp-dropdown-inner');
+      const mins = [0, 10, 20, 30, 40, 50];
+      dd.innerHTML = mins.map(m => `<div class="tp-option ${m === minute ? 'is-active' : ''}" data-value="${m}">${String(m).padStart(2, '0')}</div>`).join('');
+      dd.querySelectorAll('.tp-option').forEach(opt=>{
+        opt.addEventListener('click', ()=>{
+          minute = parseInt(opt.dataset.value, 10);
+          updateTimeButtons();
+          closeDropdowns();
+        });
+      });
+    }
+    function commitHourInput(){
+      const el = document.getElementById('dl-hour-btn');
+      let h12 = parseInt(el.value, 10);
+      if(isNaN(h12) || h12 < 1 || h12 > 12){ updateTimeButtons(); return; }
+      const isPM = hour24 >= 12;
+      hour24 = isPM ? (h12 % 12) + 12 : (h12 % 12);
+      updateTimeButtons();
+    }
+    function commitMinuteInput(){
+      const el = document.getElementById('dl-minute-btn');
+      let m = parseInt(el.value, 10);
+      if(isNaN(m) || m < 0 || m > 59){ updateTimeButtons(); return; }
+      minute = m;
+      updateTimeButtons();
+    }
+
+    document.getElementById('dl-cal-prev').addEventListener('click', ()=>{ viewDate.setMonth(viewDate.getMonth() - 1); renderCal(); });
+    document.getElementById('dl-cal-next').addEventListener('click', ()=>{ viewDate.setMonth(viewDate.getMonth() + 1); renderCal(); });
+    overlay.querySelectorAll('.tp-ampm-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const wantPM = btn.dataset.value === 'PM';
+        const isPM = hour24 >= 12;
+        if(wantPM !== isPM) hour24 = wantPM ? (hour24 + 12) % 24 : (hour24 - 12 + 24) % 24;
+        updateTimeButtons();
+      });
+    });
+    const hourInput = document.getElementById('dl-hour-btn');
+    const minuteInput = document.getElementById('dl-minute-btn');
+    hourInput.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const dd = document.getElementById('dl-hour-dropdown');
+      const willOpen = dd.style.display !== 'block';
+      closeDropdowns();
+      if(willOpen){ buildHourOptions(); dd.style.display = 'block'; hourInput.classList.add('is-open'); }
+    });
+    minuteInput.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const dd = document.getElementById('dl-minute-dropdown');
+      const willOpen = dd.style.display !== 'block';
+      closeDropdowns();
+      if(willOpen){ buildMinuteOptions(); dd.style.display = 'block'; minuteInput.classList.add('is-open'); }
+    });
+    hourInput.addEventListener('input', ()=>{ hourInput.value = hourInput.value.replace(/[^0-9]/g, '').slice(0, 2); });
+    minuteInput.addEventListener('input', ()=>{ minuteInput.value = minuteInput.value.replace(/[^0-9]/g, '').slice(0, 2); });
+    hourInput.addEventListener('blur', commitHourInput);
+    minuteInput.addEventListener('blur', commitMinuteInput);
+    hourInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ commitHourInput(); closeDropdowns(); } });
+    minuteInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ commitMinuteInput(); closeDropdowns(); } });
+    document.getElementById('dl-modal-confirm').addEventListener('click', ()=>{
+      commitHourInput(); commitMinuteInput();
+      closeModal();
+      if(onApply) onApply();
+    });
+
+    renderCal();
+    updateSelectedLabel();
+    updateTimeButtons();
+  }
+
+  return { getISOString, getSummaryText, openModal };
+}
+
+function renderDateChipContent(chip){
+  const isDatetime = document.querySelector('.segmented-btn.is-active')?.dataset.value === 'datetime';
+  const [y,m,d] = chip.dataset.date.split('-');
+  if(isDatetime){
+    chip.classList.add('chip-datetime');
+    chip.innerHTML = `
+      <span class="chip-date-label">${m}/${d}</span>
+      <input type="time" class="chip-time-from" value="${chip.dataset.start || '09:00'}" />
+      <span>~</span>
+      <input type="time" class="chip-time-to" value="${chip.dataset.end || '21:00'}" />
+      <button type="button" class="chip-remove">삭제</button>
+    `;
+    chip.querySelector('.chip-time-from').addEventListener('change', (e)=>{ chip.dataset.start = e.target.value; });
+    chip.querySelector('.chip-time-to').addEventListener('change', (e)=>{ chip.dataset.end = e.target.value; });
+  } else {
+    chip.classList.remove('chip-datetime');
+    chip.innerHTML = `<span>${m}/${d}</span><button type="button" class="chip-remove">삭제</button>`;
+  }
+  chip.querySelector('.chip-remove').addEventListener('click', ()=>{
+    chip.remove();
+    refreshCalendarIfOpen();
+  });
+}
+function addDateChip(dateStr){
+  const list = document.getElementById('date-chips');
+  if([...list.children].some(c => c.dataset.date === dateStr)) return;
+  const chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.dataset.date = dateStr;
+  chip.dataset.start = document.getElementById('f-start')?.value || '09:00';
+  chip.dataset.end = document.getElementById('f-end')?.value || '21:00';
+  renderDateChipContent(chip);
+  list.appendChild(chip);
+  refreshCalendarIfOpen();
+}
+function removeDateChip(dateStr){
+  const list = document.getElementById('date-chips');
+  const chip = [...list.children].find(c => c.dataset.date === dateStr);
+  if(chip) chip.remove();
+}
+function refreshCalendarIfOpen(){
+  const wrap = document.getElementById('calendar-wrap');
+  if(wrap && wrap.style.display !== 'none') renderCalendar();
+}
+function renderCalendar(){
+  const grid = document.getElementById('calendar-grid');
+  if(!grid) return;
+  const year = calendarViewDate.getFullYear();
+  const month = calendarViewDate.getMonth();
+  document.getElementById('cal-month-label').textContent = `${year}년 ${month + 1}월`;
+  const now = new Date();
+  const isAtCurrentMonth = year === now.getFullYear() && month === now.getMonth();
+  const prevBtn = document.getElementById('cal-prev');
+  if(prevBtn) prevBtn.disabled = isAtCurrentMonth;
+  const firstDay = new Date(year, month, 1);
+  const startOffset = firstDay.getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayStr = fmtDateStr(new Date());
+  const chosen = new Set([...document.getElementById('date-chips').children].map(c => c.dataset.date));
+  let cells = '';
+  for(let i = 0; i < startOffset; i++) cells += `<div class="cal-day is-empty"></div>`;
+  for(let d = 1; d <= daysInMonth; d++){
+    const dateObj = new Date(year, month, d);
+    const dateStr = fmtDateStr(dateObj);
+    const dow = dateObj.getDay();
+    const isPast = dateStr < todayStr;
+    const isSelected = chosen.has(dateStr);
+    let cls = 'cal-day';
+    if(isPast) cls += ' is-disabled';
+    if(isSelected) cls += ' is-selected';
+    if(dow === 0) cls += ' is-sun';
+    cells += `<button type="button" class="${cls}" data-date="${dateStr}" ${isPast ? 'disabled' : ''}>${d}</button>`;
+  }
+  grid.innerHTML = cells;
+  grid.querySelectorAll('.cal-day[data-date]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const ds = btn.dataset.date;
+      if(chosen.has(ds)) removeDateChip(ds); else addDateChip(ds);
+      renderCalendar();
+    });
+  });
+}
+
+function addOptionRow(prefillName = '', namePlaceholder = '항목명 (예: 파스타집)', includeLink = true){
+  const rows = document.getElementById('option-rows');
+  const row = document.createElement('div');
+  row.className = 'option-row';
+  row.innerHTML = `
+    <input type="text" placeholder="${escapeHtml(namePlaceholder)}" class="opt-name-input" value="${escapeHtml(prefillName)}" />
+    ${includeLink ? '<input type="url" placeholder="링크(선택)" class="opt-link-input" />' : ''}
+    <button type="button" class="btn btn-danger-ghost btn-sm" style="flex:0 0 auto;">삭제</button>
+  `;
+  row.querySelector('button').addEventListener('click', ()=>{
+    if(rows.children.length > 1) row.remove();
+  });
+  rows.appendChild(row);
+}
+
+function showFormError(msg){
+  const box = document.getElementById('f-error');
+  box.textContent = msg;
+  box.style.display = 'block';
+}
+
+function generateDateOnlySlots(dates){
+  const sortedDates = [...dates].sort();
+  return sortedDates.map((date, i) => ({
+    slot_date: date,
+    slot_time: null,
+    label: '종일',
+    sort_order: i
+  }));
+}
+
+function generateTimeSlots(dates, startTime, endTime, intervalMin){
+  const items = [];
+  let order = 0;
+  const [sh,sm] = startTime.split(':').map(Number);
+  const [eh,em] = endTime.split(':').map(Number);
+  const startMin = sh*60+sm, endMin = eh*60+em;
+  const sortedDates = [...dates].sort();
+  for(const date of sortedDates){
+    for(let t = startMin; t < endMin; t += intervalMin){
+      const hh = String(Math.floor(t/60)).padStart(2,'0');
+      const mm = String(t%60).padStart(2,'0');
+      items.push({
+        slot_date: date,
+        slot_time: `${hh}:${mm}:00`,
+        label: `${hh}:${mm}`,
+        sort_order: order++
+      });
+    }
+  }
+  return items;
+}
+
+// 일부 브라우저 확장 프로그램이 fetch 응답을 가로채면서 발생하는
+// "DataCloneError: ...postMessage...Headers..." 오류를 방어적으로 처리.
+// 실제로는 insert가 서버에 반영됐는데 클라이언트 쪽 응답 처리만 깨지는 경우가 있어,
+// 에러가 이 패턴이면 방금 만든 room을 재조회해서 성공으로 간주한다.
+function isPostMessageCloneError(err){
+  const msg = String(err && (err.message || err.name || err) || '');
+  return msg.includes('DataCloneError') || msg.includes('postMessage') || msg.includes('could not be cloned');
+}
+async function insertRoomWithFallback(client, payload){
+  try{
+    const { data, error } = await client.from('rooms').insert(payload).select().single();
+    if(error) throw error;
+    return { room: data, error: null };
+  }catch(err){
+    if(isPostMessageCloneError(err)){
+      await new Promise(r => setTimeout(r, 600));
+      const { data: recent } = await client.from('rooms').select()
+        .eq('title', payload.title).eq('room_type', payload.room_type)
+        .order('created_at', { ascending: false }).limit(1);
+      if(recent && recent.length) return { room: recent[0], error: null };
+    }
+    return { room: null, error: err };
+  }
+}
+
+async function submitTimeRoom(){
+  const title = document.getElementById('f-title').value.trim();
+  const deadlineISO = currentDeadlinePicker ? currentDeadlinePicker.getISOString() : null;
+  const chips = [...document.getElementById('date-chips').children];
+  const timeMode = document.querySelector('.segmented-btn.is-active').dataset.value; // 'datetime' | 'dateonly'
+  const interval = Number(document.getElementById('f-interval').value);
+
+  if(!title){ showFormError('제목을 입력해주세요.'); return; }
+  if(!deadlineISO){ showFormError('마감일시를 선택해주세요.'); return; }
+  if(chips.length === 0){ showFormError('날짜를 하나 이상 추가해주세요.'); return; }
+
+  let slotsPerDate = [];
+  if(timeMode === 'dateonly'){
+    slotsPerDate = generateDateOnlySlots(chips.map(c => c.dataset.date));
+  } else {
+    for(const chip of chips){
+      const date = chip.dataset.date;
+      const s = chip.dataset.start || '09:00';
+      const e = chip.dataset.end || '21:00';
+      if(s >= e){ showFormError(`${date.replace(/-/g,'.')} 날짜는 종료 시간이 시작 시간보다 늦어야 해요.`); return; }
+      slotsPerDate.push(...generateTimeSlots([date], s, e, interval));
+    }
+  }
+
+  const btn = document.getElementById('f-submit');
+  btn.disabled = true; btn.textContent = '만드는 중...';
+
+  const client = getClient();
+  const ownerToken = generateOwnerToken();
+  const { room, error: roomErr } = await insertRoomWithFallback(client,
+    { title, room_type: 'time', deadline: deadlineISO, owner_token: ownerToken });
+  if(roomErr || !room){ showFormError('방 생성 실패: ' + (roomErr?.message || '알 수 없는 오류')); btn.disabled=false; btn.textContent='방 만들기'; return; }
+  localStorage.setItem(`sched:${room.id}:ownerToken`, room.owner_token || ownerToken);
+
+  const slots = slotsPerDate.map(s => ({ room_id: room.id, ...s }));
+  const { error: itemsErr } = await client.from('items').insert(slots);
+  if(itemsErr){ showFormError('슬롯 생성 실패: ' + itemsErr.message); btn.disabled=false; btn.textContent='방 만들기'; return; }
+
+  await createPreProfiles(client, room.id);
+  renderCreateSuccess(room.id);
+}
+
+function generateOwnerToken(){
+  if(typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return 'tok-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+async function createPreProfiles(client, roomId){
+  const input = document.getElementById('profile-bulk-input');
+  if(!input) return;
+  const names = [...new Set(input.value.split('\n').map(s => s.trim()).filter(Boolean))];
+  if(names.length === 0) return;
+  try{
+    await client.from('participants').insert(
+      names.map(name => ({ room_id: roomId, name, is_claimed: false }))
+    );
+  }catch(e){ /* 사전 프로필은 부가 기능이라 실패해도 방 생성 자체는 계속 진행 */ }
+}
+
+async function submitMenuRoom(){
+  const title = document.getElementById('f-title').value.trim();
+  const decideTarget = document.querySelector('#create-form .segmented-btn.is-active')?.dataset.value || 'menu';
+  const place = decideTarget === 'menu' ? document.getElementById('f-place').value.trim() : '';
+  const deadlineISO = currentDeadlinePicker ? currentDeadlinePicker.getISOString() : null;
+  const rows = [...document.querySelectorAll('#option-rows .option-row')];
+  const options = rows.map(r => ({
+    name: r.querySelector('.opt-name-input').value.trim(),
+    link: r.querySelector('.opt-link-input').value.trim()
+  })).filter(o => o.name || o.link);
+
+  if(!title){ showFormError('제목을 입력해주세요.'); return; }
+  if(!deadlineISO){ showFormError('마감일시를 선택해주세요.'); return; }
+
+  const btn = document.getElementById('f-submit');
+  btn.disabled = true; btn.textContent = '만드는 중...';
+
+  const client = getClient();
+  const ownerToken = generateOwnerToken();
+  const { room, error: roomErr } = await insertRoomWithFallback(client,
+    { title, room_type: 'menu', deadline: deadlineISO, place_name: place || null, decide_target: decideTarget, owner_token: ownerToken });
+  if(roomErr || !room){ showFormError('방 생성 실패: ' + (roomErr?.message || '알 수 없는 오류')); btn.disabled=false; btn.textContent='방 만들기'; return; }
+  localStorage.setItem(`sched:${room.id}:ownerToken`, room.owner_token || ownerToken);
+
+  if(options.length > 0){
+    const items = options.map((o, i) => ({
+      room_id: room.id, label: o.name || '링크 보기', link: o.link || null, sort_order: i
+    }));
+    const { error: itemsErr } = await client.from('items').insert(items);
+    if(itemsErr){ showFormError('후보 생성 실패: ' + itemsErr.message); btn.disabled=false; btn.textContent='방 만들기'; return; }
+  }
+
+  await createPreProfiles(client, room.id);
+  renderCreateSuccess(room.id);
+}
+
+async function submitLadderRoom(){
+  const title = document.getElementById('f-title').value.trim();
+  const rows = [...document.querySelectorAll('#option-rows .option-row')];
+  const options = rows.map(r => ({
+    name: r.querySelector('.opt-name-input').value.trim(),
+    link: r.querySelector('.opt-link-input')?.value.trim() || ''
+  })).filter(o => o.name);
+
+  if(!title){ showFormError('제목을 입력해주세요.'); return; }
+  if(options.length < 2){ showFormError('후보 항목을 2개 이상 입력해주세요.'); return; }
+
+  const btn = document.getElementById('f-submit');
+  btn.disabled = true; btn.textContent = '만드는 중...';
+
+  const client = getClient();
+  // 벌칙뽑기·순서정하기는 응답 마감이 필요없어서 형식상 먼 미래로 채워둠(DB 제약상 not null)
+  const farDeadline = new Date(Date.now() + 365*24*3600*1000).toISOString();
+  const { room, error: roomErr } = await insertRoomWithFallback(client,
+    { title, room_type: 'ladder', deadline: farDeadline });
+  if(roomErr || !room){ showFormError('방 생성 실패: ' + (roomErr?.message || '알 수 없는 오류')); btn.disabled=false; btn.textContent='방 만들기'; return; }
+
+  const items = options.map((o, i) => ({
+    room_id: room.id, label: o.name, link: o.link || null, sort_order: i
+  }));
+  const { error: itemsErr } = await client.from('items').insert(items);
+  if(itemsErr){ showFormError('항목 생성 실패: ' + itemsErr.message); btn.disabled=false; btn.textContent='방 만들기'; return; }
+
+  renderCreateSuccess(room.id);
+}
+
+function renderCreateSuccess(roomId){
+  addRecentRoom(roomId);
+  const url = shareUrl(roomId);
+  const hasOwnerToken = !!localStorage.getItem(`sched:${roomId}:ownerToken`);
+  app.innerHTML = `
+    <h1>방이 만들어졌어요</h1>
+    <p class="sub">아래 링크를 공유해서 응답을 받아보세요.</p>
+    <div class="link-row">
+      <code>${escapeHtml(url)}</code>
+      <button class="btn btn-primary btn-sm" id="copy-btn" style="width:auto; margin:0;">링크 복사</button>
+    </div>
+    <a class="btn btn-ghost" style="display:block; text-align:center; text-decoration:none;" href="#/room/${roomId}">내가 먼저 응답하기</a>
+    ${hasOwnerToken ? `
+      <a class="btn btn-outline-accent" style="display:block; text-align:center; text-decoration:none; margin-top:10px;" href="#/room/${roomId}/manage">방장 확정 관리 페이지</a>
+      <div class="sub" style="text-align:center; margin-top:8px;">이 링크는 방장만 접근 가능해요 (이 브라우저에만 저장됨)</div>
+    ` : ''}
+  `;
+  document.getElementById('copy-btn').addEventListener('click', (e)=> copyToClipboard(url, e.target));
+}
+
+/* ---------------- ROOM (VOTE) PAGE ---------------- */
+async function renderRoom(roomId){
+  app.innerHTML = `<div class="loading">불러오는 중...</div>`;
+  const client = getClient();
+  const { data: room, error: roomErr } = await client.from('rooms').select().eq('id', roomId).single();
+  if(roomErr || !room){
+    app.innerHTML = `<div class="empty-state">방을 찾을 수 없어요.<br><a class="plain" href="#/create">새 방 만들기</a></div>`;
+    return;
+  }
+  addRecentRoom(roomId);
+
+  const { data: items } = await client.from('items').select().eq('room_id', roomId)
+    .order('slot_date', { ascending: true }).order('slot_time', { ascending: true }).order('sort_order', { ascending: true });
+
+  if(room.room_type === 'ladder'){
+    renderLadderRoom(room, items || []);
+    return;
+  }
+
+  if(new Date() > new Date(room.deadline)){
+    location.hash = `#/room/${roomId}/results`;
+    return;
+  }
+
+  const savedPid = localStorage.getItem(`sched:${roomId}:pid`);
+  const savedName = localStorage.getItem(`sched:${roomId}:name`);
+  let participant = null;
+  if(savedPid){
+    const { data } = await client.from('participants').select().eq('id', savedPid).maybeSingle();
+    if(data) participant = data;
+  }
+
+  if(!participant){
+    renderNamePrompt(room, items);
+  } else {
+    renderVoteForm(room, items, participant);
+  }
+}
+
+/* ---------------- 벌칙뽑기 · 순서정하기 ---------------- */
+async function ensureLadderParticipant(roomId){
+  const key = `sched:${roomId}:ladderPid`;
+  if(localStorage.getItem(key)) return;
+  try{
+    const participant = await getOrCreateParticipant(roomId, '참여자');
+    localStorage.setItem(key, participant.id);
+  }catch(e){ /* 카운트용이라 실패해도 기능엔 영향 없음 */ }
+}
+
+function shuffleIds(ids){
+  const arr = [...ids];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function renderLadderRoom(room, items, options = {}){
+  const client = getClient();
+  ensureLadderParticipant(room.id);
+  const isDecided = Array.isArray(room.result_order) && room.result_order.length > 0;
+  const order = isDecided ? room.result_order.map(id => items.find(it => it.id === id)).filter(Boolean) : [];
+  const winner = order[0] || null;
+  const rest = order.slice(1);
+  const shouldAnimate = !!options.animate && isDecided;
+
+  app.innerHTML = `
+    ${roomHeaderHtml(room, { metaExtra: `후보 ${items.length}개` })}
+    <div class="card" style="text-align:center;">
+      ${!isDecided ? `
+        <div class="prize-box-wrap"><div class="prize-box"><span class="prize-box-face">?</span></div></div>
+        <button class="btn btn-accent" id="ladder-draw-btn" style="margin-top:20px;">뽑기</button>
+      ` : `
+        <div class="prize-box-wrap">
+          <div class="prize-box ${shouldAnimate ? 'is-shaking' : ''}" id="prize-box">
+            ${shouldAnimate
+              ? `<span class="prize-box-face" id="prize-box-face">?</span>`
+              : `<span class="prize-box-name">${escapeHtml(winner.label)}</span>`}
+          </div>
+        </div>
+        <div class="prize-winner-label" id="prize-winner-label" style="${shouldAnimate ? 'opacity:0;' : ''}">1등 확정</div>
+        ${rest.length ? `
+          <div class="ladder-rest-list" id="ladder-rest-list" style="${shouldAnimate ? 'opacity:0;' : ''}">
+            ${rest.map((it, i) => `
+              <div class="result-item" style="cursor:default;">
+                <div class="content">
+                  <span class="label">${i + 2}등 · ${escapeHtml(it.label)}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      `}
+    </div>
+  `;
+  attachHeaderCopyBtn(room);
+
+  if(shouldAnimate){
+    setTimeout(() => {
+      const box = document.getElementById('prize-box');
+      const face = document.getElementById('prize-box-face');
+      if(box) box.classList.remove('is-shaking');
+      if(face) face.outerHTML = `<span class="prize-box-name prize-box-pop">${escapeHtml(winner.label)}</span>`;
+      const winnerLabel = document.getElementById('prize-winner-label');
+      if(winnerLabel){ winnerLabel.style.transition = 'opacity .4s ease'; winnerLabel.style.opacity = '1'; }
+      const restList = document.getElementById('ladder-rest-list');
+      if(restList){ restList.style.transition = 'opacity .5s ease'; restList.style.opacity = '1'; }
+    }, 1100);
+  }
+
+  const drawBtn = document.getElementById('ladder-draw-btn');
+  if(drawBtn){
+    drawBtn.addEventListener('click', async () => {
+      drawBtn.disabled = true; drawBtn.textContent = '뽑는 중...';
+      const shuffled = shuffleIds(items.map(it => it.id));
+      const { data, error } = await client.from('rooms')
+        .update({ result_order: shuffled })
+        .eq('id', room.id)
+        .is('result_order', null)
+        .select().maybeSingle();
+      if(error){
+        alert('결과 저장 실패: ' + error.message + '\n(Supabase에 migration_4.sql이 적용됐는지 확인해주세요)');
+        drawBtn.disabled = false; drawBtn.textContent = '뽑기';
+        return;
+      }
+      let finalRoom = data;
+      if(!finalRoom){
+        const { data: existing, error: fetchErr } = await client.from('rooms').select().eq('id', room.id).single();
+        if(fetchErr || !existing){
+          alert('결과를 불러오지 못했어요. 새로고침 후 다시 시도해주세요.');
+          drawBtn.disabled = false; drawBtn.textContent = '뽑기';
+          return;
+        }
+        finalRoom = existing;
+      }
+      renderLadderRoom(finalRoom, items, { animate: true });
+    });
+  }
+}
+
+async function renderNamePrompt(room, items){
+  const client = getClient();
+  const { data: profiles } = await client.from('participants')
+    .select().eq('room_id', room.id).eq('is_claimed', false);
+  const hasProfiles = profiles && profiles.length > 0;
+  const profileColorMap = hasProfiles ? buildAvatarColorMap(profiles.map(p => p.name)) : {};
+
+  app.innerHTML = `
+    ${roomHeaderHtml(room, { metaExtra: fmtDeadline(room.deadline) })}
+    <div class="card">
+      ${hasProfiles ? `
+        <label>내 프로필을 선택해주세요</label>
+        <div class="profile-grid" id="profile-grid">
+          ${profiles.map(p => `
+            <button type="button" class="profile-btn" data-pid="${p.id}">
+              ${avatarHtml(p.name, 46, profileColorMap)}
+              <span>${escapeHtml(p.name)}</span>
+            </button>
+          `).join('')}
+        </div>
+        <button type="button" class="btn btn-ghost btn-sm" id="show-manual-entry" style="margin-top:16px;">목록에 없어요 (직접 입력)</button>
+        <div id="manual-entry-wrap" style="display:none; margin-top:14px;">
+          <label>이름을 입력해주세요</label>
+          <input type="text" id="name-input" placeholder="예: 지은" />
+          <div class="error-box" id="name-error" style="display:none;"></div>
+          <button class="btn btn-primary" id="name-submit">입장하기</button>
+        </div>
+      ` : `
+        <label>이름을 입력해주세요</label>
+        <input type="text" id="name-input" placeholder="예: 지은" />
+        <div class="error-box" id="name-error" style="display:none;"></div>
+        <button class="btn btn-primary" id="name-submit">입장하기</button>
+      `}
+    </div>
+  `;
+  attachHeaderCopyBtn(room);
+
+  if(hasProfiles){
+    document.getElementById('show-manual-entry').addEventListener('click', ()=>{
+      document.getElementById('manual-entry-wrap').style.display = 'block';
+    });
+    document.querySelectorAll('.profile-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        document.querySelectorAll('.profile-btn').forEach(b => b.disabled = true);
+        const pid = btn.dataset.pid;
+        const { data, error } = await client.from('participants')
+          .update({ is_claimed: true })
+          .eq('id', pid).eq('is_claimed', false)
+          .select().maybeSingle();
+        if(error || !data){
+          alert('이미 다른 사람이 선택한 프로필이에요. 목록을 다시 불러올게요.');
+          renderNamePrompt(room, items);
+          return;
+        }
+        localStorage.setItem(`sched:${room.id}:pid`, data.id);
+        localStorage.setItem(`sched:${room.id}:name`, data.name);
+        renderVoteForm(room, items, data);
+      });
+    });
+  }
+
+  document.getElementById('name-submit').addEventListener('click', async ()=>{
+    const nameInput = document.getElementById('name-input');
+    const base = nameInput.value.trim();
+    if(!base){
+      const box = document.getElementById('name-error');
+      box.textContent = '이름을 입력해주세요.'; box.style.display = 'block';
+      return;
+    }
+    const btn = document.getElementById('name-submit');
+    btn.disabled = true; btn.textContent = '입장 중...';
+    try{
+      const participant = await getOrCreateParticipant(room.id, base);
+      localStorage.setItem(`sched:${room.id}:pid`, participant.id);
+      localStorage.setItem(`sched:${room.id}:name`, participant.name);
+      renderVoteForm(room, items, participant);
+    }catch(e){
+      const box = document.getElementById('name-error');
+      box.textContent = '입장 실패: ' + e.message; box.style.display = 'block';
+      btn.disabled = false; btn.textContent = '입장하기';
+    }
+  });
+}
+
+async function getOrCreateParticipant(roomId, baseName){
+  const client = getClient();
+  let name = baseName;
+  for(let attempt = 0; attempt < 30; attempt++){
+    const { data, error } = await client.from('participants')
+      .insert({ room_id: roomId, name, is_claimed: true }).select().single();
+    if(!error) return data;
+    if(error.code === '23505'){
+      name = `${baseName}_${attempt+1}`;
+      continue;
+    }
+    throw error;
+  }
+  throw new Error('이름 중복이 너무 많아요.');
+}
+
+async function renderVoteForm(room, items, participant){
+  const client = getClient();
+  const { data: myResponses } = await client.from('responses').select('item_id').eq('participant_id', participant.id);
+  const selected = new Set((myResponses || []).map(r => r.item_id));
+
+  const itemIds = items.map(i => i.id);
+  const { data: allResponses } = await client.from('responses').select('item_id')
+    .in('item_id', itemIds.length ? itemIds : ['00000000-0000-0000-0000-000000000000']);
+  const countMap = {};
+  for(const it of items) countMap[it.id] = 0;
+  for(const r of allResponses || []){ if(countMap[r.item_id] != null) countMap[r.item_id]++; }
+  const maxCount = Math.max(1, ...Object.values(countMap));
+
+  const url = shareUrl(room.id);
+  const isTime = room.room_type === 'time';
+  const hasTimeSlots = items.some(it => it.slot_time != null);
+  const metaExtra = `<span class="meta-with-avatar">${avatarHtml(participant.name, 18)}${escapeHtml(participant.name)}님 · ${fmtDeadline(room.deadline)}</span>`;
+  const badges = !isTime ? `<div class="badge-row"><span class="pill-badge">복수 선택 가능</span></div>` : '';
+
+  let voteCalViewDate = new Date();
+
+  function inferRoomTimePattern(){
+    const times = [...new Set(items.filter(it => it.slot_time).map(it => it.slot_time))].sort();
+    if(times.length === 0) return null;
+    const start = times[0].slice(0, 5);
+    let interval = 30;
+    if(times.length >= 2){
+      const [h1, m1] = times[0].split(':').map(Number);
+      const [h2, m2] = times[1].split(':').map(Number);
+      const diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+      if(diff > 0) interval = diff;
+    }
+    const [lh, lm] = times[times.length - 1].split(':').map(Number);
+    const endMin = lh * 60 + lm + interval;
+    const end = `${String(Math.floor(endMin / 60)).padStart(2, '0')}:${String(endMin % 60).padStart(2, '0')}`;
+    return { start, end, interval };
+  }
+
+  function buildVoteCalendarHtml(){
+    const candidateDates = new Set(items.map(it => it.slot_date));
+    const year = voteCalViewDate.getFullYear(), month = voteCalViewDate.getMonth();
+    const now = new Date();
+    const isCurrentMonth = year === now.getFullYear() && month === now.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const todayStr = fmtDateStr(now);
+    const startDay = isCurrentMonth ? Math.max(1, now.getDate() - now.getDay()) : 1;
+    const startOffset = new Date(year, month, startDay).getDay();
+    let cells = '';
+    for(let i = 0; i < startOffset; i++) cells += `<div class="vote-cal-day is-empty"></div>`;
+    for(let d = startDay; d <= daysInMonth; d++){
+      const dateStr = fmtDateStr(new Date(year, month, d));
+      const isPast = dateStr < todayStr;
+      const isCandidate = candidateDates.has(dateStr);
+      const voted = items.some(it => it.slot_date === dateStr && selected.has(it.id));
+      let cls = 'vote-cal-day';
+      if(isPast) cls += ' is-disabled';
+      if(isCandidate) cls += ' is-candidate';
+      if(voted) cls += ' is-voted';
+      cells += `<button type="button" class="${cls}" data-date="${dateStr}" ${isPast ? 'disabled' : ''}>${d}</button>`;
+    }
+    return `
+      <div class="calendar-header">
+        <button type="button" class="cal-nav" id="vote-cal-prev">이전달</button>
+        <span>${year}년 ${month + 1}월</span>
+        <button type="button" class="cal-nav" id="vote-cal-next">다음달</button>
+      </div>
+      <div class="calendar-grid">${cells}</div>
+      <div class="vote-cal-legend">
+        <span><i class="legend-dot is-candidate"></i>후보 날짜</span>
+        <span><i class="legend-dot is-voted"></i>내가 투표함</span>
+      </div>
+    `;
+  }
+
+  function refreshVoteCalendar(){
+    const wrap = document.getElementById('vote-calendar-wrap');
+    if(!wrap) return;
+    wrap.innerHTML = buildVoteCalendarHtml();
+    attachVoteCalendarEvents();
+  }
+
+  function toggleSlotSelection(id, forceState){
+    const newState = forceState !== undefined ? forceState : !selected.has(id);
+    if(newState) selected.add(id); else selected.delete(id);
+  }
+
+  function openDateSlotModal(dateStr){
+    const slotsForDate = items.filter(it => it.slot_date === dateStr)
+      .sort((a,b) => (a.slot_time || '').localeCompare(b.slot_time || ''));
+    const [y, m, d] = dateStr.split('-');
+    const overlay = showModal(`
+      <h2>${Number(m)}/${Number(d)} 시간 선택</h2>
+      <div id="date-slot-modal-list">
+        ${slotsForDate.map(s => `
+          <label class="modal-slot-row">
+            <input type="checkbox" data-item-id="${s.id}" ${selected.has(s.id) ? 'checked' : ''} />
+            <span>${escapeHtml(s.label)}</span>
+          </label>
+        `).join('')}
+      </div>
+      <button type="button" class="btn btn-primary" id="date-slot-modal-confirm" style="margin-top:16px;">확인</button>
+    `);
+    overlay.querySelectorAll('input[type=checkbox][data-item-id]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{ toggleSlotSelection(cb.dataset.itemId, cb.checked); });
+    });
+    document.getElementById('date-slot-modal-confirm').addEventListener('click', ()=>{
+      closeModal();
+      refreshVoteCalendar();
+    });
+  }
+
+  function attachVoteCalendarEvents(){
+    const prevBtn = document.getElementById('vote-cal-prev');
+    const nextBtn = document.getElementById('vote-cal-next');
+    if(prevBtn) prevBtn.addEventListener('click', ()=>{ voteCalViewDate.setMonth(voteCalViewDate.getMonth() - 1); refreshVoteCalendar(); });
+    if(nextBtn) nextBtn.addEventListener('click', ()=>{ voteCalViewDate.setMonth(voteCalViewDate.getMonth() + 1); refreshVoteCalendar(); });
+    document.querySelectorAll('.vote-cal-day[data-date]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const dateStr = el.dataset.date;
+        if(el.classList.contains('is-candidate')){
+          if(!hasTimeSlots){
+            const it = items.find(i => i.slot_date === dateStr);
+            if(it){ toggleSlotSelection(it.id); refreshVoteCalendar(); }
+          } else {
+            openDateSlotModal(dateStr);
+          }
+          return;
+        }
+        if(el.disabled) return;
+        showConfirmModal(`${dateStr.replace(/-/g, '.')} 날짜를 후보로 추가하시겠습니까?`, async ()=>{
+          await addCandidateDate(dateStr);
+        });
+      });
+    });
+  }
+
+  async function addCandidateDate(dateStr){
+    let newSlots;
+    if(hasTimeSlots){
+      const pattern = inferRoomTimePattern();
+      newSlots = pattern ? generateTimeSlots([dateStr], pattern.start, pattern.end, pattern.interval) : generateDateOnlySlots([dateStr]);
+    } else {
+      newSlots = generateDateOnlySlots([dateStr]);
+    }
+    const existingKeys = new Set(items.map(it => `${it.slot_date}|${it.slot_time}`));
+    newSlots = newSlots.filter(s => !existingKeys.has(`${s.slot_date}|${s.slot_time}`));
+    if(newSlots.length === 0){ alert('이미 후보에 있는 날짜예요.'); return; }
+    const payload = newSlots.map((s, i) => ({ room_id: room.id, ...s, sort_order: items.length + i }));
+    const { data: newItems, error } = await client.from('items').insert(payload).select();
+    if(error){ alert('추가 실패: ' + error.message); return; }
+    newItems.forEach(ni => { items.push(ni); countMap[ni.id] = 0; });
+    refreshVoteCalendar();
+  }
+
+  function renderBody(){
+    if(isTime){
+      return '';
+    } else {
+      return `<div class="options-grid" id="options-grid">` + items.map(it => {
+        const cnt = countMap[it.id] || 0;
+        const pct = Math.round((cnt / maxCount) * 100);
+        return `
+          <div class="option-card ${selected.has(it.id) ? 'is-selected' : ''}" data-item-id="${it.id}">
+            <div class="opt-name">${escapeHtml(it.label)}</div>
+            <div class="opt-bar-track"><div class="opt-bar-fill" style="width:${pct}%"></div></div>
+            <div class="opt-foot">
+              <span class="opt-count">${cnt}표</span>
+              ${it.link ? `<a href="${escapeHtml(it.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">참고 링크</a>` : '<span></span>'}
+            </div>
+          </div>
+        `;
+      }).join('') + `</div>
+      <button class="add-option-row" id="add-candidate-btn" type="button">+ ${room.decide_target === 'place' ? '장소' : '메뉴'} 추가하기</button>`;
+    }
+  }
+
+  app.innerHTML = `
+    ${roomHeaderHtml(room, { metaExtra, badges })}
+    <div class="header-actions">
+      <a class="btn btn-outline-accent btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${room.id}/results">결과 보기</a>
+    </div>
+    ${isTime ? `<div class="calendar-wrap" id="vote-calendar-wrap" style="margin:16px auto 0;">${buildVoteCalendarHtml()}</div>` : ''}
+    <div id="toast-area"></div>
+    <div id="vote-body" style="margin-top:16px;">${renderBody()}</div>
+    ${isTime ? `
+      <button class="add-option-row" id="add-slot-btn" type="button" style="margin-top:12px;">+ 날짜/시간 추가하기</button>
+      <div id="add-slot-form" style="display:none; margin-top:10px;">
+        <div class="row">
+          <input type="date" id="add-slot-date" />
+        </div>
+        ${hasTimeSlots ? `
+          <div class="row" style="margin-top:8px;">
+            <input type="time" id="add-slot-time-from" value="19:00" />
+            <input type="time" id="add-slot-time-to" value="21:00" />
+          </div>
+        ` : ''}
+        <div class="row" style="margin-top:8px; gap:8px;">
+          <button type="button" class="btn btn-ghost btn-sm" id="add-slot-cancel">취소</button>
+          <button type="button" class="btn btn-primary btn-sm" id="add-slot-confirm" style="margin-top:0;">추가</button>
+        </div>
+      </div>
+    ` : ''}
+    ${!isTime ? '<div class="tie-hint">동점이면 방장이 최종 조율해요</div>' : ''}
+    <label style="margin-top:20px;">${isTime ? '원하는 날짜/시간을 직접 적어주세요' : (room.decide_target === 'place' ? '원하는 장소를 직접 적어주세요' : '원하는 메뉴를 직접 적어주세요')} (선택)</label>
+    <input type="text" id="free-text-input"
+      placeholder="${isTime ? '예: 8/26 저녁 7시가 더 편해요' : (room.decide_target === 'place' ? '예: 우리 동네 파스타집 어때요' : '예: 크림파스타 먹고 싶어요')}"
+      value="${escapeHtml(participant.free_text || '')}" />
+    <button class="btn btn-primary" id="vote-submit">${(selected.size > 0 || participant.free_text) ? '수정하기' : '제출하기'}</button>
+  `;
+
+  let isDragging = false;
+  let dragSelectMode = null;
+  let lastClickedSlotId = null;
+
+  function applySlotState(el, id, select){
+    if(select){ selected.add(id); el.classList.add('is-selected'); }
+    else { selected.delete(id); el.classList.remove('is-selected'); }
+    updateVoteCalendarVotedMarks();
+  }
+
+  function updateVoteCalendarVotedMarks(){
+    document.querySelectorAll('.vote-cal-day[data-date]').forEach(el=>{
+      const date = el.dataset.date;
+      const voted = items.some(it => it.slot_date === date && selected.has(it.id));
+      el.classList.toggle('is-voted', voted);
+    });
+  }
+
+  function attachRowEvents(){
+    const slotEls = [...document.querySelectorAll('.slot-item[data-item-id]')];
+    slotEls.forEach(el=>{
+      const id = el.dataset.itemId;
+      el.addEventListener('mousedown', (e)=>{
+        isDragging = true;
+        if(e.shiftKey && lastClickedSlotId && lastClickedSlotId !== id){
+          const ids = slotEls.map(x => x.dataset.itemId);
+          const i1 = ids.indexOf(lastClickedSlotId);
+          const i2 = ids.indexOf(id);
+          if(i1 !== -1 && i2 !== -1){
+            const [start, end] = i1 < i2 ? [i1, i2] : [i2, i1];
+            const shouldSelect = !selected.has(id);
+            for(let i = start; i <= end; i++){
+              applySlotState(slotEls[i], slotEls[i].dataset.itemId, shouldSelect);
+            }
+          }
+          dragSelectMode = null;
+        } else {
+          dragSelectMode = !selected.has(id);
+          applySlotState(el, id, dragSelectMode);
+        }
+        lastClickedSlotId = id;
+        e.preventDefault();
+      });
+      el.addEventListener('mouseenter', ()=>{
+        if(isDragging && dragSelectMode !== null) applySlotState(el, id, dragSelectMode);
+      });
+      el.addEventListener('touchstart', ()=>{
+        isDragging = true;
+        dragSelectMode = !selected.has(id);
+        applySlotState(el, id, dragSelectMode);
+        lastClickedSlotId = id;
+      }, { passive: true });
+    });
+    document.querySelectorAll('.option-card[data-item-id]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const id = el.dataset.itemId;
+        if(selected.has(id)) selected.delete(id); else selected.add(id);
+        el.classList.toggle('is-selected');
+      });
+    });
+  }
+  attachRowEvents();
+  if(isTime) attachVoteCalendarEvents();
+  document.addEventListener('mouseup', ()=>{ isDragging = false; dragSelectMode = null; });
+  document.addEventListener('touchend', ()=>{ isDragging = false; dragSelectMode = null; });
+  document.addEventListener('touchmove', (e)=>{
+    if(!isDragging) return;
+    const touch = e.touches[0];
+    if(!touch) return;
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const slotEl = target && target.closest && target.closest('.slot-item[data-item-id]');
+    if(slotEl && dragSelectMode !== null) applySlotState(slotEl, slotEl.dataset.itemId, dragSelectMode);
+  }, { passive: true });
+
+  attachHeaderCopyBtn(room);
+
+  const addBtn = document.getElementById('add-candidate-btn');
+  if(addBtn){
+    addBtn.addEventListener('click', async ()=>{
+      const targetLabel = room.decide_target === 'place' ? '장소' : '메뉴';
+      const name = (prompt(`추가할 ${targetLabel} 이름 (링크만 입력할 거면 비워두세요)`) || '').trim();
+      const link = (prompt('참고 링크 (선택, 없으면 취소/빈칸)') || '').trim();
+      if(!name && !link) return;
+      const { data: newItem, error } = await client.from('items')
+        .insert({ room_id: room.id, label: name || '링크 보기', link: link || null, sort_order: items.length })
+        .select().single();
+      if(error){ alert('추가 실패: ' + error.message); return; }
+      items.push(newItem);
+      countMap[newItem.id] = 0;
+      document.getElementById('vote-body').innerHTML = renderBody();
+      attachRowEvents();
+    });
+  }
+
+  const addSlotBtn = document.getElementById('add-slot-btn');
+  if(addSlotBtn){
+    const addSlotForm = document.getElementById('add-slot-form');
+    addSlotBtn.addEventListener('click', ()=>{
+      addSlotForm.style.display = 'block';
+      addSlotBtn.style.display = 'none';
+    });
+    document.getElementById('add-slot-cancel').addEventListener('click', ()=>{
+      addSlotForm.style.display = 'none';
+      addSlotBtn.style.display = 'block';
+    });
+    document.getElementById('add-slot-confirm').addEventListener('click', async ()=>{
+      const dateVal = document.getElementById('add-slot-date').value;
+      if(!dateVal){ alert('날짜를 선택해주세요.'); return; }
+      let newSlots;
+      if(hasTimeSlots){
+        const fromVal = document.getElementById('add-slot-time-from').value;
+        const toVal = document.getElementById('add-slot-time-to').value;
+        if(!fromVal || !toVal){ alert('시작/종료 시간을 선택해주세요.'); return; }
+        if(fromVal >= toVal){ alert('종료 시간이 시작 시간보다 늦어야 해요.'); return; }
+        newSlots = generateTimeSlots([dateVal], fromVal, toVal, 30);
+      } else {
+        newSlots = generateDateOnlySlots([dateVal]);
+      }
+      const existingKeys = new Set(items.map(it => `${it.slot_date}|${it.slot_time}`));
+      newSlots = newSlots.filter(s => !existingKeys.has(`${s.slot_date}|${s.slot_time}`));
+      if(newSlots.length === 0){ alert('이미 있는 시간대예요.'); return; }
+      const payload = newSlots.map((s, i) => ({ room_id: room.id, ...s, sort_order: items.length + i }));
+      const { data: newItems, error } = await client.from('items').insert(payload).select();
+      if(error){ alert('추가 실패: ' + error.message); return; }
+      newItems.forEach(ni => { items.push(ni); countMap[ni.id] = 0; });
+      document.getElementById('vote-body').innerHTML = renderBody();
+      attachRowEvents();
+      addSlotForm.style.display = 'none';
+      addSlotBtn.style.display = 'block';
+    });
+  }
+
+  document.getElementById('vote-submit').addEventListener('click', async ()=>{
+    const btn = document.getElementById('vote-submit');
+    btn.disabled = true; btn.textContent = '제출 중...';
+    const freeText = document.getElementById('free-text-input').value.trim();
+    await client.from('responses').delete().eq('participant_id', participant.id);
+    if(selected.size){
+      await client.from('responses').insert([...selected].map(itemId => ({ participant_id: participant.id, item_id: itemId })));
+    }
+    await client.from('participants').update({ free_text: freeText || null }).eq('id', participant.id);
+    document.getElementById('toast-area').innerHTML = `<div class="toast">제출 완료! 결과 페이지에서 확인할 수 있어요.</div>`;
+    btn.disabled = false; btn.textContent = '수정하기';
+    window.scrollTo(0,0);
+  });
+}
+
+/* ---------------- RESULTS PAGE ---------------- */
+async function renderResults(roomId, isManage = false){
+  app.innerHTML = `<div class="loading">불러오는 중...</div>`;
+  const client = getClient();
+  const { data: room, error: roomErr } = await client.from('rooms').select().eq('id', roomId).single();
+  if(roomErr || !room){
+    app.innerHTML = `<div class="empty-state">방을 찾을 수 없어요.</div>`;
+    return;
+  }
+  addRecentRoom(roomId);
+  if(room.room_type === 'ladder'){
+    location.hash = `#/room/${roomId}`;
+    return;
+  }
+  const { data: items } = await client.from('items').select().eq('room_id', roomId)
+    .order('slot_date', { ascending: true }).order('slot_time', { ascending: true }).order('sort_order', { ascending: true });
+  const { data: participants } = await client.from('participants').select().eq('room_id', roomId);
+  const { data: responses } = await client.from('responses').select('item_id, participant_id')
+    .in('item_id', (items || []).map(i => i.id).length ? items.map(i => i.id) : ['00000000-0000-0000-0000-000000000000']);
+
+  const totalParticipants = (participants || []).length;
+  const nameById = Object.fromEntries((participants || []).map(p => [p.id, p.name]));
+  const resultColorMap = buildAvatarColorMap((participants || []).map(p => p.name));
+  const countMap = {}; // item_id -> [names]
+  for(const it of items || []) countMap[it.id] = [];
+  for(const r of responses || []){
+    if(countMap[r.item_id]) countMap[r.item_id].push(nameById[r.participant_id] || '익명');
+  }
+  const maxCount = Math.max(1, ...Object.values(countMap).map(arr => arr.length));
+  const isPastDeadline = new Date() > new Date(room.deadline);
+  const itemById = Object.fromEntries((items || []).map(it => [it.id, it]));
+  const confirmedItem = room.confirmed_item_id ? itemById[room.confirmed_item_id] : null;
+
+  let confirmSelectedId = null;
+
+  function namesRowHtml(names){
+    if(!names.length) return '없음';
+    return `<div class="name-chip-row">${names.map(n => `<span class="name-chip">${avatarHtml(n, 18, resultColorMap)}<span>${escapeHtml(n)}</span></span>`).join('')}</div>`;
+  }
+
+  function resultItemHtml(it){
+    const names = countMap[it.id] || [];
+    const pct = Math.round((names.length / maxCount) * 100);
+    const isTop = names.length > 0 && names.length === maxCount;
+    const isFullConsensus = totalParticipants > 0 && names.length === totalParticipants;
+    const ratio = totalParticipants > 0 ? `${names.length}/${totalParticipants}` : `${names.length}명`;
+    const isConfirmChoice = isManage && !confirmedItem && it.id === confirmSelectedId;
+    return `
+      <div class="result-item ${isTop ? 'is-top' : ''} ${isConfirmChoice ? 'is-confirm-selected' : ''}" data-item-id="${it.id}">
+        <div class="bar-bg" style="width:${pct}%"></div>
+        <div class="content">
+          <span class="label">${escapeHtml(it.label)}${it.link ? ` · <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener" style="font-size:12px; color:inherit;">링크</a>` : ''}${isTop ? `<span class="stamp-badge">${isFullConsensus ? '전원 가능 · 최적' : '최다'}</span>` : ''}</span>
+          <span class="count">${ratio}</span>
+        </div>
+        <div class="names">${namesRowHtml(names)}</div>
+      </div>
+    `;
+  }
+
+  function attachResultItemEvents(){
+    document.querySelectorAll('.result-item[data-item-id]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        el.classList.toggle('expanded');
+        if(!isManage || confirmedItem) return; // 방장 관리페이지가 아니거나 이미 확정된 방은 선택 변경 불가
+        const id = el.dataset.itemId;
+        confirmSelectedId = id;
+        document.querySelectorAll('.result-item[data-item-id]').forEach(e2=>{
+          e2.classList.toggle('is-confirm-selected', e2.dataset.itemId === id);
+        });
+        const confirmBtn = document.getElementById('confirm-btn');
+        if(confirmBtn){
+          const chosenItem = itemById[id];
+          confirmBtn.textContent = `${room.room_type === 'time' ? formatConfirmedTime(chosenItem) : chosenItem.label}(으)로 확정`;
+        }
+      });
+    });
+  }
+
+  function buildResultCalendarHtml(dateEntries, maxCount, selectedDate){
+    const byYearMonth = {};
+    dateEntries.forEach(d=>{
+      const [y, m] = d.date.split('-');
+      const key = `${y}-${m}`;
+      if(!byYearMonth[key]) byYearMonth[key] = {};
+      byYearMonth[key][d.date] = d;
+    });
+    const sortedKeys = Object.keys(byYearMonth).sort();
+    return sortedKeys.map(key=>{
+      const [year, month] = key.split('-').map(Number);
+      const dataByDate = byYearMonth[key];
+      const firstDay = new Date(year, month - 1, 1);
+      const startOffset = firstDay.getDay();
+      const daysInMonth = new Date(year, month, 0).getDate();
+      let cells = '';
+      for(let i = 0; i < startOffset; i++) cells += `<div class="result-cal-day is-empty"></div>`;
+      for(let d = 1; d <= daysInMonth; d++){
+        const dateStr = fmtDateStr(new Date(year, month - 1, d));
+        const entry = dataByDate[dateStr];
+        const count = entry ? entry.count : 0;
+        const pct = count > 0 ? count / maxCount : 0;
+        const bg = count > 0 ? `rgba(232,84,47,${(0.15 + 0.65 * pct).toFixed(2)})` : 'transparent';
+        const textColor = pct > 0.55 ? '#fff' : 'var(--ink)';
+        const isSel = dateStr === selectedDate;
+        cells += `
+          <button type="button" class="result-cal-day ${entry ? 'has-data' : ''} ${isSel ? 'is-selected' : ''}"
+            data-date="${dateStr}" style="background:${bg}; color:${textColor};">
+            <span class="rcd-day">${d}</span>
+            ${count > 0 ? `<span class="rcd-count">${count}명</span>` : ''}
+          </button>`;
+      }
+      return `
+        <div class="result-calendar-block">
+          <div class="result-calendar-title">${year}년 ${month}월</div>
+          <div class="result-calendar-grid">${cells}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function buildDetailPanelHtml(entry){
+    if(!entry) return '';
+    const [y, m, d] = entry.date.split('-');
+    return `
+      <div class="result-date-title">${m}/${d} 상세 <span class="rd-count">${entry.count}명</span></div>
+      ${entry.slots.map(resultItemHtml).join('')}
+    `;
+  }
+
+  let bodyHtml = '';
+  let topItem = null;
+  let dateEntries = [];
+  let bestBannerHtmlPiece = '';
+  let calendarHtmlPiece = '';
+  let detailPanelHtmlPiece = '';
+  if(!items || items.length === 0){
+    bodyHtml = `<div class="empty-state">등록된 항목이 없어요.</div>`;
+  } else if(room.room_type === 'time'){
+    let bestOverall = -1;
+    for(const it of items){
+      const c = (countMap[it.id]||[]).length;
+      if(c > bestOverall){ bestOverall = c; topItem = it; }
+    }
+    confirmSelectedId = confirmedItem ? confirmedItem.id : (topItem ? topItem.id : null);
+
+    const dateAggMap = {};
+    for(const it of items){
+      if(!dateAggMap[it.slot_date]) dateAggMap[it.slot_date] = { namesSet: new Set(), slots: [] };
+      (countMap[it.id] || []).forEach(n => dateAggMap[it.slot_date].namesSet.add(n));
+      dateAggMap[it.slot_date].slots.push(it);
+    }
+    dateEntries = Object.entries(dateAggMap).map(([date, agg]) => ({
+      date, count: agg.namesSet.size,
+      slots: agg.slots.sort((a,b) => (a.slot_time||'').localeCompare(b.slot_time||''))
+    })).sort((a,b) => a.date.localeCompare(b.date));
+    const maxDateCount = Math.max(1, ...dateEntries.map(d => d.count));
+    let bestDateEntry = dateEntries[0] || null;
+    for(const d of dateEntries) if(!bestDateEntry || d.count > bestDateEntry.count) bestDateEntry = d;
+
+    bestBannerHtmlPiece = (bestDateEntry && bestDateEntry.count > 0) ? (() => {
+      const [by, bm, bd] = bestDateEntry.date.split('-');
+      return `<div class="result-best-date-banner">최다 득표일 <strong>${bm}/${bd}</strong> · ${bestDateEntry.count}명</div>`;
+    })() : '';
+    calendarHtmlPiece = buildResultCalendarHtml(dateEntries, maxDateCount, bestDateEntry ? bestDateEntry.date : null);
+    detailPanelHtmlPiece = `<div id="result-detail-panel">${buildDetailPanelHtml(bestDateEntry)}</div>`;
+
+    bodyHtml = `${bestBannerHtmlPiece}${calendarHtmlPiece}${detailPanelHtmlPiece}`;
+  } else {
+    const sorted = [...items].sort((a,b) => (countMap[b.id]||[]).length - (countMap[a.id]||[]).length);
+    topItem = sorted[0];
+    confirmSelectedId = confirmedItem ? confirmedItem.id : (topItem ? topItem.id : null);
+    bodyHtml = sorted.map(resultItemHtml).join('');
+  }
+
+  const isOwner = !!room.owner_token && localStorage.getItem(`sched:${roomId}:ownerToken`) === room.owner_token;
+  const showConfirmSection = isManage && !confirmedItem && topItem && items && items.length > 0;
+  const isTimeManageReorder = isManage && room.room_type === 'time';
+  const mainResultsHtml = isTimeManageReorder ? (bestBannerHtmlPiece + detailPanelHtmlPiece) : bodyHtml;
+  const freeTexts = (participants || []).filter(p => p.free_text);
+  const freeTextHtml = freeTexts.length ? `
+    <div class="result-date-title" style="background:var(--ink);">직접 제안</div>
+    ${freeTexts.map(p => `
+      <div class="result-item" style="cursor:default;">
+        <div class="content">
+          <span class="label" style="display:flex; align-items:center; gap:6px;">${avatarHtml(p.name, 20, resultColorMap)}${escapeHtml(p.name)}</span>
+        </div>
+        <div class="names" style="display:block; margin-top:6px;">${escapeHtml(p.free_text)}</div>
+      </div>
+    `).join('')}
+  ` : '';
+
+  app.innerHTML = `
+    ${roomHeaderHtml(room, { metaExtra: `총 ${totalParticipants}명 응답` })}
+    ${isManage ? `<div class="badge-row"><span class="pill-badge">방장 전용 관리 페이지</span></div>` : ''}
+    ${confirmedItem ? `
+      <div class="confirmed-banner">
+        <div class="cb-label">확정됨</div>
+        <div class="cb-value">${escapeHtml(room.room_type === 'time' ? formatConfirmedTime(confirmedItem) : confirmedItem.label)}</div>
+      </div>
+    ` : ''}
+    <div class="header-actions">
+      ${!isPastDeadline ? `<a class="btn btn-ghost btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${roomId}">응답하러 가기</a>` : ''}
+      <button class="btn btn-ghost btn-sm" id="refresh-btn">새로고침</button>
+      ${(!isManage && isOwner) ? `<a class="btn btn-outline-accent btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${roomId}/manage">확정 관리로 이동</a>` : ''}
+      ${isManage ? `<a class="btn btn-ghost btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${roomId}/results">결과 보기 페이지로 이동</a>` : ''}
+    </div>
+    <div style="margin-top:16px;">${mainResultsHtml}</div>
+    ${freeTextHtml}
+    ${showConfirmSection ? `
+      <div class="tie-hint" style="margin-top:18px;">항목을 클릭하면 확정할 것을 바꿀 수 있어요</div>
+      <div class="header-actions" style="margin-top:8px; flex-direction:column;">
+        <a class="btn btn-ghost" style="text-decoration:none; display:flex; margin-bottom:8px;" href="#/room/${roomId}">내 응답 수정</a>
+        <button class="btn btn-accent" id="confirm-btn" style="margin-top:0;">${escapeHtml(room.room_type === 'time' ? formatConfirmedTime(topItem) : topItem.label)}(으)로 확정</button>
+      </div>
+    ` : ''}
+    ${(isManage && confirmedItem) ? `<button class="btn btn-ghost" id="cancel-confirm-btn" style="margin-top:14px; width:100%;">확정 취소</button>` : ''}
+    ${isTimeManageReorder ? `<div style="margin-top:20px;">${calendarHtmlPiece}</div>` : ''}
+  `;
+  document.getElementById('refresh-btn').addEventListener('click', ()=> renderResults(roomId, isManage));
+  attachHeaderCopyBtn(room);
+
+  attachResultItemEvents();
+
+  if(room.room_type === 'time'){
+    document.querySelectorAll('.result-cal-day.has-data').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.result-cal-day').forEach(b => b.classList.remove('is-selected'));
+        btn.classList.add('is-selected');
+        const entry = dateEntries.find(d => d.date === btn.dataset.date);
+        document.getElementById('result-detail-panel').innerHTML = buildDetailPanelHtml(entry);
+        attachResultItemEvents();
+      });
+    });
+  }
+
+  const confirmBtn = document.getElementById('confirm-btn');
+  if(confirmBtn){
+    confirmBtn.addEventListener('click', async ()=>{
+      confirmBtn.disabled = true; confirmBtn.textContent = '확정 중...';
+      const { error } = await client.from('rooms').update({ confirmed_item_id: confirmSelectedId }).eq('id', roomId);
+      if(error){ alert('확정 실패: ' + error.message); confirmBtn.disabled = false; return; }
+      renderResults(roomId, isManage);
+    });
+  }
+
+  const cancelBtn = document.getElementById('cancel-confirm-btn');
+  if(cancelBtn){
+    cancelBtn.addEventListener('click', async ()=>{
+      cancelBtn.disabled = true; cancelBtn.textContent = '취소 중...';
+      const { error } = await client.from('rooms').update({ confirmed_item_id: null }).eq('id', roomId);
+      if(error){ alert('취소 실패: ' + error.message); cancelBtn.disabled = false; return; }
+      renderResults(roomId, isManage);
+    });
+  }
+}
+
+async function renderManage(roomId){
+  const client = getClient();
+  const { data: room } = await client.from('rooms').select().eq('id', roomId).single();
+  if(!room){ location.hash = `#/room/${roomId}/results`; return; }
+  const token = localStorage.getItem(`sched:${roomId}:ownerToken`);
+  if(!token || !room.owner_token || token !== room.owner_token){
+    alert('방장만 접근할 수 있는 페이지예요.');
+    location.hash = `#/room/${roomId}/results`;
+    return;
+  }
+  renderResults(roomId, true);
+}
+
+function formatConfirmedTime(item){
+  if(!item.slot_date) return item.label;
+  const [y,m,d] = item.slot_date.split('-');
+  return item.slot_time ? `${m}/${d} ${item.label}` : `${m}/${d} 종일`;
+}
+</script>
+</body>
+</html>
