@@ -92,6 +92,21 @@
   .btn-outline-accent:hover{ background: var(--accent-soft); }
   .btn-sm{ padding: 7px 12px; font-size: 15px; border-radius: 8px; }
   .btn-danger-ghost{ background: transparent; color: var(--danger); border: 1px solid #EFC9BC; }
+  .deadline-trigger-btn{
+    border: 1.5px solid var(--accent); border-radius: 9px; background: var(--white);
+    color: var(--accent-deep); font-size: 14px; font-weight: 700; padding: 9px 14px;
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+  }
+  .deadline-trigger-btn:hover{ background: var(--accent-soft); }
+  .deadline-trigger-btn.is-unset{
+    background: var(--accent); color: var(--white); border-color: var(--accent);
+    animation: deadline-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes deadline-pulse{
+    0%, 100% { box-shadow: 0 0 0 0 rgba(232,84,47,0.35); }
+    50% { box-shadow: 0 0 0 5px rgba(232,84,47,0); }
+  }
+  #dl-selected-date.is-unset{ color: var(--accent-deep); font-weight: 700; }
 
   .chip-list{ display:flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .chip{
@@ -263,12 +278,18 @@
   .deadline-badge.is-over{ color: var(--ink-soft); }
   .room-header .meta{ font-size: 15px; color: var(--ink); font-weight: 500; margin-top: 6px; }
   .place-badge{ font-size: 16px; color: var(--accent-deep); font-weight: 700; margin-top: 6px; }
-  .badge-row{ display:flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .badge-row{ display:flex; gap: 6px; margin: 10px 0 14px; flex-wrap: wrap; }
   .pill-badge{
     font-size: 14px; font-weight: 700; color: var(--accent-deep);
     background: var(--accent-soft); border: 1px solid var(--accent-soft); border-radius: 999px; padding: 4px 10px;
   }
   .header-actions{ display:flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .room-notice-box{
+    display:flex; align-items:flex-start; gap: 8px;
+    background: var(--ink); color: var(--white); border-radius: 10px;
+    padding: 12px 14px; font-size: 14px; font-weight: 600; line-height: 1.5; margin-top: 14px;
+  }
+  .notice-icon{ width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; color: var(--accent); }
 
   /* --- time-mode slot voting (탭형 로우, 얇은 진행바 + 실시간 인원수) --- */
   .slots-container{ display:flex; flex-direction: column; gap: 22px; }
@@ -297,21 +318,15 @@
   .slot-item.is-selected .slot-count{ color: var(--accent-deep); font-weight: 700; }
 
   /* --- menu-mode voting (모던 카드, 아이콘 없이 보더/배경으로 선택 표시) --- */
-  .options-grid{ display:grid; grid-template-columns: 1fr; gap: 14px; }
-  @media (min-width: 600px){ .options-grid{ grid-template-columns: 1fr 1fr; } }
+  .options-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
   .option-card{
-    border:1px solid var(--line); border-radius:12px; padding: 20px;
+    border:1px solid var(--line); border-radius:10px; padding: 10px;
     cursor: pointer; transition: border-color .12s ease, background-color .12s ease;
   }
   .option-card.is-selected{ border-color: var(--accent); background: var(--accent-soft); }
-  .option-card .opt-name{ font-weight: 700; font-size: 17px; }
+  .option-card .opt-name{ font-weight: 700; font-size: 14px; }
   .option-card.is-selected .opt-name{ color: var(--accent-deep); }
-  .option-card .opt-meta{ font-size: 14.5px; color: var(--ink-soft); margin-top: 2px; }
-  .option-card .opt-bar-track{ height: 4px; background: var(--line); border-radius: 999px; margin-top: 10px; overflow:hidden; }
-  .option-card .opt-bar-fill{ height: 100%; background: var(--accent); border-radius: 999px; }
-  .option-card .opt-foot{ display:flex; justify-content: space-between; align-items:center; margin-top: 6px; }
-  .option-card .opt-count{ font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-  .option-card a{ color: var(--accent); font-size: 14.5px; text-decoration: none; }
+  .option-card a{ color: var(--accent); font-size: 12px; text-decoration: none; display: inline-block; margin-top: 4px; }
   .option-card a:hover{ text-decoration: underline; }
   .add-option-row{
     border: 1.5px dashed var(--line-strong); border-radius: 12px; padding: 13px;
@@ -319,6 +334,12 @@
     background: none; width: 100%; font-family: inherit; margin-top: 14px;
   }
   .add-option-row:hover{ border-color: var(--accent); color: var(--accent); }
+  .disclosure-btn-prominent{
+    border: 1.5px solid var(--accent); border-radius: 12px; padding: 13px;
+    text-align:center; color: var(--accent-deep); font-size: 15.5px; font-weight: 700; cursor: pointer;
+    background: var(--accent-soft); width: 100%; font-family: inherit;
+  }
+  .disclosure-btn-prominent:hover{ background: var(--accent); color: var(--white); }
   .top-bar{ display:flex; align-items:center; gap:10px; margin-bottom: 26px; }
   .top-bar-back{
     background:none; border:none; font-size: 20px; line-height:1; color: var(--ink);
@@ -386,18 +407,56 @@
   .meta-with-avatar{ display:flex; align-items:center; gap: 6px; margin-top: 2px; }
 
   /* --- 참여자 프로필 그룹 관리 모달 --- */
-  .profile-group-list{ display:flex; flex-direction:column; gap: 10px; }
+  .profile-group-list{ display:grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
   .profile-group-row{
     border: 1px solid var(--line); border-radius: 12px; padding: 14px;
-    display:flex; flex-direction:column; gap: 12px;
+    display:flex; flex-direction:column; gap: 10px;
   }
   .pg-info{ min-width: 0; }
-  .pg-name{ font-weight: 700; font-size: 16px; color: var(--ink); }
+  .pg-card-header{ display:flex; align-items:center; justify-content:space-between; gap: 8px; }
+  .pg-name{ font-weight: 800; font-size: 16px; color: var(--ink); }
+  .pg-count-badge{
+    font-size: 12px; font-weight: 700; color: var(--accent-deep); background: var(--accent-soft);
+    padding: 2px 8px; border-radius: 999px; flex-shrink: 0;
+  }
   .pg-count{ font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
-  .pg-actions{ display:flex; gap: 8px; justify-content: flex-end; }
-  .pg-actions .btn{ white-space: nowrap; width: auto; flex: 0 0 auto; padding-left: 14px; padding-right: 14px; }
+  .pg-avatar-stack{ display:flex; align-items:center; }
+  .pg-avatar-stack .avatar-circle{ border: 2px solid var(--white); margin-left: -8px; }
+  .pg-avatar-stack .avatar-circle:first-child{ margin-left: 0; }
+  .pg-avatar-more{
+    font-size: 12px; font-weight: 700; color: var(--ink-soft); background: var(--line);
+    width: 26px; height: 26px; border-radius: 50%; display:flex; align-items:center; justify-content:center;
+    margin-left: -8px; border: 2px solid var(--white);
+  }
+  .pg-actions{ display:flex; flex-direction:column; gap: 6px; }
+  .pg-actions .btn{ white-space: nowrap; width: 100%; }
+  .pg-actions .pg-actions-row{ display:flex; gap: 6px; }
+  .pg-actions .pg-actions-row .btn{ width: auto; flex: 1; padding-left: 8px; padding-right: 8px; }
   .profile-group-editor{ margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .pg-selected-card{
+    border: 1.5px solid var(--accent); background: var(--accent-soft); border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 10px;
+  }
+  .pg-selected-name{ font-weight: 700; font-size: 16px; color: var(--accent-deep); }
+  .pg-selected-count{ font-size: 13px; color: var(--ink-soft); margin-top: 3px; }
   .pg-code-line{ display:flex; align-items:center; gap: 8px; flex-wrap: wrap; font-size: 14px; color: var(--ink); }
+
+  /* --- 통합 참여자 박스 (그룹선택 + 직접추가 한 UI) --- */
+  .participant-box{
+    border: 1px dashed var(--line-strong); border-radius: 14px; padding: 18px;
+  }
+  #participant-box-empty{ text-align: center; padding: 6px 0 4px; }
+  .participant-box-plus{
+    width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--accent);
+    background: var(--accent-soft); color: var(--accent-deep); font-size: 22px; font-weight: 700;
+    cursor: pointer; display:inline-flex; align-items:center; justify-content:center;
+    font-family: inherit; line-height: 1; padding: 0;
+  }
+  .participant-box-plus:hover{ background: var(--accent); color: var(--white); }
+  .link-plain-btn{
+    background: none; border: none; color: var(--accent-deep); font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; padding: 0; margin-top: 10px; text-decoration: underline;
+  }
   .pg-code-line strong{ font-size: 16px; letter-spacing: 0.05em; color: var(--accent-deep); }
 
   /* --- 벌칙뽑기 · 순서정하기 (박스 연출) --- */
@@ -465,6 +524,17 @@
   .result-cal-day .rcd-count{ font-size: 10px; font-weight: 800; }
   .result-cal-day.is-selected{ outline: 2px solid var(--ink); outline-offset: 1px; }
 
+  .order-summary-card{ border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .order-summary-title{ font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 12px; }
+  .order-row{
+    display:flex; align-items:center; justify-content: space-between; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid var(--line);
+  }
+  .order-row:last-child{ border-bottom: none; }
+  .order-row-name{ display:flex; align-items:center; gap: 8px; font-size: 14.5px; font-weight: 600; color: var(--ink); flex-shrink: 0; }
+  .order-row-choice{ font-size: 14.5px; color: var(--ink); font-weight: 600; text-align: right; }
+  .order-row-choice.is-empty{ color: var(--ink-faint); font-weight: 500; }
+
   .result-date-title{
     font-weight: 700; font-size: 15px; margin: 20px 0 8px; color: var(--white);
     background: var(--ink); display:inline-flex; align-items:center; gap: 8px;
@@ -472,25 +542,31 @@
   }
   .result-date-title:first-child{ margin-top: 0; }
   .result-date-title .rd-count{ color: var(--accent); font-weight: 800; }
-  .result-item{ border:1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin-bottom: 12px; cursor: pointer; position: relative; overflow: hidden; }
+  .result-item-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+  .result-item{ border:1px solid var(--line); border-radius: 10px; padding: 16px 10px; margin-bottom: 6px; cursor: pointer; position: relative; overflow: hidden; }
+  .result-item-grid .result-item{ margin-bottom: 0; }
   .result-item .bar-bg{ position:absolute; left:0; top:0; bottom:0; background: var(--accent-soft); z-index:0; }
   .result-item .content{ position: relative; z-index: 1; display:flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .result-item-grid .result-item .content{ flex-direction: column; align-items: flex-start; gap: 4px; }
   .result-item .label{ font-size: 16.5px; font-weight: 600; }
   .result-item .count{ font-size: 15px; color: var(--accent-deep); font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .result-item .names{ position: relative; z-index:1; font-size: 14.5px; color: var(--ink-soft); margin-top: 8px; display:none; }
-  .result-item.expanded .names{ display:block; }
-  .result-item.is-top{ background: var(--accent); border-color: var(--accent); }
+  .result-item .names{ position: relative; z-index:1; font-size: 14.5px; color: var(--ink-soft); margin-top: 4px; display:block; }
+  .result-item.is-top{ background: var(--accent-soft); border-color: var(--accent); }
   .result-item.is-top .bar-bg{ display:none; }
-  .result-item.is-top .label, .result-item.is-top .count{ color: var(--white); }
-  .result-item.is-top .names{ color: rgba(255,255,255,.85); }
-  .result-item.is-confirm-selected{ outline: 2px solid var(--ink); outline-offset: 2px; }
+  .result-item.is-top .label, .result-item.is-top .count{ color: var(--accent-deep); }
+  .result-item.is-top .names{ color: var(--ink-soft); }
+  .result-item.is-confirm-selected{ background: var(--accent); border-color: var(--accent); }
+  .result-item.is-confirm-selected .bar-bg{ display:none; }
+  .result-item.is-confirm-selected .label, .result-item.is-confirm-selected .count{ color: var(--white); }
+  .result-item.is-confirm-selected .names{ color: rgba(255,255,255,.85); }
   .stamp-badge{
     display:inline-flex; align-items:center; gap:4px;
-    background: rgba(255,255,255,.22); color: var(--white);
+    background: var(--accent); color: var(--white);
     font-size: 13px; font-weight: 800;
     padding: 2px 8px; border-radius: 999px;
     margin-left: 8px;
   }
+  .result-item.is-confirm-selected .stamp-badge{ background: var(--white); color: var(--accent-deep); }
   .empty-state{ text-align:center; color: var(--ink-soft); font-size: 15.5px; padding: 40px 10px; }
   .loading{ text-align:center; color: var(--ink-soft); padding: 60px 10px; font-size: 16px; }
   a.plain{ color: var(--accent); font-size: 15px; text-decoration: none; font-weight: 600; }
@@ -517,6 +593,26 @@ function getClient(){
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
   return sb;
+}
+
+/* ---------------- 실시간 반영 (Supabase Realtime) ---------------- */
+let realtimeChannel = null;
+function unsubscribeRealtime(){
+  if(realtimeChannel){
+    try{ getClient()?.removeChannel(realtimeChannel); }catch(e){}
+    realtimeChannel = null;
+  }
+}
+function subscribeRoomRealtime(roomId, onChange){
+  unsubscribeRealtime();
+  const client = getClient();
+  if(!client) return;
+  realtimeChannel = client.channel(`room-rt-${roomId}-${Date.now()}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'items', filter: `room_id=eq.${roomId}` }, onChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'participants', filter: `room_id=eq.${roomId}` }, onChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'rooms', filter: `id=eq.${roomId}` }, onChange)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'responses' }, onChange)
+    .subscribe();
 }
 
 const app = document.getElementById('app');
@@ -669,8 +765,24 @@ function attachHeaderCopyBtn(room){
   const btn = document.getElementById('header-copy-btn');
   if(btn) btn.addEventListener('click', (e)=> copyToClipboard(shareUrl(room.id), e.target));
 }
+function noticeBoxHtml(notice){
+  if(!notice) return '';
+  return `
+    <div class="room-notice-box">
+      <svg class="notice-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M3 10v4a1 1 0 0 0 1 1h2.2l5.3 3.5a1 1 0 0 0 1.5-.85V6.35a1 1 0 0 0-1.5-.85L6.2 9H4a1 1 0 0 0-1 1Z" fill="currentColor"/>
+        <path d="M15.5 8.5a4.5 4.5 0 0 1 0 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+        <path d="M18 6a8 8 0 0 1 0 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span>${escapeHtml(notice)}</span>
+    </div>
+  `;
+}
 function shareUrl(roomId){
   return `${location.origin}${location.pathname}#/room/${roomId}`;
+}
+function resultsShareUrl(roomId){
+  return `${location.origin}${location.pathname}#/room/${roomId}/results`;
 }
 async function copyToClipboard(text, btn){
   try{
@@ -683,6 +795,7 @@ async function copyToClipboard(text, btn){
 
 /* ---------------- ROUTER ---------------- */
 function route(){
+  unsubscribeRealtime();
   const hash = location.hash.replace(/^#\/?/, '');
   const parts = hash.split('/').filter(Boolean);
   window.scrollTo(0,0);
@@ -812,7 +925,6 @@ async function loadRecentRooms(){
 
 function renderCreateForm(mode){
   const container = document.getElementById('create-form');
-  const defaultDeadline = roundToNext10Min(new Date());
   if(mode === 'time'){
     container.innerHTML = `
       <div class="card">
@@ -820,10 +932,12 @@ function renderCreateForm(mode){
         <label>제목</label>
         <div class="row" style="gap:8px;">
           <input type="text" id="f-title" placeholder="예: 8월 정기모임" style="flex:1;" />
-          <button type="button" class="btn btn-ghost btn-sm" id="deadline-trigger-btn" style="flex:0 0 auto; white-space:nowrap;"></button>
+          <button type="button" class="deadline-trigger-btn" id="deadline-trigger-btn" style="flex:0 0 auto;"></button>
         </div>
+        <label>주의사항 (선택)</label>
+        <input type="text" id="f-notice" placeholder="예: 18시 이후는 응답 반영이 어려워요" />
         <label>선택 방식</label>
-        <div class="segmented">
+        <div class="segmented" id="date-mode-segmented">
           <button type="button" class="segmented-btn is-active" data-value="dateonly">날짜만 선택</button>
           <button type="button" class="segmented-btn" data-value="datetime">날짜+시간대 선택</button>
         </div>
@@ -854,33 +968,57 @@ function renderCreateForm(mode){
             <option value="60">1시간</option>
           </select>
         </div>
-        <label style="margin-top:20px;">참여자 프로필 미리 만들기 (선택)</label>
-        <div class="sub" id="profile-group-summary" style="margin:0 0 8px;">선택된 그룹 없음</div>
-        <div class="row" style="gap:8px;">
-          <button type="button" class="btn btn-ghost btn-sm" id="open-profile-group-btn" style="flex:0 0 auto;">참여자 프로필 관리</button>
-          <button type="button" class="btn btn-ghost btn-sm" id="clear-profile-group-btn" style="flex:0 0 auto; display:none;">선택 해제</button>
+        <label style="margin-top:20px;">참여자는 어떻게 입력받을까요?</label>
+        <div class="segmented" id="participant-mode-segmented">
+          <button type="button" class="segmented-btn is-active" data-value="self">참여자가 직접 입력</button>
+          <button type="button" class="segmented-btn" data-value="preset">미리 등록하기</button>
         </div>
-        <label style="margin-top:14px;">이름 직접 추가 (그룹 없이, 입력 후 Enter)</label>
-        <input type="text" id="quick-profile-input" placeholder="이름 입력 후 Enter" />
-        <div class="chip-list" id="quick-profile-chips" style="margin-top:10px;"></div>
-        <div class="sub" style="margin:6px 0 0;">그룹을 선택하거나 이름을 직접 추가할 수 있어요 (둘 다 가능). 아무것도 안 하면 참여자가 직접 이름을 입력해요.</div>
+        <div id="profiles-section" style="display:none; margin-top:16px;">
+          <div class="participant-box" id="participant-box">
+            <div id="participant-box-empty">
+              <button type="button" class="participant-box-plus" id="open-profile-group-btn" title="참여자 프로필 관리">+</button>
+            </div>
+            <div id="quick-profile-chips" style="display:none;"></div>
+            <input type="text" id="quick-profile-input" placeholder="이름 입력 후 Enter" style="margin-top:14px;" />
+            <button type="button" class="link-plain-btn" id="open-profile-group-btn-2" style="display:none;">저장된 그룹에서 가져오기</button>
+          </div>
+          <div class="sub" style="margin:8px 0 0;">비워두면 참여자가 직접 이름을 입력해요.</div>
+        </div>
         <div class="error-box" id="f-error" style="display:none;"></div>
         <button class="btn btn-primary" id="f-submit">방 만들기</button>
       </div>
     `;
-    document.querySelectorAll('.segmented-btn').forEach(btn=>{
+    document.querySelectorAll('#date-mode-segmented .segmented-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        document.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('is-active'));
+        document.querySelectorAll('#date-mode-segmented .segmented-btn').forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
         document.getElementById('time-range-wrap').style.display =
           btn.dataset.value === 'dateonly' ? 'none' : 'block';
         document.querySelectorAll('#date-chips .chip').forEach(renderDateChipContent);
       });
     });
+    document.querySelectorAll('#participant-mode-segmented .segmented-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('#participant-mode-segmented .segmented-btn').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        const isPreset = btn.dataset.value === 'preset';
+        document.getElementById('profiles-section').style.display = isPreset ? 'block' : 'none';
+        if(!isPreset){
+          currentProfileGroupMembers = [];
+          currentQuickProfileNames = [];
+          const quickInput = document.getElementById('quick-profile-input');
+          if(quickInput) quickInput.value = '';
+          renderParticipantBox();
+        }
+      });
+    });
     wireProfileGroupSection();
-    currentDeadlinePicker = createDeadlinePickerController(defaultDeadline);
+    currentDeadlinePicker = createDeadlinePickerController();
     const deadlineBtn = document.getElementById('deadline-trigger-btn');
-    const refreshDeadlineBtn = () => { deadlineBtn.textContent = `마감 ${currentDeadlinePicker.getSummaryText()}`; };
+    const refreshDeadlineBtn = () => {
+      deadlineBtn.textContent = currentDeadlinePicker.getSummaryText();
+      deadlineBtn.classList.toggle('is-unset', !currentDeadlinePicker.getISOString());
+    };
     refreshDeadlineBtn();
     deadlineBtn.addEventListener('click', () => currentDeadlinePicker.openModal(refreshDeadlineBtn));
     calendarViewDate = new Date();
@@ -901,57 +1039,90 @@ function renderCreateForm(mode){
         <label>제목</label>
         <div class="row" style="gap:8px;">
           <input type="text" id="f-title" placeholder="예: 회식 메뉴 투표" style="flex:1;" />
-          <button type="button" class="btn btn-ghost btn-sm" id="deadline-trigger-btn" style="flex:0 0 auto; white-space:nowrap;"></button>
+          <button type="button" class="deadline-trigger-btn" id="deadline-trigger-btn" style="flex:0 0 auto;"></button>
         </div>
+        <label>주의사항 (선택)</label>
+        <input type="text" id="f-notice" placeholder="예: 카드 결제만 가능해요" />
         <label>무엇을 정할까요?</label>
-        <div class="segmented">
+        <div class="segmented" id="decide-target-segmented">
           <button type="button" class="segmented-btn is-active" data-value="menu">메뉴만 정하기</button>
           <button type="button" class="segmented-btn" data-value="place">장소만 정하기</button>
         </div>
-        <div id="place-field-wrap">
-          <label>장소 (선택)</label>
-          <input type="text" id="f-place" placeholder="예: OO 파스타집 (장소는 고정, 메뉴만 투표)" />
+
+        <button type="button" class="add-option-row" id="toggle-candidates-btn" style="margin-top:20px;">+ 후보 추가하기 (선택)</button>
+        <div id="candidates-section" style="display:none; margin-top:16px;">
+          <div id="place-field-wrap">
+            <label>장소 (선택)</label>
+            <input type="text" id="f-place" placeholder="예: OO 파스타집 (장소는 고정, 메뉴만 투표)" />
+          </div>
+          <label style="margin-top:16px;" id="option-section-label">메뉴 후보</label>
+          <div id="option-rows"></div>
+          <button class="btn btn-ghost btn-sm" id="opt-add" type="button">+ 메뉴 추가</button>
+          <div class="sub" id="option-section-hint" style="margin:6px 0 0;">비워두면 참여자가 직접 입력해요. 이름 없이 링크만 등록해도 돼요.</div>
         </div>
-        <label style="margin-top:20px;" id="option-section-label">메뉴 후보 (선택)</label>
-        <div id="option-rows"></div>
-        <button class="btn btn-ghost btn-sm" id="opt-add" type="button">+ 메뉴 추가</button>
-        <div class="sub" id="option-section-hint" style="margin:6px 0 0;">메뉴 후보를 안 정해도 돼요 — 참여자가 직접 텍스트로 메뉴를 적을 수도 있어요. 이름 없이 링크만 입력해도 돼요.</div>
-        <label style="margin-top:20px;">참여자 프로필 미리 만들기 (선택)</label>
-        <div class="sub" id="profile-group-summary" style="margin:0 0 8px;">선택된 그룹 없음</div>
-        <div class="row" style="gap:8px;">
-          <button type="button" class="btn btn-ghost btn-sm" id="open-profile-group-btn" style="flex:0 0 auto;">참여자 프로필 관리</button>
-          <button type="button" class="btn btn-ghost btn-sm" id="clear-profile-group-btn" style="flex:0 0 auto; display:none;">선택 해제</button>
+
+        <label style="margin-top:20px;">참여자는 어떻게 입력받을까요?</label>
+        <div class="segmented" id="participant-mode-segmented">
+          <button type="button" class="segmented-btn is-active" data-value="self">참여자가 직접 입력</button>
+          <button type="button" class="segmented-btn" data-value="preset">미리 등록하기</button>
         </div>
-        <label style="margin-top:14px;">이름 직접 추가 (그룹 없이, 입력 후 Enter)</label>
-        <input type="text" id="quick-profile-input" placeholder="이름 입력 후 Enter" />
-        <div class="chip-list" id="quick-profile-chips" style="margin-top:10px;"></div>
-        <div class="sub" style="margin:6px 0 0;">그룹을 선택하거나 이름을 직접 추가할 수 있어요 (둘 다 가능). 아무것도 안 하면 참여자가 직접 이름을 입력해요.</div>
+        <div id="profiles-section" style="display:none; margin-top:16px;">
+          <div class="participant-box" id="participant-box">
+            <div id="participant-box-empty">
+              <button type="button" class="participant-box-plus" id="open-profile-group-btn" title="참여자 프로필 관리">+</button>
+            </div>
+            <div id="quick-profile-chips" style="display:none;"></div>
+            <input type="text" id="quick-profile-input" placeholder="이름 입력 후 Enter" style="margin-top:14px;" />
+            <button type="button" class="link-plain-btn" id="open-profile-group-btn-2" style="display:none;">저장된 그룹에서 가져오기</button>
+          </div>
+          <div class="sub" style="margin:8px 0 0;">비워두면 참여자가 직접 이름을 입력해요.</div>
+        </div>
+
         <div class="error-box" id="f-error" style="display:none;"></div>
-        <button class="btn btn-primary" id="f-submit">방 만들기</button>
+        <button class="btn btn-primary" id="f-submit" style="margin-top:20px;">방 만들기</button>
       </div>
     `;
     addOptionRow('', '메뉴명 (예: 크림파스타, 링크만 입력해도 OK)');
     wireProfileGroupSection();
-    currentDeadlinePicker = createDeadlinePickerController(defaultDeadline);
+    wireDisclosure('toggle-candidates-btn', 'candidates-section', '+ 후보 추가하기 (선택)', '− 후보 접기');
+    currentDeadlinePicker = createDeadlinePickerController();
     const menuDeadlineBtn = document.getElementById('deadline-trigger-btn');
-    const refreshMenuDeadlineBtn = () => { menuDeadlineBtn.textContent = `마감 ${currentDeadlinePicker.getSummaryText()}`; };
+    const refreshMenuDeadlineBtn = () => {
+      menuDeadlineBtn.textContent = currentDeadlinePicker.getSummaryText();
+      menuDeadlineBtn.classList.toggle('is-unset', !currentDeadlinePicker.getISOString());
+    };
     refreshMenuDeadlineBtn();
     menuDeadlineBtn.addEventListener('click', () => currentDeadlinePicker.openModal(refreshMenuDeadlineBtn));
     document.getElementById('opt-add').addEventListener('click', ()=>{
-      const target = document.querySelector('#create-form .segmented-btn.is-active')?.dataset.value || 'menu';
+      const target = document.querySelector('#decide-target-segmented .segmented-btn.is-active')?.dataset.value || 'menu';
       addOptionRow('', target === 'place' ? '장소명 (예: OO파스타집, 링크만 입력해도 OK)' : '메뉴명 (예: 크림파스타, 링크만 입력해도 OK)');
     });
-    document.querySelectorAll('#create-form .segmented-btn').forEach(btn=>{
+    document.querySelectorAll('#decide-target-segmented .segmented-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
-        document.querySelectorAll('#create-form .segmented-btn').forEach(b => b.classList.remove('is-active'));
+        document.querySelectorAll('#decide-target-segmented .segmented-btn').forEach(b => b.classList.remove('is-active'));
         btn.classList.add('is-active');
         const isPlace = btn.dataset.value === 'place';
         document.getElementById('place-field-wrap').style.display = isPlace ? 'none' : 'block';
-        document.getElementById('option-section-label').textContent = isPlace ? '장소 후보 (선택)' : '메뉴 후보 (선택)';
+        document.getElementById('option-section-label').textContent = isPlace ? '장소 후보' : '메뉴 후보';
         document.getElementById('option-section-hint').textContent = isPlace
-          ? '장소 후보를 안 정해도 돼요 — 참여자가 직접 텍스트로 장소를 적을 수도 있어요. 이름 없이 링크만 입력해도 돼요.'
-          : '메뉴 후보를 안 정해도 돼요 — 참여자가 직접 텍스트로 메뉴를 적을 수도 있어요. 이름 없이 링크만 입력해도 돼요.';
+          ? '비워두면 참여자가 직접 입력해요. 이름 없이 링크만 등록해도 돼요.'
+          : '비워두면 참여자가 직접 입력해요. 이름 없이 링크만 등록해도 돼요.';
         document.getElementById('opt-add').textContent = isPlace ? '+ 장소 추가' : '+ 메뉴 추가';
+      });
+    });
+    document.querySelectorAll('#participant-mode-segmented .segmented-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('#participant-mode-segmented .segmented-btn').forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        const isPreset = btn.dataset.value === 'preset';
+        document.getElementById('profiles-section').style.display = isPreset ? 'block' : 'none';
+        if(!isPreset){
+          currentProfileGroupMembers = [];
+          currentQuickProfileNames = [];
+          const quickInput = document.getElementById('quick-profile-input');
+          if(quickInput) quickInput.value = '';
+          renderParticipantBox();
+        }
       });
     });
     document.getElementById('f-submit').addEventListener('click', submitMenuRoom);
@@ -961,7 +1132,9 @@ function renderCreateForm(mode){
         <h2>벌칙뽑기 · 순서정하기 방 만들기</h2>
         <label>제목</label>
         <input type="text" id="f-title" placeholder="예: 오늘 커피 사는 사람 뽑기" />
-        <label>인원수로 빈 칸 만들기</label>
+        <label>주의사항 (선택)</label>
+        <input type="text" id="f-notice" placeholder="예: 결과는 되돌릴 수 없어요" />
+        <label style="margin-top:20px;">인원수로 빈 칸 만들기</label>
         <div class="row">
           <input type="number" id="ladder-count-input" min="2" max="20" value="4" />
           <button type="button" class="btn btn-ghost btn-sm" id="ladder-count-apply" style="flex:0 0 auto;">칸 만들기</button>
@@ -969,7 +1142,19 @@ function renderCreateForm(mode){
         <label>참여자 정보 한 번에 입력 (줄바꿈으로 구분)</label>
         <textarea id="ladder-bulk-input" rows="4" placeholder="예:&#10;지민&#10;현우&#10;서연&#10;도윤"></textarea>
         <button type="button" class="btn btn-ghost btn-sm" id="ladder-bulk-apply" style="margin-top:8px;">일괄 입력</button>
-        <div id="ladder-options-wrap" style="display:none;">
+
+        <button type="button" class="disclosure-btn-prominent" id="toggle-profiles-btn" style="margin-top:20px;">+ 저장된 참여자 프로필에서 가져오기 (선택)</button>
+        <div id="profiles-section" style="display:none; margin-top:16px;">
+          <div class="row" style="gap:8px;">
+            <button type="button" class="btn btn-ghost btn-sm" id="open-profile-group-btn" style="flex:0 0 auto;">참여자 프로필 관리</button>
+          </div>
+          <label style="margin-top:14px;">이름 직접 추가 (입력 후 Enter)</label>
+          <input type="text" id="quick-profile-input" placeholder="이름 입력 후 Enter" />
+          <div id="quick-profile-chips" style="margin-top:10px;"></div>
+          <div class="sub" style="margin:8px 0 0;">그룹을 선택하거나 이름을 추가하면 아래 후보 항목에 바로 들어가요.</div>
+        </div>
+
+        <div id="ladder-options-wrap" style="display:none; margin-top:20px;">
           <label>후보 항목</label>
           <div id="option-rows"></div>
           <button class="btn btn-ghost btn-sm" id="opt-add" type="button">+ 항목 추가</button>
@@ -992,6 +1177,8 @@ function renderCreateForm(mode){
       lines.forEach(name => addOptionRow(name, '예: 참여자 이름', false));
       document.getElementById('ladder-options-wrap').style.display = 'block';
     });
+    wireLadderProfileSection();
+    wireDisclosure('toggle-profiles-btn', 'profiles-section', '+ 저장된 참여자 프로필에서 가져오기 (선택)', '− 접기');
     document.getElementById('f-submit').addEventListener('click', submitLadderRoom);
   }
 }
@@ -1005,21 +1192,25 @@ let calendarViewDate = new Date();
 /* ---------------- 마감일시 커스텀 피커 (모달: 달력 + 오전/오후 시:분 스피너) ---------------- */
 let currentDeadlinePicker = null;
 
-function createDeadlinePickerController(defaultDate){
-  let selectedDateStr = fmtDateStr(defaultDate);
-  let hour24 = defaultDate.getHours();
-  let minute = defaultDate.getMinutes();
-  let viewDate = new Date(defaultDate.getFullYear(), defaultDate.getMonth(), 1);
+function createDeadlinePickerController(){
+  const now = new Date();
+  let selectedDateStr = fmtDateStr(now);
+  let hour24 = now.getHours();
+  let minute = now.getMinutes();
+  let viewDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  let hasConfirmed = false;
 
   function getISOString(){
+    if(!hasConfirmed) return null;
     const [y, m, d] = selectedDateStr.split('-').map(Number);
     return new Date(y, m - 1, d, hour24, minute, 0, 0).toISOString();
   }
   function getSummaryText(){
+    if(!hasConfirmed) return '마감일시 선택 (필수)';
     const [y, m, d] = selectedDateStr.split('-');
     const ampmLabel = hour24 < 12 ? '오전' : '오후';
     let h12 = hour24 % 12; if(h12 === 0) h12 = 12;
-    return `${Number(m)}/${Number(d)} ${ampmLabel} ${h12}:${String(minute).padStart(2, '0')}`;
+    return `마감 ${Number(m)}/${Number(d)} ${ampmLabel} ${h12}:${String(minute).padStart(2, '0')}`;
   }
 
   function openModal(onApply){
@@ -1099,8 +1290,11 @@ function createDeadlinePickerController(defaultDate){
       });
     }
     function updateSelectedLabel(){
+      const el = document.getElementById('dl-selected-date');
+      if(!selectedDateStr){ el.textContent = '날짜를 선택해주세요'; el.classList.add('is-unset'); return; }
+      el.classList.remove('is-unset');
       const [y, m, d] = selectedDateStr.split('-');
-      document.getElementById('dl-selected-date').textContent = `${y}.${m}.${d}`;
+      el.textContent = `${y}.${m}.${d}`;
     }
     function closeDropdowns(){
       document.getElementById('dl-hour-dropdown').style.display = 'none';
@@ -1198,7 +1392,9 @@ function createDeadlinePickerController(defaultDate){
     hourInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ commitHourInput(); closeDropdowns(); } });
     minuteInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ commitMinuteInput(); closeDropdowns(); } });
     document.getElementById('dl-modal-confirm').addEventListener('click', ()=>{
+      if(!selectedDateStr){ showAlertModal('날짜를 선택해주세요.'); return; }
       commitHourInput(); commitMinuteInput();
+      hasConfirmed = true;
       closeModal();
       if(onApply) onApply();
     });
@@ -1374,6 +1570,7 @@ async function insertRoomWithFallback(client, payload){
 
 async function submitTimeRoom(){
   const title = document.getElementById('f-title').value.trim();
+  const notice = document.getElementById('f-notice')?.value.trim() || null;
   const deadlineISO = currentDeadlinePicker ? currentDeadlinePicker.getISOString() : null;
   const chips = [...document.getElementById('date-chips').children];
   const timeMode = document.querySelector('.segmented-btn.is-active').dataset.value; // 'datetime' | 'dateonly'
@@ -1402,7 +1599,7 @@ async function submitTimeRoom(){
   const client = getClient();
   const ownerToken = generateOwnerToken();
   const { room, error: roomErr } = await insertRoomWithFallback(client,
-    { title, room_type: 'time', deadline: deadlineISO, owner_token: ownerToken });
+    { title, room_type: 'time', deadline: deadlineISO, owner_token: ownerToken, notice });
   if(roomErr || !room){ showFormError('방 생성 실패: ' + (roomErr?.message || '알 수 없는 오류')); btn.disabled=false; btn.textContent='방 만들기'; return; }
   localStorage.setItem(`sched:${room.id}:ownerToken`, room.owner_token || ownerToken);
 
@@ -1438,22 +1635,48 @@ function generateShortCode(len = 8){
 let currentProfileGroupMembers = [];
 let currentQuickProfileNames = [];
 
-function renderQuickProfileChips(){
-  const list = document.getElementById('quick-profile-chips');
-  if(!list) return;
-  list.className = 'profile-grid';
-  const colorMap = buildAvatarColorMap(currentQuickProfileNames);
-  list.innerHTML = currentQuickProfileNames.map(name => `
-    <button type="button" class="profile-btn profile-btn-removable" data-qname="${escapeHtml(name)}" title="눌러서 삭제">
+function renderParticipantBox(){
+  const emptyEl = document.getElementById('participant-box-empty');
+  const chipsEl = document.getElementById('quick-profile-chips');
+  const linkBtn2 = document.getElementById('open-profile-group-btn-2');
+  if(!chipsEl) return;
+  const all = [...new Set([...currentProfileGroupMembers, ...currentQuickProfileNames])];
+  if(all.length === 0){
+    if(emptyEl) emptyEl.style.display = 'block';
+    chipsEl.style.display = 'none';
+    chipsEl.innerHTML = '';
+    if(linkBtn2) linkBtn2.style.display = 'none';
+    return;
+  }
+  if(emptyEl) emptyEl.style.display = 'none';
+  if(linkBtn2) linkBtn2.style.display = 'block';
+  chipsEl.style.display = 'flex';
+  chipsEl.className = 'profile-grid';
+  const colorMap = buildAvatarColorMap(all);
+  chipsEl.innerHTML = all.map(name => `
+    <button type="button" class="profile-btn profile-btn-removable" data-uname="${escapeHtml(name)}" title="눌러서 삭제">
       ${avatarHtml(name, 46, colorMap)}
       <span>${escapeHtml(name)}</span>
     </button>
   `).join('');
-  list.querySelectorAll('.profile-btn[data-qname]').forEach(btn=>{
+  chipsEl.querySelectorAll('.profile-btn[data-uname]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      currentQuickProfileNames = currentQuickProfileNames.filter(n => n !== btn.dataset.qname);
-      renderQuickProfileChips();
+      const name = btn.dataset.uname;
+      currentProfileGroupMembers = currentProfileGroupMembers.filter(n => n !== name);
+      currentQuickProfileNames = currentQuickProfileNames.filter(n => n !== name);
+      renderParticipantBox();
     });
+  });
+}
+
+function wireDisclosure(btnId, sectionId, openLabel, closeLabel){
+  const btn = document.getElementById(btnId);
+  const section = document.getElementById(sectionId);
+  if(!btn || !section) return;
+  btn.addEventListener('click', ()=>{
+    const isOpen = section.style.display !== 'none';
+    section.style.display = isOpen ? 'none' : 'block';
+    btn.textContent = isOpen ? openLabel : closeLabel;
   });
 }
 
@@ -1461,20 +1684,40 @@ function wireProfileGroupSection(){
   currentProfileGroupMembers = [];
   currentQuickProfileNames = [];
   const openBtn = document.getElementById('open-profile-group-btn');
-  const clearBtn = document.getElementById('clear-profile-group-btn');
-  const summary = document.getElementById('profile-group-summary');
+  const openBtn2 = document.getElementById('open-profile-group-btn-2');
+  if(!openBtn) return;
+  renderParticipantBox();
+  const openGroupModal = ()=>{
+    openProfileGroupModal((group)=>{
+      currentProfileGroupMembers = [...new Set([...currentProfileGroupMembers, ...group.members])];
+      renderParticipantBox();
+    });
+  };
+  openBtn.addEventListener('click', openGroupModal);
+  if(openBtn2) openBtn2.addEventListener('click', openGroupModal);
+  const quickInput = document.getElementById('quick-profile-input');
+  if(quickInput){
+    quickInput.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        const val = quickInput.value.trim();
+        if(val && !currentQuickProfileNames.includes(val) && !currentProfileGroupMembers.includes(val)) currentQuickProfileNames.push(val);
+        quickInput.value = '';
+        renderParticipantBox();
+      }
+    });
+  }
+}
+
+function wireLadderProfileSection(){
+  const openBtn = document.getElementById('open-profile-group-btn');
   if(!openBtn) return;
   openBtn.addEventListener('click', ()=>{
     openProfileGroupModal((group)=>{
-      currentProfileGroupMembers = [...group.members];
-      summary.textContent = `선택된 그룹: ${group.name} (${group.members.length}명)`;
-      clearBtn.style.display = 'inline-flex';
+      document.getElementById('option-rows').innerHTML = '';
+      group.members.forEach(name => addOptionRow(name, '예: 참여자 이름', false));
+      document.getElementById('ladder-options-wrap').style.display = 'block';
     });
-  });
-  clearBtn.addEventListener('click', ()=>{
-    currentProfileGroupMembers = [];
-    summary.textContent = '선택된 그룹 없음';
-    clearBtn.style.display = 'none';
   });
   const quickInput = document.getElementById('quick-profile-input');
   if(quickInput){
@@ -1482,9 +1725,10 @@ function wireProfileGroupSection(){
       if(e.key === 'Enter'){
         e.preventDefault();
         const val = quickInput.value.trim();
-        if(val && !currentQuickProfileNames.includes(val)) currentQuickProfileNames.push(val);
+        if(!val){ return; }
+        addOptionRow(val, '예: 참여자 이름', false);
+        document.getElementById('ladder-options-wrap').style.display = 'block';
         quickInput.value = '';
-        renderQuickProfileChips();
       }
     });
   }
@@ -1526,19 +1770,30 @@ async function openProfileGroupModal(onApply){
       ` : ''}
       ${loading ? `<div class="loading" style="padding:20px 0;">불러오는 중...</div>` : `
         <div class="profile-group-list">
-          ${groups.length === 0 ? `<div class="sub" style="margin:0 0 14px;">저장된 그룹이 없어요.</div>` : groups.map(g => `
+          ${groups.length === 0 ? `<div class="sub" style="margin:0 0 14px;">저장된 그룹이 없어요.</div>` : groups.map(g => {
+            const gColorMap = buildAvatarColorMap(g.members);
+            return `
             <div class="profile-group-row">
               <div class="pg-info">
-                <div class="pg-name">${escapeHtml(g.name)}</div>
-                <div class="pg-count">${g.members.length}명 · ${g.members.slice(0,3).map(escapeHtml).join(', ')}${g.members.length > 3 ? ' 외' : ''}</div>
+                <div class="pg-card-header">
+                  <div class="pg-name">${escapeHtml(g.name)}</div>
+                  <span class="pg-count-badge">${g.members.length}명</span>
+                </div>
+                <div class="pg-avatar-stack">
+                  ${g.members.slice(0,4).map(name => avatarHtml(name, 26, gColorMap)).join('')}
+                  ${g.members.length > 4 ? `<span class="pg-avatar-more">+${g.members.length - 4}</span>` : ''}
+                </div>
               </div>
               <div class="pg-actions">
                 ${onApply ? `<button type="button" class="btn btn-accent btn-sm" data-action="use" data-gid="${g.id}" style="margin-top:0;">사용하기</button>` : ''}
-                <button type="button" class="btn btn-ghost btn-sm" data-action="edit" data-gid="${g.id}" style="margin-top:0;">수정</button>
-                <button type="button" class="btn btn-danger-ghost btn-sm" data-action="delete" data-gid="${g.id}" style="margin-top:0;">삭제</button>
+                <div class="pg-actions-row">
+                  <button type="button" class="btn btn-ghost btn-sm" data-action="edit" data-gid="${g.id}" style="margin-top:0;">수정</button>
+                  <button type="button" class="btn btn-danger-ghost btn-sm" data-action="delete" data-gid="${g.id}" style="margin-top:0;">삭제</button>
+                </div>
               </div>
             </div>
-          `).join('')}
+          `;
+          }).join('')}
         </div>
         ${editingId ? `
           <div class="profile-group-editor">
@@ -1683,7 +1938,8 @@ async function createPreProfiles(client, roomId){
 
 async function submitMenuRoom(){
   const title = document.getElementById('f-title').value.trim();
-  const decideTarget = document.querySelector('#create-form .segmented-btn.is-active')?.dataset.value || 'menu';
+  const notice = document.getElementById('f-notice')?.value.trim() || null;
+  const decideTarget = document.querySelector('#decide-target-segmented .segmented-btn.is-active')?.dataset.value || 'menu';
   const place = decideTarget === 'menu' ? document.getElementById('f-place').value.trim() : '';
   const deadlineISO = currentDeadlinePicker ? currentDeadlinePicker.getISOString() : null;
   const rows = [...document.querySelectorAll('#option-rows .option-row')];
@@ -1701,7 +1957,7 @@ async function submitMenuRoom(){
   const client = getClient();
   const ownerToken = generateOwnerToken();
   const { room, error: roomErr } = await insertRoomWithFallback(client,
-    { title, room_type: 'menu', deadline: deadlineISO, place_name: place || null, decide_target: decideTarget, owner_token: ownerToken });
+    { title, room_type: 'menu', deadline: deadlineISO, place_name: place || null, decide_target: decideTarget, owner_token: ownerToken, notice });
   if(roomErr || !room){ showFormError('방 생성 실패: ' + (roomErr?.message || '알 수 없는 오류')); btn.disabled=false; btn.textContent='방 만들기'; return; }
   localStorage.setItem(`sched:${room.id}:ownerToken`, room.owner_token || ownerToken);
 
@@ -1719,6 +1975,7 @@ async function submitMenuRoom(){
 
 async function submitLadderRoom(){
   const title = document.getElementById('f-title').value.trim();
+  const notice = document.getElementById('f-notice')?.value.trim() || null;
   const rows = [...document.querySelectorAll('#option-rows .option-row')];
   const options = rows.map(r => ({
     name: r.querySelector('.opt-name-input').value.trim(),
@@ -1735,7 +1992,7 @@ async function submitLadderRoom(){
   // 벌칙뽑기·순서정하기는 응답 마감이 필요없어서 형식상 먼 미래로 채워둠(DB 제약상 not null)
   const farDeadline = new Date(Date.now() + 365*24*3600*1000).toISOString();
   const { room, error: roomErr } = await insertRoomWithFallback(client,
-    { title, room_type: 'ladder', deadline: farDeadline });
+    { title, room_type: 'ladder', deadline: farDeadline, notice });
   if(roomErr || !room){ showFormError('방 생성 실패: ' + (roomErr?.message || '알 수 없는 오류')); btn.disabled=false; btn.textContent='방 만들기'; return; }
 
   const items = options.map((o, i) => ({
@@ -1836,6 +2093,7 @@ function renderLadderRoom(room, items, options = {}){
 
   app.innerHTML = `
     ${roomHeaderHtml(room, { metaExtra: `후보 ${items.length}개` })}
+    ${noticeBoxHtml(room.notice)}
     <div class="card" style="text-align:center;">
       ${!isDecided ? `
         <div class="prize-box-wrap"><div class="prize-box"><span class="prize-box-face">?</span></div></div>
@@ -2168,25 +2426,21 @@ async function renderVoteForm(room, items, participant){
       return '';
     } else {
       return `<div class="options-grid" id="options-grid">` + items.map(it => {
-        const cnt = countMap[it.id] || 0;
-        const pct = Math.round((cnt / maxCount) * 100);
         return `
           <div class="option-card ${selected.has(it.id) ? 'is-selected' : ''}" data-item-id="${it.id}">
             <div class="opt-name">${escapeHtml(it.label)}</div>
-            <div class="opt-bar-track"><div class="opt-bar-fill" style="width:${pct}%"></div></div>
-            <div class="opt-foot">
-              <span class="opt-count">${cnt}표</span>
-              ${it.link ? `<a href="${escapeHtml(it.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">참고 링크</a>` : '<span></span>'}
-            </div>
+            ${it.link ? `<a href="${escapeHtml(it.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">참고 링크</a>` : ''}
           </div>
         `;
       }).join('') + `</div>
-      <button class="add-option-row" id="add-candidate-btn" type="button">+ ${room.decide_target === 'place' ? '장소' : '메뉴'} 추가하기</button>`;
+      <input type="text" id="quick-add-item-input"
+        placeholder="${room.decide_target === 'place' ? '장소' : '메뉴'} 이름 또는 링크 입력 후 Enter" style="margin-top:12px;" />`;
     }
   }
 
   app.innerHTML = `
     ${roomHeaderHtml(room, { metaExtra, badges })}
+    ${noticeBoxHtml(room.notice)}
     <div class="header-actions">
       <a class="btn btn-outline-accent btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${room.id}/results">결과 보기</a>
     </div>
@@ -2194,10 +2448,12 @@ async function renderVoteForm(room, items, participant){
     <div id="toast-area"></div>
     <div id="vote-body" style="margin-top:16px;">${renderBody()}</div>
     ${!isTime ? '<div class="tie-hint">동점이면 방장이 최종 조율해요</div>' : ''}
-    <label style="margin-top:20px;">${isTime ? '다른 요구사항이나 특이사항이 있으면 적어주세요' : (room.decide_target === 'place' ? '원하는 장소를 직접 적어주세요' : '원하는 메뉴를 직접 적어주세요')} (선택)</label>
-    <input type="text" id="free-text-input"
-      placeholder="${isTime ? '예: 저녁 7시 이후면 아무 때나 괜찮아요' : (room.decide_target === 'place' ? '예: 우리 동네 파스타집 어때요' : '예: 크림파스타 먹고 싶어요')}"
-      value="${escapeHtml(participant.free_text || '')}" />
+    ${isTime ? `
+      <label style="margin-top:20px;">다른 요구사항이나 특이사항이 있으면 적어주세요 (선택)</label>
+      <input type="text" id="free-text-input"
+        placeholder="예: 저녁 7시 이후면 아무 때나 괜찮아요"
+        value="${escapeHtml(participant.free_text || '')}" />
+    ` : ''}
     <button class="btn btn-primary" id="vote-submit">${(selected.size > 0 || participant.free_text) ? '수정하기' : '제출하기'}</button>
   `;
 
@@ -2277,43 +2533,43 @@ async function renderVoteForm(room, items, participant){
 
   attachHeaderCopyBtn(room);
 
-  const addBtn = document.getElementById('add-candidate-btn');
-  if(addBtn){
-    addBtn.addEventListener('click', ()=>{
-      const targetLabel = room.decide_target === 'place' ? '장소' : '메뉴';
-      showPromptModal({
-        title: `${targetLabel} 추가하기`,
-        fields: [
-          { id: 'name', label: `${targetLabel} 이름 (링크만 입력할 거면 비워두세요)`, placeholder: `예: ${targetLabel === '장소' ? 'OO파스타집' : '크림파스타'}` },
-          { id: 'link', label: '참고 링크 (선택)', placeholder: '예: https://...' }
-        ],
-        onSubmit: async ({ name, link }) => {
-          if(!name && !link) return;
-          const { data: newItem, error } = await client.from('items')
-            .insert({ room_id: room.id, label: name || '링크 보기', link: link || null, sort_order: items.length })
-            .select().single();
-          if(error){ showAlertModal('추가 실패: ' + error.message); return; }
-          items.push(newItem);
-          countMap[newItem.id] = 0;
-          document.getElementById('vote-body').innerHTML = renderBody();
-          attachRowEvents();
-        }
-      });
+  function attachQuickAddItemInput(){
+    const el = document.getElementById('quick-add-item-input');
+    if(!el) return;
+    el.addEventListener('keydown', async (e)=>{
+      if(e.key !== 'Enter') return;
+      e.preventDefault();
+      const val = el.value.trim();
+      if(!val) return;
+      const isUrl = /^https?:\/\//i.test(val);
+      const payload = isUrl ? { label: '링크 보기', link: val } : { label: val, link: null };
+      el.disabled = true;
+      const { data: newItem, error } = await client.from('items')
+        .insert({ room_id: room.id, ...payload, sort_order: items.length })
+        .select().single();
+      if(error){ showAlertModal('추가 실패: ' + error.message); el.disabled = false; return; }
+      items.push(newItem);
+      countMap[newItem.id] = 0;
+      document.getElementById('vote-body').innerHTML = renderBody();
+      attachRowEvents();
+      attachQuickAddItemInput();
+      const newInput = document.getElementById('quick-add-item-input');
+      if(newInput) newInput.focus();
     });
   }
+  attachQuickAddItemInput();
 
   document.getElementById('vote-submit').addEventListener('click', async ()=>{
     const btn = document.getElementById('vote-submit');
     btn.disabled = true; btn.textContent = '제출 중...';
-    const freeText = document.getElementById('free-text-input').value.trim();
+    const freeTextEl = document.getElementById('free-text-input');
+    const freeText = freeTextEl ? freeTextEl.value.trim() : '';
     await client.from('responses').delete().eq('participant_id', participant.id);
     if(selected.size){
       await client.from('responses').insert([...selected].map(itemId => ({ participant_id: participant.id, item_id: itemId })));
     }
     await client.from('participants').update({ free_text: freeText || null }).eq('id', participant.id);
-    document.getElementById('toast-area').innerHTML = `<div class="toast">제출 완료! 결과 페이지에서 확인할 수 있어요.</div>`;
-    btn.disabled = false; btn.textContent = '수정하기';
-    window.scrollTo(0,0);
+    location.hash = `#/room/${room.id}/results`;
   });
 }
 
@@ -2366,6 +2622,7 @@ async function renderResults(roomId, isManage = false){
   ` : '';
 
   let confirmSelectedId = null;
+  const isOrderAggregation = room.room_type === 'menu' && room.decide_target === 'menu'; // 개인별 주문 취합 목적 (승자 결정 아님)
 
   function namesRowHtml(names){
     if(!names.length) return '없음';
@@ -2375,7 +2632,7 @@ async function renderResults(roomId, isManage = false){
   function resultItemHtml(it){
     const names = countMap[it.id] || [];
     const pct = Math.round((names.length / maxCount) * 100);
-    const isTop = names.length > 0 && names.length === maxCount;
+    const isTop = !isOrderAggregation && names.length > 0 && names.length === maxCount;
     const isFullConsensus = totalParticipants > 0 && names.length === totalParticipants;
     const ratio = totalParticipants > 0 ? `${names.length}/${totalParticipants}` : `${names.length}명`;
     const isConfirmChoice = isManage && !confirmedItem && it.id === confirmSelectedId;
@@ -2395,7 +2652,7 @@ async function renderResults(roomId, isManage = false){
     document.querySelectorAll('.result-item[data-item-id]').forEach(el=>{
       el.addEventListener('click', ()=>{
         el.classList.toggle('expanded');
-        if(!isManage || confirmedItem) return; // 방장 관리페이지가 아니거나 이미 확정된 방은 선택 변경 불가
+        if(!isManage || confirmedItem || isOrderAggregation) return; // 방장 관리페이지 + 승자결정 목적일 때만 확정 대상 선택 가능
         const id = el.dataset.itemId;
         confirmSelectedId = id;
         document.querySelectorAll('.result-item[data-item-id]').forEach(e2=>{
@@ -2456,7 +2713,7 @@ async function renderResults(roomId, isManage = false){
     const [y, m, d] = entry.date.split('-');
     return `
       <div class="result-date-title">${m}/${d} 상세 <span class="rd-count">${entry.count}명</span></div>
-      ${entry.slots.map(resultItemHtml).join('')}
+      <div class="result-item-grid">${entry.slots.map(resultItemHtml).join('')}</div>
     `;
   }
 
@@ -2502,11 +2759,42 @@ async function renderResults(roomId, isManage = false){
     const sorted = [...items].sort((a,b) => (countMap[b.id]||[]).length - (countMap[a.id]||[]).length);
     topItem = sorted[0];
     confirmSelectedId = confirmedItem ? confirmedItem.id : (topItem ? topItem.id : null);
-    bodyHtml = sorted.map(resultItemHtml).join('');
+
+    if(!isOrderAggregation){
+      bodyHtml = `<div class="result-item-grid">${sorted.map(resultItemHtml).join('')}</div>`;
+    } else {
+      const orderMap = {}; // participant name -> [item labels]
+      for(const r of responses || []){
+        const name = nameById[r.participant_id];
+        const item = itemById[r.item_id];
+        if(name && item){
+          if(!orderMap[name]) orderMap[name] = [];
+          orderMap[name].push(item.label);
+        }
+      }
+      const orderListHtml = (participants || []).length ? `
+        <div class="order-summary-card">
+          <div class="order-summary-title">인원별 주문 현황</div>
+          ${(participants || []).map(p => {
+            const orders = orderMap[p.name] || [];
+            const text = orders.length ? orders.join(', ') : (p.free_text ? p.free_text : '아직 선택 안 함');
+            const isEmpty = orders.length === 0 && !p.free_text;
+            return `
+              <div class="order-row">
+                <div class="order-row-name">${avatarHtml(p.name, 26, resultColorMap)}<span>${escapeHtml(p.name)}</span></div>
+                <div class="order-row-choice ${isEmpty ? 'is-empty' : ''}">${escapeHtml(text)}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      ` : '';
+
+      bodyHtml = `${orderListHtml}<div class="result-date-title" style="background:var(--ink); margin-top:20px;">메뉴별 집계</div><div class="result-item-grid">${sorted.map(resultItemHtml).join('')}</div>`;
+    }
   }
 
   const isOwner = !!room.owner_token && localStorage.getItem(`sched:${roomId}:ownerToken`) === room.owner_token;
-  const showConfirmSection = isManage && !confirmedItem && topItem && items && items.length > 0;
+  const showConfirmSection = isManage && !isOrderAggregation && !confirmedItem && topItem && items && items.length > 0;
   const isTimeManageReorder = isManage && room.room_type === 'time';
   const mainResultsHtml = isTimeManageReorder ? (bestBannerHtmlPiece + detailPanelHtmlPiece) : bodyHtml;
   const freeTexts = (participants || []).filter(p => p.free_text);
@@ -2523,7 +2811,7 @@ async function renderResults(roomId, isManage = false){
   ` : '';
 
   app.innerHTML = `
-    ${roomHeaderHtml(room, { metaExtra: `총 ${totalParticipants}명 응답` })}
+    ${roomHeaderHtml(room, { metaExtra: `${votedParticipants.length}/${totalParticipants}명 응답` })}
     ${isManage ? `<div class="badge-row"><span class="pill-badge">방장 전용 관리 페이지</span></div>` : ''}
     ${statusBoardHtml}
     ${confirmedItem ? `
@@ -2537,6 +2825,7 @@ async function renderResults(roomId, isManage = false){
       <button class="btn btn-ghost btn-sm" id="refresh-btn">새로고침</button>
       ${(!isManage && isOwner) ? `<a class="btn btn-outline-accent btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${roomId}/manage">확정 관리로 이동</a>` : ''}
       ${isManage ? `<a class="btn btn-ghost btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${roomId}/results">결과 보기 페이지로 이동</a>` : ''}
+      ${isManage ? `<button type="button" class="btn btn-accent btn-sm" id="share-results-btn" style="margin-top:0;">결과 공유하기</button>` : ''}
     </div>
     <div style="margin-top:16px;">${mainResultsHtml}</div>
     ${freeTextHtml}
@@ -2551,6 +2840,8 @@ async function renderResults(roomId, isManage = false){
     ${isTimeManageReorder ? `<div style="margin-top:20px;">${calendarHtmlPiece}</div>` : ''}
   `;
   document.getElementById('refresh-btn').addEventListener('click', ()=> renderResults(roomId, isManage));
+  const shareResultsBtn = document.getElementById('share-results-btn');
+  if(shareResultsBtn) shareResultsBtn.addEventListener('click', (e)=> copyToClipboard(resultsShareUrl(roomId), e.target));
   attachHeaderCopyBtn(room);
 
   attachResultItemEvents();
