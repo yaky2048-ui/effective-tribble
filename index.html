@@ -42,9 +42,9 @@
   @media (min-width: 1100px){
     #app{ max-width: 960px; }
   }
-  h1{ font-size: 21px; font-weight: 700; margin: 4px 0 4px; letter-spacing: -0.02em; }
-  h2{ font-size: 17px; font-weight: 700; margin: 0 0 12px; }
-  .sub{ color: var(--ink-soft); font-size: 13px; margin: 0 0 20px; }
+  h1{ font-size: 23px; font-weight: 700; margin: 4px 0 4px; letter-spacing: -0.02em; }
+  h2{ font-size: 19px; font-weight: 700; margin: 0 0 12px; }
+  .sub{ color: var(--ink-soft); font-size: 15px; margin: 0 0 20px; }
   .card{
     background: var(--white);
     border: 1px solid var(--line);
@@ -52,14 +52,14 @@
     padding: 18px;
     margin-bottom: 14px;
   }
-  label{ display:block; font-size: 13px; font-weight: 600; color: var(--ink); margin: 14px 0 6px; }
+  label{ display:block; font-size: 15px; font-weight: 600; color: var(--ink); margin: 14px 0 6px; }
   label:first-child{ margin-top:0; }
   input[type=text], input[type=date], input[type=time], input[type=datetime-local], input[type=url], input[type=number], select, textarea{
     width: 100%;
     padding: 11px 12px;
     border: 1px solid var(--line-strong);
     border-radius: 9px;
-    font-size: 15px;
+    font-size: 17px;
     font-family: inherit;
     background: var(--white);
     color: var(--ink);
@@ -76,7 +76,7 @@
     padding: 12px 18px;
     border-radius: 10px;
     border: none;
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
     cursor: pointer;
     font-family: inherit;
@@ -88,25 +88,25 @@
   .btn-ghost{ background: var(--white); color: var(--ink); border: 1px solid var(--line-strong); }
   .btn-outline-accent{ background: var(--white); color: var(--accent-deep); border: 1.5px solid var(--accent); }
   .btn-outline-accent:hover{ background: var(--accent-soft); }
-  .btn-sm{ padding: 7px 12px; font-size: 13px; border-radius: 8px; }
+  .btn-sm{ padding: 7px 12px; font-size: 15px; border-radius: 8px; }
   .btn-danger-ghost{ background: transparent; color: var(--danger); border: 1px solid #EFC9BC; }
 
   .chip-list{ display:flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .chip{
     display:flex; align-items:center; gap: 8px;
     background: var(--accent-soft); color: var(--accent-deep);
-    padding: 6px 8px 6px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;
+    padding: 6px 8px 6px 12px; border-radius: 999px; font-size: 15px; font-weight: 600;
   }
   .chip .chip-remove{
     background:none; border:none; color: var(--accent-deep); cursor:pointer;
-    font-size: 12px; font-weight: 700; line-height:1; padding: 4px 6px; font-family: inherit;
+    font-size: 14px; font-weight: 700; line-height:1; padding: 4px 6px; font-family: inherit;
   }
   .chip.chip-datetime{
     border-radius: 12px; padding: 8px 10px; width: 100%;
   }
   .chip-datetime .chip-date-label{ flex: 0 0 auto; min-width: 34px; }
   .chip-datetime input[type=time]{
-    width: auto; flex: 1; min-width: 0; padding: 4px 6px; font-size: 12.5px;
+    width: auto; flex: 1; min-width: 0; padding: 4px 6px; font-size: 14.5px;
     border-radius: 6px; background: var(--white);
   }
 
@@ -116,7 +116,7 @@
   }
   .segmented-btn{
     flex: 1; border: none; background: transparent; border-radius: 8px;
-    padding: 10px 8px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft);
+    padding: 10px 8px; font-size: 15.5px; font-weight: 600; color: var(--ink-soft);
     cursor: pointer; font-family: inherit; transition: background-color .12s ease, color .12s ease;
   }
   .segmented-btn.is-active{ background: var(--accent); color: var(--white); }
@@ -130,24 +130,24 @@
     flex: 0 0 auto;
   }
   .selected-dates-col{ flex: 1; min-width: 130px; padding-top: 4px; }
-  .selected-dates-col .label-inline{ font-size: 12px; font-weight: 700; color: var(--ink-soft); margin-bottom: 8px; }
+  .selected-dates-col .label-inline{ font-size: 14px; font-weight: 700; color: var(--ink-soft); margin-bottom: 8px; }
   .dl-selected-date-line{ display:flex; align-items:center; gap: 8px; }
-  .dl-selected-date-line .label-inline{ font-size: 12px; font-weight: 700; color: var(--ink-soft); }
-  .dl-selected-date-line #dl-selected-date{ font-weight: 700; font-size: 14px; }
+  .dl-selected-date-line .label-inline{ font-size: 14px; font-weight: 700; color: var(--ink-soft); }
+  .dl-selected-date-line #dl-selected-date{ font-weight: 700; font-size: 16px; }
 
   /* --- 시간 선택 스피너 (오전/오후 + 시:분 + 드롭다운) --- */
   .time-picker{ position: relative; }
   .tp-ampm{ display:flex; gap: 6px; margin-bottom: 8px; }
   .tp-ampm-btn{
     border: 1px solid var(--line-strong); border-radius: 8px; background: var(--white);
-    color: var(--ink-soft); font-size: 12.5px; font-weight: 600; padding: 6px 10px;
+    color: var(--ink-soft); font-size: 14.5px; font-weight: 600; padding: 6px 10px;
     cursor: pointer; font-family: inherit;
   }
   .tp-ampm-btn.is-active{ background: var(--ink); color: var(--white); border-color: var(--ink); }
-  .tp-hm{ display:flex; align-items:center; gap: 6px; font-size: 15px; font-weight: 700; }
+  .tp-hm{ display:flex; align-items:center; gap: 6px; font-size: 17px; font-weight: 700; }
   .tp-field{
     border: 1.5px solid var(--line-strong); border-radius: 8px; background: var(--white);
-    padding: 7px 12px; font-size: 15px; font-weight: 700; color: var(--ink);
+    padding: 7px 12px; font-size: 17px; font-weight: 700; color: var(--ink);
     cursor: pointer; font-family: inherit; width: 52px; text-align: center;
   }
   .tp-field.is-open{ border-color: var(--accent); color: var(--accent-deep); }
@@ -159,7 +159,7 @@
   }
   .tp-dropdown-inner{ max-height: 160px; overflow-y: auto; }
   .tp-option{
-    padding: 8px 14px; font-size: 14px; color: var(--ink); cursor: pointer; text-align:center;
+    padding: 8px 14px; font-size: 16px; color: var(--ink); cursor: pointer; text-align:center;
   }
   .tp-option:hover{ background: var(--line); }
   .tp-option.is-active{ color: var(--accent-deep); font-weight: 700; background: var(--accent-soft); }
@@ -174,11 +174,17 @@
     max-width: 360px; width: 100%; max-height: 85vh; overflow-y: auto;
   }
   .modal-panel h2{ margin: 0 0 14px; }
+  .modal-panel.modal-panel-wide{ max-width: 360px; }
+  @media (min-width: 480px){
+    .modal-panel.modal-panel-wide{ max-width: 460px; }
+    .modal-panel.modal-panel-wide .date-picker-row{ flex-wrap: nowrap; }
+    .modal-panel.modal-panel-wide .selected-dates-col{ flex: 0 0 auto; min-width: 0; }
+  }
 
   /* --- 투표페이지 후보 캘린더 --- */
   .vote-cal-day{
     aspect-ratio: 1; border: none; border-radius: 6px; padding: 0;
-    display:flex; align-items:center; justify-content:center; font-size: 11.5px; font-weight: 600;
+    display:flex; align-items:center; justify-content:center; font-size: 13.5px; font-weight: 600;
     cursor: pointer; font-family: inherit; -webkit-appearance:none; appearance:none;
     background: none; color: var(--ink);
   }
@@ -187,21 +193,21 @@
   .vote-cal-day.is-disabled{ color: var(--ink-faint); cursor: not-allowed; opacity: 0.4; }
   .vote-cal-day.is-candidate{ background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; }
   .vote-cal-day.is-voted{ box-shadow: inset 0 0 0 2px var(--accent); }
-  .vote-cal-legend{ display:flex; gap: 14px; margin-top: 10px; font-size: 11.5px; color: var(--ink-soft); }
+  .vote-cal-legend{ display:flex; gap: 14px; margin-top: 10px; font-size: 13.5px; color: var(--ink-soft); }
   .legend-dot{ display:inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; vertical-align: middle; background: var(--line); }
   .legend-dot.is-candidate{ background: var(--accent-soft); border: 1px solid var(--accent-deep); }
   .legend-dot.is-voted{ background: var(--white); box-shadow: inset 0 0 0 2px var(--accent); }
   .modal-slot-row{
     display:flex; align-items:center; gap: 10px; padding: 10px 4px;
-    border-bottom: 1px solid var(--line); font-size: 14.5px; cursor: pointer;
+    border-bottom: 1px solid var(--line); font-size: 16.5px; cursor: pointer;
   }
   .modal-slot-row:last-child{ border-bottom: none; }
   .modal-slot-row input[type=checkbox]{ width: 20px; height: 20px; accent-color: var(--accent); flex-shrink:0; }
   .calendar-header{ display:flex; align-items:center; justify-content: space-between; margin-bottom: 10px; }
-  .calendar-header span{ font-weight: 700; font-size: 13px; }
+  .calendar-header span{ font-weight: 700; font-size: 15px; }
   .cal-nav{
     background:none; border: 1px solid var(--line-strong); border-radius: 7px; padding: 4px 8px;
-    font-size: 11.5px; font-weight: 600; color: var(--ink-soft); cursor:pointer; font-family: inherit;
+    font-size: 13.5px; font-weight: 600; color: var(--ink-soft); cursor:pointer; font-family: inherit;
   }
   .cal-nav:hover:not(:disabled){ border-color: var(--accent); color: var(--accent); }
   .cal-nav:disabled{ opacity: 0.35; cursor: not-allowed; }
@@ -209,7 +215,7 @@
   .cal-day{
     aspect-ratio: 1; border: none; background: none; border-radius: 6px; padding: 0;
     -webkit-appearance: none; appearance: none;
-    font-size: 11.5px; color: var(--ink); cursor: pointer; font-family: inherit;
+    font-size: 13.5px; color: var(--ink); cursor: pointer; font-family: inherit;
   }
   .cal-day:hover:not(:disabled){ background: var(--line); }
   .cal-day.is-empty{ visibility: hidden; cursor: default; }
@@ -229,29 +235,32 @@
     margin: 16px 0;
     display:flex; gap: 10px; align-items:center; justify-content: space-between; flex-wrap: wrap;
   }
-  .link-row code{ font-size: 12px; word-break: break-all; color: var(--ink-soft); }
+  .link-row code{ font-size: 14px; word-break: break-all; color: var(--ink-soft); }
 
-  .error-box{ background: var(--accent-soft); color: var(--danger); border-radius: 10px; padding: 12px 14px; font-size: 13px; margin: 10px 0; }
-  .toast{ background: var(--accent-soft); color: var(--accent-deep); border-radius: 10px; padding: 12px 14px; font-size: 13px; margin: 10px 0; font-weight: 600; }
+  .error-box{ background: var(--accent-soft); color: var(--danger); border-radius: 10px; padding: 12px 14px; font-size: 15px; margin: 10px 0; }
+  .toast{ background: var(--accent-soft); color: var(--accent-deep); border-radius: 10px; padding: 12px 14px; font-size: 15px; margin: 10px 0; font-weight: 600; }
 
   /* --- room header --- */
   .room-header{ position: relative; margin-bottom: 18px; padding-bottom: 14px; padding-right: 84px; border-bottom: 1px solid var(--line); }
   .header-copy-btn{
     position: absolute; top: 0; right: 0;
     background: var(--white); border: 1px solid var(--line-strong); border-radius: 8px;
-    color: var(--ink); font-size: 12px; font-weight: 600; padding: 6px 10px;
+    color: var(--ink); font-size: 14px; font-weight: 600; padding: 6px 10px;
     cursor: pointer; font-family: inherit;
   }
   .header-copy-btn:hover{ border-color: var(--accent); color: var(--accent-deep); }
   .header-top{ display:flex; align-items:center; justify-content: space-between; }
-  .eyebrow{ font-size: 12px; font-weight: 700; color: var(--ink-soft); letter-spacing: .01em; }
-  .deadline-badge{ font-size: 12.5px; font-weight: 800; color: var(--accent); }
+  .eyebrow{
+    display:inline-block; font-size: 14px; font-weight: 700; color: var(--accent-deep);
+    background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; letter-spacing: .01em;
+  }
+  .deadline-badge{ font-size: 14.5px; font-weight: 800; color: var(--accent); }
   .deadline-badge.is-over{ color: var(--ink-soft); }
-  .room-header .meta{ font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
-  .place-badge{ font-size: 12.5px; color: var(--accent-deep); font-weight: 600; margin-top: 4px; }
+  .room-header .meta{ font-size: 15px; color: var(--ink); font-weight: 500; margin-top: 6px; }
+  .place-badge{ font-size: 16px; color: var(--accent-deep); font-weight: 700; margin-top: 6px; }
   .badge-row{ display:flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
   .pill-badge{
-    font-size: 12px; font-weight: 700; color: var(--accent-deep);
+    font-size: 14px; font-weight: 700; color: var(--accent-deep);
     background: var(--accent-soft); border: 1px solid var(--accent-soft); border-radius: 999px; padding: 4px 10px;
   }
   .header-actions{ display:flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
@@ -263,7 +272,7 @@
     .date-col{ flex: 0 0 170px; }
   }
   .date-col-title{
-    font-weight: 700; font-size: 13.5px; margin-bottom: 8px; color: var(--ink-soft);
+    font-weight: 700; font-size: 15.5px; margin-bottom: 8px; color: var(--ink-soft);
     display:flex; align-items:center; justify-content:space-between;
   }
   .slot-item{
@@ -276,8 +285,8 @@
     position:absolute; left:0; top:0; bottom:0; z-index:0;
     background: var(--line); width: 2px;
   }
-  .slot-item .slot-time, .slot-item .slot-count{ position: relative; z-index: 1; font-size: 14.5px; }
-  .slot-item .slot-count{ font-size: 12.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .slot-item .slot-time, .slot-item .slot-count{ position: relative; z-index: 1; font-size: 16.5px; }
+  .slot-item .slot-count{ font-size: 14.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
   .slot-item.is-selected{ background: var(--accent-soft); color: var(--accent-deep); font-weight: 700; }
   .slot-item.is-selected .slot-item-bar{ background: #F5C7B6; }
   .slot-item.is-selected .slot-count{ color: var(--accent-deep); font-weight: 700; }
@@ -290,29 +299,29 @@
     cursor: pointer; transition: border-color .12s ease, background-color .12s ease;
   }
   .option-card.is-selected{ border-color: var(--accent); background: var(--accent-soft); }
-  .option-card .opt-name{ font-weight: 700; font-size: 15px; }
+  .option-card .opt-name{ font-weight: 700; font-size: 17px; }
   .option-card.is-selected .opt-name{ color: var(--accent-deep); }
-  .option-card .opt-meta{ font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .option-card .opt-meta{ font-size: 14.5px; color: var(--ink-soft); margin-top: 2px; }
   .option-card .opt-bar-track{ height: 4px; background: var(--line); border-radius: 999px; margin-top: 10px; overflow:hidden; }
   .option-card .opt-bar-fill{ height: 100%; background: var(--accent); border-radius: 999px; }
   .option-card .opt-foot{ display:flex; justify-content: space-between; align-items:center; margin-top: 6px; }
-  .option-card .opt-count{ font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
-  .option-card a{ color: var(--accent); font-size: 12.5px; text-decoration: none; }
+  .option-card .opt-count{ font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .option-card a{ color: var(--accent); font-size: 14.5px; text-decoration: none; }
   .option-card a:hover{ text-decoration: underline; }
   .add-option-row{
     border: 1.5px dashed var(--line-strong); border-radius: 12px; padding: 13px;
-    text-align:center; color: var(--ink-soft); font-size: 13.5px; font-weight: 600; cursor: pointer;
+    text-align:center; color: var(--ink-soft); font-size: 15.5px; font-weight: 600; cursor: pointer;
     background: none; width: 100%; font-family: inherit; margin-top: 14px;
   }
   .add-option-row:hover{ border-color: var(--accent); color: var(--accent); }
   .top-bar{ display:flex; align-items:center; gap:10px; margin-bottom: 26px; }
   .top-bar-back{
-    background:none; border:none; font-size:18px; line-height:1; color: var(--ink);
+    background:none; border:none; font-size: 20px; line-height:1; color: var(--ink);
     cursor:pointer; padding: 4px 6px 4px 0; font-family: inherit;
   }
-  .top-bar-title{ font-size: 14px; font-weight: 700; color: var(--ink); }
-  .home-headline{ font-size: 25px; font-weight: 800; line-height: 1.32; letter-spacing: -0.02em; margin: 0 0 10px; }
-  .home-sub{ font-size: 13.5px; color: var(--ink-soft); margin: 0 0 24px; line-height: 1.55; }
+  .top-bar-title{ font-size: 16px; font-weight: 700; color: var(--ink); }
+  .home-headline{ font-size: 27px; font-weight: 800; line-height: 1.32; letter-spacing: -0.02em; margin: 0 0 10px; }
+  .home-sub{ font-size: 15.5px; color: var(--ink-soft); margin: 0 0 24px; line-height: 1.55; }
 
   .mode-list{ display:flex; flex-direction:column; gap: 10px; }
   .mode-list.has-form{ margin-bottom: 20px; }
@@ -325,24 +334,24 @@
   .mode-card-row:hover{ border-color: var(--accent); }
   .mode-card-row.is-active{ border-color: var(--accent); background: var(--accent-soft); }
   .mcr-top{ display:flex; align-items:center; gap: 8px; }
-  .mcr-title{ font-weight: 700; font-size: 15.5px; }
+  .mcr-title{ font-weight: 700; font-size: 17.5px; }
   .mode-card-row.is-active .mcr-title{ color: var(--accent-deep); }
   .mcr-badge{
-    font-size: 11px; font-weight: 700; color: var(--accent-deep);
+    font-size: 13px; font-weight: 700; color: var(--accent-deep);
     background: var(--accent-soft); padding: 2px 8px; border-radius: 999px;
   }
-  .mcr-desc{ font-size: 12.5px; color: var(--ink-soft); margin-top: 4px; }
+  .mcr-desc{ font-size: 14.5px; color: var(--ink-soft); margin-top: 4px; }
 
   .recent-divider{ height: 1px; background: var(--line); margin: 26px 0 16px; }
-  .recent-label{ font-size: 12px; color: var(--ink-soft); font-weight: 700; margin-bottom: 6px; }
+  .recent-label{ font-size: 14px; color: var(--ink-soft); font-weight: 700; margin-bottom: 6px; }
   .recent-item{ display:block; text-decoration:none; color:inherit; padding: 12px 0; border-bottom: 1px solid var(--line); }
   .recent-item:last-child{ border-bottom:none; }
   .recent-item-top{ display:flex; align-items:center; gap: 8px; }
-  .recent-item-title{ font-weight: 700; font-size: 14.5px; color: var(--ink); }
-  .recent-item-badge{ font-size: 11.5px; font-weight: 800; color: var(--accent); }
-  .recent-item-sub{ font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .recent-item-title{ font-weight: 700; font-size: 16.5px; color: var(--ink); }
+  .recent-item-badge{ font-size: 13.5px; font-weight: 800; color: var(--accent); }
+  .recent-item-sub{ font-size: 14.5px; color: var(--ink-soft); margin-top: 2px; }
 
-  .tie-hint{ font-size: 12.5px; color: var(--ink-soft); margin-top: 14px; text-align: center; }
+  .tie-hint{ font-size: 14.5px; color: var(--ink-soft); margin-top: 14px; text-align: center; }
 
   /* --- 구글 스타일 랜덤컬러 아바타 --- */
   .avatar-circle{
@@ -354,10 +363,10 @@
     display:flex; flex-direction:column; align-items:center; gap: 6px;
     background:none; border:none; cursor:pointer; font-family:inherit; width: 68px; padding: 0;
   }
-  .profile-btn span{ font-size: 12px; color: var(--ink); font-weight: 600; text-align:center; word-break: keep-all; }
+  .profile-btn span{ font-size: 14px; color: var(--ink); font-weight: 600; text-align:center; word-break: keep-all; }
   .profile-btn:disabled{ opacity: 0.35; cursor: not-allowed; }
   .name-chip-row{ display:flex; flex-wrap:wrap; gap: 8px; }
-  .name-chip{ display:inline-flex; align-items:center; gap: 5px; font-size: 12.5px; }
+  .name-chip{ display:inline-flex; align-items:center; gap: 5px; font-size: 14.5px; }
   .meta-with-avatar{ display:flex; align-items:center; gap: 6px; margin-top: 2px; }
 
   /* --- 벌칙뽑기 · 순서정하기 (박스 연출) --- */
@@ -368,14 +377,14 @@
     position: relative; padding: 10px;
   }
   .prize-box.is-shaking{ animation: pbx-shake 0.9s ease-in-out; }
-  .prize-box-face{ color: var(--white); font-size: 42px; font-weight: 800; }
+  .prize-box-face{ color: var(--white); font-size: 44px; font-weight: 800; }
   .prize-box-name{
-    color: var(--white); font-size: 21px; font-weight: 700; text-align:center;
+    color: var(--white); font-size: 23px; font-weight: 700; text-align:center;
     word-break: keep-all; line-height: 1.3; letter-spacing: -0.02em;
   }
   .prize-box-pop{ animation: pbx-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
   .prize-winner-label{
-    font-size: 13px; font-weight: 700; color: var(--accent-deep); margin-top: 14px;
+    font-size: 15px; font-weight: 700; color: var(--accent-deep); margin-top: 14px;
   }
   .ladder-rest-list{ margin-top: 18px; text-align:left; }
   @keyframes pbx-shake{
@@ -390,21 +399,29 @@
   }
 
   /* --- results --- */
+  .status-board{
+    border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px;
+  }
+  .status-board-count{ font-size: 22px; font-weight: 800; color: var(--ink); }
+  .status-board-total{ font-size: 15px; font-weight: 600; color: var(--ink-soft); margin-left: 4px; }
+  .status-board-pending{ margin-top: 12px; }
+  .status-board-pending .label-inline{ font-size: 13px; font-weight: 700; color: var(--ink-soft); margin-bottom: 8px; display: block; }
+  .status-board-pending-done{ margin-top: 10px; font-size: 14px; color: var(--accent-deep); font-weight: 700; }
   .confirmed-banner{
     background: var(--ink); color: var(--white); border-radius: 12px;
     padding: 16px; margin-bottom: 16px; text-align:center;
   }
-  .confirmed-banner .cb-label{ font-size: 12px; color: #C7C7CC; font-weight:600; margin-bottom: 4px; }
-  .confirmed-banner .cb-value{ font-size: 19px; font-weight: 800; }
+  .confirmed-banner .cb-label{ font-size: 14px; color: #C7C7CC; font-weight:600; margin-bottom: 4px; }
+  .confirmed-banner .cb-value{ font-size: 21px; font-weight: 800; }
 
   /* --- 시간조율 결과 캘린더 --- */
   .result-best-date-banner{
     background: var(--accent-soft); color: var(--accent-deep); border-radius: 10px;
-    padding: 12px 14px; font-size: 13.5px; font-weight: 600; margin-bottom: 16px; text-align:center;
+    padding: 12px 14px; font-size: 15.5px; font-weight: 600; margin-bottom: 16px; text-align:center;
   }
-  .result-best-date-banner strong{ font-size: 15px; font-weight: 800; }
+  .result-best-date-banner strong{ font-size: 17px; font-weight: 800; }
   .result-calendar-block{ margin: 0 auto 18px; width: 240px; max-width: 100%; }
-  .result-calendar-title{ font-weight: 700; font-size: 13.5px; margin-bottom: 8px; color: var(--ink-soft); }
+  .result-calendar-title{ font-weight: 700; font-size: 15.5px; margin-bottom: 8px; color: var(--ink-soft); }
   .result-calendar-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
   .result-cal-day{
     aspect-ratio: 1; border: none; border-radius: 6px; padding: 1px;
@@ -413,12 +430,12 @@
   }
   .result-cal-day.is-empty{ visibility:hidden; cursor:default; }
   .result-cal-day:not(.has-data){ color: var(--ink-faint); cursor: default; }
-  .result-cal-day .rcd-day{ font-size: 11.5px; font-weight: 700; }
-  .result-cal-day .rcd-count{ font-size: 8px; font-weight: 800; }
+  .result-cal-day .rcd-day{ font-size: 13.5px; font-weight: 700; }
+  .result-cal-day .rcd-count{ font-size: 10px; font-weight: 800; }
   .result-cal-day.is-selected{ outline: 2px solid var(--ink); outline-offset: 1px; }
 
   .result-date-title{
-    font-weight: 700; font-size: 13px; margin: 20px 0 8px; color: var(--white);
+    font-weight: 700; font-size: 15px; margin: 20px 0 8px; color: var(--white);
     background: var(--ink); display:inline-flex; align-items:center; gap: 8px;
     padding: 5px 12px; border-radius: 999px;
   }
@@ -427,9 +444,9 @@
   .result-item{ border:1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; position: relative; overflow: hidden; }
   .result-item .bar-bg{ position:absolute; left:0; top:0; bottom:0; background: var(--accent-soft); z-index:0; }
   .result-item .content{ position: relative; z-index: 1; display:flex; justify-content: space-between; align-items: center; gap: 10px; }
-  .result-item .label{ font-size: 14.5px; font-weight: 600; }
-  .result-item .count{ font-size: 13px; color: var(--accent-deep); font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .result-item .names{ position: relative; z-index:1; font-size: 12.5px; color: var(--ink-soft); margin-top: 8px; display:none; }
+  .result-item .label{ font-size: 16.5px; font-weight: 600; }
+  .result-item .count{ font-size: 15px; color: var(--accent-deep); font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .result-item .names{ position: relative; z-index:1; font-size: 14.5px; color: var(--ink-soft); margin-top: 8px; display:none; }
   .result-item.expanded .names{ display:block; }
   .result-item.is-top{ background: var(--accent); border-color: var(--accent); }
   .result-item.is-top .bar-bg{ display:none; }
@@ -439,13 +456,13 @@
   .stamp-badge{
     display:inline-flex; align-items:center; gap:4px;
     background: rgba(255,255,255,.22); color: var(--white);
-    font-size: 11px; font-weight: 800;
+    font-size: 13px; font-weight: 800;
     padding: 2px 8px; border-radius: 999px;
     margin-left: 8px;
   }
-  .empty-state{ text-align:center; color: var(--ink-soft); font-size: 13.5px; padding: 40px 10px; }
-  .loading{ text-align:center; color: var(--ink-soft); padding: 60px 10px; font-size: 14px; }
-  a.plain{ color: var(--accent); font-size: 13px; text-decoration: none; font-weight: 600; }
+  .empty-state{ text-align:center; color: var(--ink-soft); font-size: 15.5px; padding: 40px 10px; }
+  .loading{ text-align:center; color: var(--ink-soft); padding: 60px 10px; font-size: 16px; }
+  a.plain{ color: var(--accent); font-size: 15px; text-decoration: none; font-weight: 600; }
   a.plain:hover{ text-decoration: underline; }
 </style>
 </head>
@@ -490,7 +507,7 @@ function closeModal(){
 }
 function showConfirmModal(message, onConfirm){
   const overlay = showModal(`
-    <p style="font-size:14.5px; margin:0 0 18px; line-height:1.5;">${escapeHtml(message)}</p>
+    <p style="font-size: 16.5px; margin:0 0 18px; line-height:1.5;">${escapeHtml(message)}</p>
     <div class="row" style="gap:8px;">
       <button type="button" class="btn btn-ghost" id="modal-no" style="margin-top:0;">아니오</button>
       <button type="button" class="btn btn-primary" id="modal-yes" style="margin-top:0;">예</button>
@@ -498,6 +515,44 @@ function showConfirmModal(message, onConfirm){
   `);
   overlay.querySelector('#modal-no').addEventListener('click', closeModal);
   overlay.querySelector('#modal-yes').addEventListener('click', ()=>{ closeModal(); onConfirm(); });
+}
+function showAlertModal(message, onOk){
+  const overlay = showModal(`
+    <p style="font-size: 16.5px; margin:0 0 18px; line-height:1.5;">${escapeHtml(message)}</p>
+    <button type="button" class="btn btn-primary" id="modal-ok" style="margin-top:0;">확인</button>
+  `);
+  overlay.querySelector('#modal-ok').addEventListener('click', ()=>{ closeModal(); if(onOk) onOk(); });
+}
+function showPromptModal({ title, fields, onSubmit }){
+  const overlay = showModal(`
+    <h2>${escapeHtml(title)}</h2>
+    ${fields.map(f => `
+      <label>${escapeHtml(f.label)}</label>
+      <input type="text" id="pm-${f.id}" placeholder="${escapeHtml(f.placeholder || '')}" value="${escapeHtml(f.value || '')}" />
+    `).join('')}
+    <div class="row" style="gap:8px; margin-top:16px;">
+      <button type="button" class="btn btn-ghost" id="pm-cancel" style="margin-top:0;">취소</button>
+      <button type="button" class="btn btn-primary" id="pm-submit" style="margin-top:0;">확인</button>
+    </div>
+  `);
+  overlay.querySelector('#pm-cancel').addEventListener('click', closeModal);
+  overlay.querySelector('#pm-submit').addEventListener('click', ()=>{
+    const values = {};
+    fields.forEach(f => { values[f.id] = document.getElementById(`pm-${f.id}`).value.trim(); });
+    closeModal();
+    onSubmit(values);
+  });
+}
+function showCopyFallbackModal(text){
+  const overlay = showModal(`
+    <h2>링크 복사</h2>
+    <p style="font-size:14.5px; color:var(--ink-soft); margin:0 0 10px;">아래 링크를 길게 눌러 복사해주세요</p>
+    <input type="text" id="copy-fallback-input" value="${escapeHtml(text)}" readonly />
+    <button type="button" class="btn btn-primary" id="copy-fallback-ok" style="margin-top:16px;">확인</button>
+  `);
+  const input = overlay.querySelector('#copy-fallback-input');
+  input.focus(); input.select();
+  overlay.querySelector('#copy-fallback-ok').addEventListener('click', closeModal);
 }
 
 // 날짜/시간 input을 클릭하면 어디를 눌러도 피커가 열리도록 (아이콘만 반응하는 기본 동작 보완)
@@ -591,7 +646,7 @@ async function copyToClipboard(text, btn){
     await navigator.clipboard.writeText(text);
     if(btn){ const old = btn.textContent; btn.textContent = '복사됨!'; setTimeout(()=>btn.textContent = old, 1500); }
   }catch(e){
-    prompt('아래 링크를 복사하세요', text);
+    showCopyFallbackModal(text);
   }
 }
 
@@ -617,7 +672,7 @@ window.addEventListener('DOMContentLoaded', () => {
       <h1>설정이 필요해요</h1>
       <p class="sub">index.html 상단의 SUPABASE_URL / SUPABASE_ANON_KEY 값을 채워주세요.</p>
       <div class="card">
-        <p style="font-size:13px; color:var(--ink-soft)">
+        <p style="font-size: 15px; color:var(--ink-soft)">
           1. Supabase 프로젝트 생성<br>
           2. SQL Editor에서 schema.sql 실행<br>
           3. Project Settings &gt; API 에서 URL, anon key 복사<br>
@@ -881,7 +936,7 @@ function renderCreateForm(mode){
     });
     document.getElementById('ladder-bulk-apply').addEventListener('click', ()=>{
       const lines = document.getElementById('ladder-bulk-input').value.split('\n').map(s => s.trim()).filter(Boolean);
-      if(lines.length < 2){ alert('2명 이상 입력해주세요.'); return; }
+      if(lines.length < 2){ showAlertModal('2명 이상 입력해주세요.'); return; }
       document.getElementById('option-rows').innerHTML = '';
       lines.forEach(name => addOptionRow(name, '예: 참여자 이름', false));
       document.getElementById('ladder-options-wrap').style.display = 'block';
@@ -932,7 +987,7 @@ function createDeadlinePickerController(defaultDate){
           </div>
           <div class="calendar-grid" id="dl-cal-grid"></div>
         </div>
-        <div class="selected-dates-col">
+        <div class="selected-dates-col" style="flex: 0 0 auto; min-width: 0;">
           <div class="label-inline">시간</div>
           <div class="time-picker">
             <div class="tp-ampm">
@@ -951,6 +1006,8 @@ function createDeadlinePickerController(defaultDate){
       </div>
       <button type="button" class="btn btn-primary" id="dl-modal-confirm" style="margin-top:20px;">확인</button>
     `);
+    const panelEl = overlay.querySelector('.modal-panel');
+    if(panelEl) panelEl.classList.add('modal-panel-wide');
 
     function renderCal(){
       const grid = document.getElementById('dl-cal-grid');
@@ -1522,7 +1579,7 @@ function renderLadderRoom(room, items, options = {}){
         .is('result_order', null)
         .select().maybeSingle();
       if(error){
-        alert('결과 저장 실패: ' + error.message + '\n(Supabase에 migration_4.sql이 적용됐는지 확인해주세요)');
+        showAlertModal('결과 저장 실패: ' + error.message + '\n(Supabase에 migration_4.sql이 적용됐는지 확인해주세요)');
         drawBtn.disabled = false; drawBtn.textContent = '뽑기';
         return;
       }
@@ -1530,7 +1587,7 @@ function renderLadderRoom(room, items, options = {}){
       if(!finalRoom){
         const { data: existing, error: fetchErr } = await client.from('rooms').select().eq('id', room.id).single();
         if(fetchErr || !existing){
-          alert('결과를 불러오지 못했어요. 새로고침 후 다시 시도해주세요.');
+          showAlertModal('결과를 불러오지 못했어요. 새로고침 후 다시 시도해주세요.');
           drawBtn.disabled = false; drawBtn.textContent = '뽑기';
           return;
         }
@@ -1591,7 +1648,7 @@ async function renderNamePrompt(room, items){
           .eq('id', pid).eq('is_claimed', false)
           .select().maybeSingle();
         if(error || !data){
-          alert('이미 다른 사람이 선택한 프로필이에요. 목록을 다시 불러올게요.');
+          showAlertModal('이미 다른 사람이 선택한 프로필이에요. 목록을 다시 불러올게요.');
           renderNamePrompt(room, items);
           return;
         }
@@ -1787,10 +1844,10 @@ async function renderVoteForm(room, items, participant){
     }
     const existingKeys = new Set(items.map(it => `${it.slot_date}|${it.slot_time}`));
     newSlots = newSlots.filter(s => !existingKeys.has(`${s.slot_date}|${s.slot_time}`));
-    if(newSlots.length === 0){ alert('이미 후보에 있는 날짜예요.'); return; }
+    if(newSlots.length === 0){ showAlertModal('이미 후보에 있는 날짜예요.'); return; }
     const payload = newSlots.map((s, i) => ({ room_id: room.id, ...s, sort_order: items.length + i }));
     const { data: newItems, error } = await client.from('items').insert(payload).select();
-    if(error){ alert('추가 실패: ' + error.message); return; }
+    if(error){ showAlertModal('추가 실패: ' + error.message); return; }
     newItems.forEach(ni => { items.push(ni); countMap[ni.id] = 0; });
     refreshVoteCalendar();
   }
@@ -1929,19 +1986,26 @@ async function renderVoteForm(room, items, participant){
 
   const addBtn = document.getElementById('add-candidate-btn');
   if(addBtn){
-    addBtn.addEventListener('click', async ()=>{
+    addBtn.addEventListener('click', ()=>{
       const targetLabel = room.decide_target === 'place' ? '장소' : '메뉴';
-      const name = (prompt(`추가할 ${targetLabel} 이름 (링크만 입력할 거면 비워두세요)`) || '').trim();
-      const link = (prompt('참고 링크 (선택, 없으면 취소/빈칸)') || '').trim();
-      if(!name && !link) return;
-      const { data: newItem, error } = await client.from('items')
-        .insert({ room_id: room.id, label: name || '링크 보기', link: link || null, sort_order: items.length })
-        .select().single();
-      if(error){ alert('추가 실패: ' + error.message); return; }
-      items.push(newItem);
-      countMap[newItem.id] = 0;
-      document.getElementById('vote-body').innerHTML = renderBody();
-      attachRowEvents();
+      showPromptModal({
+        title: `${targetLabel} 추가하기`,
+        fields: [
+          { id: 'name', label: `${targetLabel} 이름 (링크만 입력할 거면 비워두세요)`, placeholder: `예: ${targetLabel === '장소' ? 'OO파스타집' : '크림파스타'}` },
+          { id: 'link', label: '참고 링크 (선택)', placeholder: '예: https://...' }
+        ],
+        onSubmit: async ({ name, link }) => {
+          if(!name && !link) return;
+          const { data: newItem, error } = await client.from('items')
+            .insert({ room_id: room.id, label: name || '링크 보기', link: link || null, sort_order: items.length })
+            .select().single();
+          if(error){ showAlertModal('추가 실패: ' + error.message); return; }
+          items.push(newItem);
+          countMap[newItem.id] = 0;
+          document.getElementById('vote-body').innerHTML = renderBody();
+          attachRowEvents();
+        }
+      });
     });
   }
 
@@ -1958,23 +2022,23 @@ async function renderVoteForm(room, items, participant){
     });
     document.getElementById('add-slot-confirm').addEventListener('click', async ()=>{
       const dateVal = document.getElementById('add-slot-date').value;
-      if(!dateVal){ alert('날짜를 선택해주세요.'); return; }
+      if(!dateVal){ showAlertModal('날짜를 선택해주세요.'); return; }
       let newSlots;
       if(hasTimeSlots){
         const fromVal = document.getElementById('add-slot-time-from').value;
         const toVal = document.getElementById('add-slot-time-to').value;
-        if(!fromVal || !toVal){ alert('시작/종료 시간을 선택해주세요.'); return; }
-        if(fromVal >= toVal){ alert('종료 시간이 시작 시간보다 늦어야 해요.'); return; }
+        if(!fromVal || !toVal){ showAlertModal('시작/종료 시간을 선택해주세요.'); return; }
+        if(fromVal >= toVal){ showAlertModal('종료 시간이 시작 시간보다 늦어야 해요.'); return; }
         newSlots = generateTimeSlots([dateVal], fromVal, toVal, 30);
       } else {
         newSlots = generateDateOnlySlots([dateVal]);
       }
       const existingKeys = new Set(items.map(it => `${it.slot_date}|${it.slot_time}`));
       newSlots = newSlots.filter(s => !existingKeys.has(`${s.slot_date}|${s.slot_time}`));
-      if(newSlots.length === 0){ alert('이미 있는 시간대예요.'); return; }
+      if(newSlots.length === 0){ showAlertModal('이미 있는 시간대예요.'); return; }
       const payload = newSlots.map((s, i) => ({ room_id: room.id, ...s, sort_order: items.length + i }));
       const { data: newItems, error } = await client.from('items').insert(payload).select();
-      if(error){ alert('추가 실패: ' + error.message); return; }
+      if(error){ showAlertModal('추가 실패: ' + error.message); return; }
       newItems.forEach(ni => { items.push(ni); countMap[ni.id] = 0; });
       document.getElementById('vote-body').innerHTML = renderBody();
       attachRowEvents();
@@ -2031,6 +2095,21 @@ async function renderResults(roomId, isManage = false){
   const itemById = Object.fromEntries((items || []).map(it => [it.id, it]));
   const confirmedItem = room.confirmed_item_id ? itemById[room.confirmed_item_id] : null;
 
+  const respondedIds = new Set((responses || []).map(r => r.participant_id));
+  const votedParticipants = (participants || []).filter(p => respondedIds.has(p.id) || p.free_text);
+  const notVotedParticipants = (participants || []).filter(p => !respondedIds.has(p.id) && !p.free_text);
+  const statusBoardHtml = totalParticipants > 0 ? `
+    <div class="status-board">
+      <div class="status-board-count">${votedParticipants.length}<span class="status-board-total">/${totalParticipants}명 투표</span></div>
+      ${notVotedParticipants.length ? `
+        <div class="status-board-pending">
+          <span class="label-inline">아직 안 한 사람</span>
+          <div class="name-chip-row">${notVotedParticipants.map(p => `<span class="name-chip">${avatarHtml(p.name, 18, resultColorMap)}<span>${escapeHtml(p.name)}</span></span>`).join('')}</div>
+        </div>
+      ` : `<div class="status-board-pending-done">모두 투표 완료!</div>`}
+    </div>
+  ` : '';
+
   let confirmSelectedId = null;
 
   function namesRowHtml(names){
@@ -2049,7 +2128,7 @@ async function renderResults(roomId, isManage = false){
       <div class="result-item ${isTop ? 'is-top' : ''} ${isConfirmChoice ? 'is-confirm-selected' : ''}" data-item-id="${it.id}">
         <div class="bar-bg" style="width:${pct}%"></div>
         <div class="content">
-          <span class="label">${escapeHtml(it.label)}${it.link ? ` · <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener" style="font-size:12px; color:inherit;">링크</a>` : ''}${isTop ? `<span class="stamp-badge">${isFullConsensus ? '전원 가능 · 최적' : '최다'}</span>` : ''}</span>
+          <span class="label">${escapeHtml(it.label)}${it.link ? ` · <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener" style="font-size: 14px; color:inherit;">링크</a>` : ''}${isTop ? `<span class="stamp-badge">${isFullConsensus ? '전원 가능 · 최적' : '최다'}</span>` : ''}</span>
           <span class="count">${ratio}</span>
         </div>
         <div class="names">${namesRowHtml(names)}</div>
@@ -2191,6 +2270,7 @@ async function renderResults(roomId, isManage = false){
   app.innerHTML = `
     ${roomHeaderHtml(room, { metaExtra: `총 ${totalParticipants}명 응답` })}
     ${isManage ? `<div class="badge-row"><span class="pill-badge">방장 전용 관리 페이지</span></div>` : ''}
+    ${statusBoardHtml}
     ${confirmedItem ? `
       <div class="confirmed-banner">
         <div class="cb-label">확정됨</div>
@@ -2237,7 +2317,7 @@ async function renderResults(roomId, isManage = false){
     confirmBtn.addEventListener('click', async ()=>{
       confirmBtn.disabled = true; confirmBtn.textContent = '확정 중...';
       const { error } = await client.from('rooms').update({ confirmed_item_id: confirmSelectedId }).eq('id', roomId);
-      if(error){ alert('확정 실패: ' + error.message); confirmBtn.disabled = false; return; }
+      if(error){ showAlertModal('확정 실패: ' + error.message); confirmBtn.disabled = false; return; }
       renderResults(roomId, isManage);
     });
   }
@@ -2247,7 +2327,7 @@ async function renderResults(roomId, isManage = false){
     cancelBtn.addEventListener('click', async ()=>{
       cancelBtn.disabled = true; cancelBtn.textContent = '취소 중...';
       const { error } = await client.from('rooms').update({ confirmed_item_id: null }).eq('id', roomId);
-      if(error){ alert('취소 실패: ' + error.message); cancelBtn.disabled = false; return; }
+      if(error){ showAlertModal('취소 실패: ' + error.message); cancelBtn.disabled = false; return; }
       renderResults(roomId, isManage);
     });
   }
@@ -2259,7 +2339,7 @@ async function renderManage(roomId){
   if(!room){ location.hash = `#/room/${roomId}/results`; return; }
   const token = localStorage.getItem(`sched:${roomId}:ownerToken`);
   if(!token || !room.owner_token || token !== room.owner_token){
-    alert('방장만 접근할 수 있는 페이지예요.');
+    showAlertModal('방장만 접근할 수 있는 페이지예요.');
     location.hash = `#/room/${roomId}/results`;
     return;
   }
