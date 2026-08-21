@@ -13,7 +13,7 @@
     --paper: #FFFFFF;
     --ink: #17181C;
     --ink-soft: #8B8B92;
-    --ink-faint: #B8B8BE;
+    --ink-faint: #D1D1D6;
     --accent: #E8542F;
     --accent-soft: #FCEAE3;
     --accent-deep: #C7431F;
@@ -116,8 +116,9 @@
   }
   .chip .chip-remove{
     background:none; border:none; color: var(--accent-deep); cursor:pointer;
-    font-size: 14px; font-weight: 700; line-height:1; padding: 4px 6px; font-family: inherit;
+    font-size: 18px; font-weight: 700; line-height:1; padding: 4px 6px; font-family: inherit;
   }
+  .chip.chip-readonly{ padding: 6px 14px; }
   .chip.chip-datetime{
     border-radius: 12px; padding: 8px 10px; width: 100%;
   }
@@ -278,6 +279,9 @@
   .deadline-badge.is-over{ color: var(--ink-soft); }
   .room-header .meta{ font-size: 15px; color: var(--ink); font-weight: 500; margin-top: 6px; }
   .place-badge{ font-size: 16px; color: var(--accent-deep); font-weight: 700; margin-top: 6px; }
+  .creator-line{ font-size: 14px; color: var(--ink-soft); font-weight: 600; margin: 2px 0 4px; }
+  .room-cta{ font-size: 15px; color: var(--accent-deep); font-weight: 700; margin-top: 8px; }
+  .room-cta-sub{ font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
   .badge-row{ display:flex; gap: 6px; margin: 10px 0 14px; flex-wrap: wrap; }
   .pill-badge{
     font-size: 14px; font-weight: 700; color: var(--accent-deep);
@@ -354,6 +358,42 @@
   .top-bar-action:hover{ border-color: var(--accent); color: var(--accent-deep); }
   .home-headline{ font-size: 27px; font-weight: 800; line-height: 1.32; letter-spacing: -0.02em; margin: 0 0 10px; }
   .home-sub{ font-size: 15.5px; color: var(--ink-soft); margin: 0 0 24px; line-height: 1.55; }
+  .accent-text{ color: var(--accent); font-weight: 700; }
+
+  /* --- 약속 정하기: 4항목 선택 그리드 --- */
+  .aspect-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .aspect-card{
+    border: 1.5px solid var(--line); border-radius: 14px; padding: 22px 14px; text-align:center;
+    background: var(--white); cursor:pointer; font-family:inherit;
+  }
+  .aspect-card.is-active{ border-color: var(--accent); background: var(--accent-soft); }
+  .aspect-title{ font-weight: 800; font-size: 18px; color: var(--ink); }
+  .aspect-card.is-active .aspect-title{ color: var(--accent-deep); }
+  .aspect-sub{ font-size: 13.5px; color: var(--ink-soft); margin-top: 4px; }
+  .aspect-summary{ margin-top: 18px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
+  .aspect-summary-value{ font-size: 16px; font-weight: 700; color: var(--ink); margin-top: 4px; }
+
+  /* --- 약속 정하기: 방생성화면 (선택 요약칩 / 구역 구분) --- */
+  .selected-aspect-bar{
+    background: var(--accent-soft); border-radius: 14px; padding: 14px 16px; margin-bottom: 16px;
+  }
+  .host-title-block{ padding-bottom: 18px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+  .host-title-block input[type=text]{
+    border: none; border-bottom: 1.5px solid var(--line-strong); border-radius: 0;
+    padding: 10px 2px 10px; background: transparent;
+  }
+  .host-title-block input[type=text]:focus{ outline: none; border-bottom-color: var(--accent); }
+  .notice-toggle-link{
+    display:inline-flex; align-items:center; gap:6px;
+    background:none; border:none; padding:0; margin-top:16px;
+    color: var(--accent-deep); font-size:15px; font-weight:600; cursor:pointer; font-family:inherit;
+    text-decoration: underline;
+  }
+  .field-group{ margin-top: 26px; padding-top: 20px; border-top: 1px dashed var(--line); }
+  .field-group-tag{
+    display:inline-flex; align-items:center; background: var(--accent-soft); color: var(--accent-deep);
+    font-size: 12.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; margin-bottom: 4px;
+  }
 
   .mode-list{ display:flex; flex-direction:column; gap: 14px; }
   .mode-list.has-form{ margin-bottom: 24px; }
@@ -551,6 +591,12 @@
   .result-item .label{ font-size: 16.5px; font-weight: 600; }
   .result-item .count{ font-size: 15px; color: var(--accent-deep); font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .result-item .names{ position: relative; z-index:1; font-size: 14.5px; color: var(--ink-soft); margin-top: 4px; display:block; }
+  .source-tag{
+    position: relative; z-index: 1; display:inline-block; font-size: 11px; font-weight: 700;
+    padding: 1px 7px; border-radius: 999px; margin-top: 4px;
+  }
+  .source-tag-participant{ background: var(--ink); color: var(--white); }
+  .result-item.is-top .source-tag-participant, .result-item.is-confirm-selected .source-tag-participant{ background: rgba(255,255,255,.25); color: var(--white); }
   .result-item.is-top{ background: var(--accent-soft); border-color: var(--accent); }
   .result-item.is-top .bar-bg{ display:none; }
   .result-item.is-top .label, .result-item.is-top .count{ color: var(--accent-deep); }
@@ -632,12 +678,14 @@ function closeModal(){
   const overlay = document.getElementById('generic-modal-overlay');
   if(overlay) overlay.remove();
 }
-function showConfirmModal(message, onConfirm){
+function showConfirmModal(message, onConfirm, labels = {}){
+  const noLabel = labels.no || '아니오';
+  const yesLabel = labels.yes || '예';
   const overlay = showModal(`
     <p style="font-size: 16.5px; margin:0 0 18px; line-height:1.5;">${escapeHtml(message)}</p>
     <div class="row" style="gap:8px;">
-      <button type="button" class="btn btn-ghost" id="modal-no" style="margin-top:0;">아니오</button>
-      <button type="button" class="btn btn-primary" id="modal-yes" style="margin-top:0;">예</button>
+      <button type="button" class="btn btn-ghost" id="modal-no" style="margin-top:0;">${escapeHtml(noLabel)}</button>
+      <button type="button" class="btn btn-primary" id="modal-yes" style="margin-top:0;">${escapeHtml(yesLabel)}</button>
     </div>
   `);
   overlay.querySelector('#modal-no').addEventListener('click', closeModal);
@@ -743,10 +791,25 @@ function dDayLabel(iso){
   const days = Math.ceil((dl - now) / (24*3600*1000));
   return days <= 0 ? `마감 오늘 ${timeStr}` : `마감 D-${days} ${timeStr}`;
 }
-function roomHeaderHtml(room, { metaExtra = '', badges = '' } = {}){
+function roomHeaderHtml(room, { metaExtra = '', badges = '', showCta = false } = {}){
   const isLadder = room.room_type === 'ladder';
+  const isAppt = room.room_type === 'appointment';
   const isOver = !isLadder && new Date() > new Date(room.deadline);
-  const eyebrow = room.room_type === 'time' ? '시간 조율' : isLadder ? '벌칙뽑기 · 순서정하기' : (room.decide_target === 'place' ? '장소 결정' : '메뉴 결정');
+  const eyebrow = room.room_type === 'time' ? '시간 조율' : isLadder ? '벌칙뽑기 · 순서정하기' : isAppt ? '약속 정하기' : (room.decide_target === 'place' ? '장소 결정' : '메뉴 결정');
+  let ctaText, ctaSub = '';
+  if(isAppt){
+    const parts = [];
+    if(room.has_date) parts.push(room.has_time ? '날짜와 시간' : '날짜');
+    if(room.has_place) parts.push('장소');
+    if(room.has_menu) parts.push('메뉴');
+    ctaText = `${parts.join(', ')}를 골라주세요`;
+    if(room.has_date) ctaSub = '여러 개 선택할 수 있어요';
+  } else {
+    ctaText = room.room_type === 'time' ? '가능한 날짜와 시간을 모두 골라주세요'
+      : isLadder ? '지금 뽑아보세요'
+      : (room.decide_target === 'place' ? '가고 싶은 장소를 골라주세요' : '먹고 싶은 메뉴를 골라주세요');
+    ctaSub = room.room_type === 'time' ? '여러 개 선택할 수 있어요' : '';
+  }
   return `
     <div class="room-header">
       <button type="button" class="header-copy-btn" id="header-copy-btn">링크 복사</button>
@@ -754,9 +817,11 @@ function roomHeaderHtml(room, { metaExtra = '', badges = '' } = {}){
         <div class="eyebrow">${eyebrow}</div>
         ${isLadder ? '' : `<div class="deadline-badge ${isOver ? 'is-over' : ''}">${dDayLabel(room.deadline)}</div>`}
       </div>
+      ${room.creator_name ? `<div class="creator-line">${escapeHtml(room.creator_name)}님이 만든 약속이에요</div>` : ''}
       <h1>${escapeHtml(room.title)}</h1>
       ${room.room_type === 'menu' && room.place_name ? `<div class="place-badge">장소 · ${escapeHtml(room.place_name)}</div>` : ''}
       <div class="meta">${metaExtra}</div>
+      ${showCta ? `<div class="room-cta">${ctaText}</div>${ctaSub ? `<div class="room-cta-sub">${ctaSub}</div>` : ''}` : ''}
       ${badges}
     </div>
   `;
@@ -830,8 +895,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 /* ---------------- CREATE PAGE ---------------- */
 const CREATE_MODES = [
-  { key: 'time', tag: '시간', title: '시간 조율', desc: '날짜 여러 개 + 시간 범위 → 슬롯 자동 생성' },
-  { key: 'menu', tag: '메뉴', title: '메뉴 · 장소 결정', desc: '후보를 올리고 표를 모아요 (참고 링크 첨부)' },
+  { key: 'appointment', tag: '약속', title: '약속 정하기', desc: '날짜·시간·장소·메뉴 중 필요한 것만 골라서 정해요' },
   { key: 'ladder', tag: '뽑기', title: '벌칙뽑기 · 순서정하기', desc: '무작위로 순서를 정하거나 벌칙 당첨자를 뽑아요' },
 ];
 function renderCreate(mode){
@@ -845,7 +909,7 @@ function renderCreate(mode){
     </div>
     ${!isFiltered ? `
       <h1 class="home-headline">언제 · 어디서 · 무엇을<br>한 번에 정하기</h1>
-      <p class="home-sub">방을 만들고 링크만 보내면 됩니다. 로그인 없이 이름만 적고 참여해요.</p>
+      <p class="home-sub">방을 만들고 링크만 보내면 됩니다. <br><br><span class="accent-text">로그인 없이 참여하세요!</span></p>
     ` : ''}
     <div class="mode-list ${isFiltered ? 'has-form' : ''}" id="mode-grid">
       ${visibleModes.map(m => `
@@ -871,10 +935,10 @@ function renderCreate(mode){
     });
   });
   const backBtn = document.getElementById('home-back-btn');
-  if(backBtn) backBtn.addEventListener('click', ()=>{ location.hash = '#/create'; });
+  if(backBtn) backBtn.onclick = ()=>{ location.hash = '#/create'; };
 
   if(isFiltered){
-    renderCreateForm(mode);
+    renderCreateForm(mode, backBtn);
   } else {
     loadRecentRooms();
   }
@@ -904,7 +968,7 @@ async function loadRecentRooms(){
   for(const p of participants || []) countByRoom[p.room_id] = (countByRoom[p.room_id] || 0) + 1;
   const roomById = Object.fromEntries(rooms.map(r => [r.id, r]));
   const ordered = ids.map(id => roomById[id]).filter(Boolean);
-  const modeLabel = t => t === 'time' ? '시간 조율' : t === 'ladder' ? '벌칙뽑기 · 순서정하기' : '메뉴·장소 결정';
+  const modeLabel = t => t === 'time' ? '시간 조율' : t === 'ladder' ? '벌칙뽑기 · 순서정하기' : t === 'appointment' ? '약속 정하기' : '메뉴·장소 결정';
   section.innerHTML = `
     <div class="recent-divider"></div>
     <div class="recent-label">최근 방</div>
@@ -923,13 +987,307 @@ async function loadRecentRooms(){
   `;
 }
 
-function renderCreateForm(mode){
+function renderAppointmentSelectorStep(container, backBtn, initialAspects){
+  const selectedAspects = new Set(initialAspects || ['date', 'time']);
+  const aspectDefs = [
+    { key: 'date', title: '날짜', sub: '언제?' },
+    { key: 'time', title: '시간', sub: '몇 시?' },
+    { key: 'place', title: '장소', sub: '어디서?' },
+    { key: 'menu', title: '메뉴', sub: '뭐 먹지?' },
+  ];
+  if(backBtn) backBtn.onclick = ()=>{ location.hash = '#/create'; };
+  function summaryText(){
+    const order = ['date', 'time', 'place', 'menu'];
+    const labelOf = { date: '날짜', time: '시간', place: '장소', menu: '메뉴' };
+    return order.filter(k => selectedAspects.has(k)).map(k => labelOf[k]).join(' · ');
+  }
+  function render(){
+    container.innerHTML = `
+      <div class="card">
+        <h2>무엇을 정할까요?</h2>
+        <div class="aspect-grid">
+          ${aspectDefs.map(a => `
+            <button type="button" class="aspect-card ${selectedAspects.has(a.key) ? 'is-active' : ''}" data-aspect="${a.key}">
+              <div class="aspect-title">${a.title}</div>
+              <div class="aspect-sub">${a.sub}</div>
+            </button>
+          `).join('')}
+        </div>
+        ${selectedAspects.size > 0 ? `
+          <div class="aspect-summary">
+            <div class="label-inline">선택한 항목</div>
+            <div class="aspect-summary-value">${summaryText()}</div>
+          </div>
+        ` : ''}
+        <button type="button" class="btn btn-primary" id="aspect-next-btn" ${selectedAspects.size === 0 ? 'disabled' : ''}>다음</button>
+      </div>
+    `;
+    document.querySelectorAll('.aspect-card').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const key = btn.dataset.aspect;
+        if(selectedAspects.has(key)) selectedAspects.delete(key); else selectedAspects.add(key);
+        render();
+      });
+    });
+    const nextBtn = document.getElementById('aspect-next-btn');
+    if(nextBtn) nextBtn.addEventListener('click', ()=>{
+      if(selectedAspects.size === 0) return;
+      renderAppointmentFormStep(container, selectedAspects, backBtn);
+    });
+  }
+  render();
+}
+
+function renderAppointmentFormStep(container, aspects, backBtn){
+  const hasTime = aspects.has('time');
+  const hasDate = aspects.has('date') || hasTime; // 시간은 날짜가 있어야 의미가 있어서, 시간만 선택해도 날짜 입력이 함께 노출됨
+  const hasPlace = aspects.has('place');
+  const hasMenu = aspects.has('menu');
+
+  if(backBtn) backBtn.onclick = ()=>{ renderAppointmentSelectorStep(container, backBtn, aspects); };
+
+  const aspectLabelOf = { date: '날짜', time: '시간', place: '장소', menu: '메뉴' };
+  const selectedAspectOrder = ['date', 'time', 'place', 'menu'].filter(k => aspects.has(k));
+
+  container.innerHTML = `
+    <div class="selected-aspect-bar">
+      <div class="label-inline" style="margin-bottom:4px;">무엇을 정할까요?에서 선택한 항목</div>
+      <div class="chip-list" style="margin-top:0;">
+        ${selectedAspectOrder.map(k => `<span class="chip chip-readonly">${aspectLabelOf[k]}</span>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h2>약속 정하기</h2>
+      <div class="host-title-block">
+        <label style="margin-top:0;">주최자 (참여 화면에 "OO님이 만든 약속" 으로 표시돼요!)</label>
+        <input type="text" id="f-creator-name" placeholder="주최자의 이름을 입력해주세요" />
+        <label style="margin-top:20px;">방 제목</label>
+        <div class="row" style="gap:8px;">
+          <input type="text" id="f-title" placeholder="예: 다음주 프로젝트 점심" style="flex:1;" />
+          <button type="button" class="deadline-trigger-btn" id="deadline-trigger-btn" style="flex:0 0 auto;"></button>
+        </div>
+        <div style="margin-top:20px;">
+          <button type="button" class="notice-toggle-link" id="notice-toggle-btn">+ 공지사항 추가</button>
+          <div id="notice-input-wrap" style="display:none; margin-top:14px;">
+            <label style="margin-top:0;">공지사항</label>
+            <input type="text" id="f-notice" placeholder="예: 카드 결제만 가능해요" />
+          </div>
+        </div>
+      </div>
+
+      ${hasDate ? `
+        <div class="field-group">
+          <div class="field-group-tag">${hasTime ? '날짜 · 시간' : '날짜'}</div>
+          <label style="margin-top:0;">후보 날짜 추가</label>
+          <div class="date-picker-row">
+            <div class="calendar-wrap" id="calendar-wrap">
+              <div class="calendar-header">
+                <button type="button" class="cal-nav" id="cal-prev">이전달</button>
+                <span id="cal-month-label"></span>
+                <button type="button" class="cal-nav" id="cal-next">다음달</button>
+              </div>
+              <div class="calendar-grid" id="calendar-grid"></div>
+            </div>
+            <div class="selected-dates-col">
+              <div class="label-inline">선택된 날짜</div>
+              <div class="chip-list" id="date-chips" style="margin-top:0;"></div>
+            </div>
+          </div>
+          ${hasTime ? `
+            <div id="time-range-wrap" style="margin-top:20px;">
+              <label>기본 시간 범위 (날짜별로 아래에서 개별 조정 가능)</label>
+              <div class="row">
+                <input type="time" id="f-start" value="09:00" />
+                <input type="time" id="f-end" value="21:00" />
+              </div>
+              <label>슬롯 단위</label>
+              <select id="f-interval">
+                <option value="30" selected>30분</option>
+                <option value="60">1시간</option>
+              </select>
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+
+      ${hasPlace ? `
+        <div class="field-group">
+          <div class="field-group-tag">장소</div>
+          <label style="margin-top:0;">장소 후보 (선택)</label>
+          <div id="place-option-rows"></div>
+          <button class="btn btn-ghost btn-sm" id="place-opt-add" type="button">+ 장소 추가</button>
+          <div class="sub" style="margin:6px 0 0;">비워두면 참여자가 직접 입력해요. 이름 없이 링크만 등록해도 돼요.</div>
+        </div>
+      ` : ''}
+
+      ${hasMenu ? `
+        <div class="field-group">
+          <div class="field-group-tag">메뉴</div>
+          <label style="margin-top:0;">메뉴 후보 (선택)</label>
+          <div id="menu-option-rows"></div>
+          <button class="btn btn-ghost btn-sm" id="menu-opt-add" type="button">+ 메뉴 추가</button>
+          <div class="sub" style="margin:6px 0 0;">비워두면 참여자가 직접 입력해요. 이름 없이 링크만 등록해도 돼요.</div>
+        </div>
+      ` : ''}
+
+      <label style="margin-top:20px;">참여자는 어떻게 입력받을까요?</label>
+      <div class="segmented" id="participant-mode-segmented">
+        <button type="button" class="segmented-btn is-active" data-value="self">참여자가 직접 입력</button>
+        <button type="button" class="segmented-btn" data-value="preset">미리 등록하기</button>
+      </div>
+      <div id="profiles-section" style="display:none; margin-top:16px;">
+        <div class="participant-box" id="participant-box">
+          <div id="participant-box-empty">
+            <button type="button" class="participant-box-plus" id="open-profile-group-btn" title="참여자 프로필 관리">+</button>
+          </div>
+          <div id="quick-profile-chips" style="display:none;"></div>
+          <input type="text" id="quick-profile-input" placeholder="이름 입력 후 Enter" style="margin-top:14px;" />
+          <button type="button" class="link-plain-btn" id="open-profile-group-btn-2" style="display:none;">저장된 그룹에서 가져오기</button>
+        </div>
+        <div class="sub" style="margin:8px 0 0;">비워두면 참여자가 직접 이름을 입력해요.</div>
+      </div>
+
+      <div class="error-box" id="f-error" style="display:none;"></div>
+      <button class="btn btn-primary" id="f-submit" style="margin-top:20px;">방 만들기</button>
+    </div>
+  `;
+
+  wireDisclosure('notice-toggle-btn', 'notice-input-wrap', '+ 공지사항 추가', '− 공지사항 접기');
+
+  if(hasPlace){
+    addOptionRow('', '장소명 (예: OO파스타집, 링크만 입력해도 OK)', true, 'place-option-rows');
+    document.getElementById('place-opt-add').addEventListener('click', ()=> addOptionRow('', '장소명 (예: OO파스타집, 링크만 입력해도 OK)', true, 'place-option-rows'));
+  }
+  if(hasMenu){
+    addOptionRow('', '메뉴명 (예: 크림파스타, 링크만 입력해도 OK)', true, 'menu-option-rows');
+    document.getElementById('menu-opt-add').addEventListener('click', ()=> addOptionRow('', '메뉴명 (예: 크림파스타, 링크만 입력해도 OK)', true, 'menu-option-rows'));
+  }
+  if(hasDate){
+    dateChipTimeMode = hasTime;
+    calendarViewDate = new Date();
+    renderCalendar();
+    document.getElementById('cal-prev').addEventListener('click', ()=>{
+      calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
+      renderCalendar();
+    });
+    document.getElementById('cal-next').addEventListener('click', ()=>{
+      calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
+      renderCalendar();
+    });
+  }
+  wireProfileGroupSection();
+  document.querySelectorAll('#participant-mode-segmented .segmented-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#participant-mode-segmented .segmented-btn').forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+      const isPreset = btn.dataset.value === 'preset';
+      document.getElementById('profiles-section').style.display = isPreset ? 'block' : 'none';
+      if(!isPreset){
+        currentProfileGroupMembers = [];
+        currentQuickProfileNames = [];
+        const quickInput = document.getElementById('quick-profile-input');
+        if(quickInput) quickInput.value = '';
+        renderParticipantBox();
+      }
+    });
+  });
+  currentDeadlinePicker = createDeadlinePickerController();
+  const deadlineBtn = document.getElementById('deadline-trigger-btn');
+  const refreshDeadlineBtn = () => {
+    deadlineBtn.textContent = currentDeadlinePicker.getSummaryText();
+    deadlineBtn.classList.toggle('is-unset', !currentDeadlinePicker.getISOString());
+  };
+  refreshDeadlineBtn();
+  deadlineBtn.addEventListener('click', () => currentDeadlinePicker.openModal(refreshDeadlineBtn));
+  document.getElementById('f-submit').addEventListener('click', () => submitAppointmentRoom({ hasDate, hasTime, hasPlace, hasMenu }));
+}
+
+async function submitAppointmentRoom({ hasDate, hasTime, hasPlace, hasMenu }){
+  const title = document.getElementById('f-title').value.trim();
+  const creatorName = document.getElementById('f-creator-name')?.value.trim() || null;
+  const notice = document.getElementById('f-notice')?.value.trim() || null;
+  const deadlineISO = currentDeadlinePicker ? currentDeadlinePicker.getISOString() : null;
+
+  if(!title){ showFormError('제목을 입력해주세요.'); return; }
+  if(!deadlineISO){ showFormError('마감일시를 선택해주세요.'); return; }
+
+  let slotsPerDate = [];
+  if(hasDate){
+    const chips = [...document.getElementById('date-chips').children];
+    if(chips.length === 0){ showFormError('날짜를 하나 이상 추가해주세요.'); return; }
+    if(hasTime){
+      const interval = Number(document.getElementById('f-interval').value);
+      for(const chip of chips){
+        const date = chip.dataset.date;
+        const s = chip.dataset.start || '09:00';
+        const e = chip.dataset.end || '21:00';
+        if(s >= e){ showFormError(`${date.replace(/-/g,'.')} 날짜는 종료 시간이 시작 시간보다 늦어야 해요.`); return; }
+        slotsPerDate.push(...generateTimeSlots([date], s, e, interval));
+      }
+    } else {
+      slotsPerDate = generateDateOnlySlots(chips.map(c => c.dataset.date));
+    }
+  }
+
+  let placeOptions = [];
+  if(hasPlace){
+    const rows = [...document.querySelectorAll('#place-option-rows .option-row')];
+    placeOptions = rows.map(r => ({
+      name: r.querySelector('.opt-name-input').value.trim(),
+      link: r.querySelector('.opt-link-input')?.value.trim() || ''
+    })).filter(o => o.name || o.link);
+  }
+  let menuOptions = [];
+  if(hasMenu){
+    const rows = [...document.querySelectorAll('#menu-option-rows .option-row')];
+    menuOptions = rows.map(r => ({
+      name: r.querySelector('.opt-name-input').value.trim(),
+      link: r.querySelector('.opt-link-input')?.value.trim() || ''
+    })).filter(o => o.name || o.link);
+  }
+
+  const btn = document.getElementById('f-submit');
+  btn.disabled = true; btn.textContent = '만드는 중...';
+
+  const client = getClient();
+  const ownerToken = generateOwnerToken();
+  const { room, error: roomErr } = await insertRoomWithFallback(client, {
+    title, room_type: 'appointment', deadline: deadlineISO, owner_token: ownerToken,
+    notice, creator_name: creatorName,
+    has_date: hasDate, has_time: hasTime, has_place: hasPlace, has_menu: hasMenu
+  });
+  if(roomErr || !room){ showFormError('방 생성 실패: ' + (roomErr?.message || '알 수 없는 오류')); btn.disabled=false; btn.textContent='방 만들기'; return; }
+  localStorage.setItem(`sched:${room.id}:ownerToken`, room.owner_token || ownerToken);
+
+  const allItems = [];
+  slotsPerDate.forEach((s, i) => allItems.push({ room_id: room.id, ...s, category: 'slot', sort_order: i }));
+  placeOptions.forEach((o, i) => allItems.push({ room_id: room.id, label: o.name || '링크 보기', link: o.link || null, category: 'place', sort_order: i }));
+  menuOptions.forEach((o, i) => allItems.push({ room_id: room.id, label: o.name || '링크 보기', link: o.link || null, category: 'menu', sort_order: i }));
+
+  if(allItems.length > 0){
+    const { error: itemsErr } = await client.from('items').insert(allItems);
+    if(itemsErr){
+      await rollbackOrphanRoom(client, room.id);
+      showFormError('항목 생성 실패: ' + itemsErr.message + ' (방 생성도 함께 취소했어요. 다시 시도해주세요)');
+      btn.disabled=false; btn.textContent='방 만들기'; return;
+    }
+  }
+
+  await createPreProfiles(client, room.id);
+  renderCreateSuccess(room.id);
+}
+
+function renderCreateForm(mode, backBtn){
   const container = document.getElementById('create-form');
-  if(mode === 'time'){
+  if(mode === 'appointment'){
+    renderAppointmentSelectorStep(container, backBtn);
+  } else if(mode === 'time'){
     container.innerHTML = `
       <div class="card">
         <h2>시간 조율 방 만들기</h2>
-        <label>제목</label>
+        <label>내 이름 (참여 화면에 "OO님이 만든 약속" 으로 표시돼요)</label>
+        <input type="text" id="f-creator-name" placeholder="예: 지은" />
+        <label style="margin-top:20px;">제목</label>
         <div class="row" style="gap:8px;">
           <input type="text" id="f-title" placeholder="예: 8월 정기모임" style="flex:1;" />
           <button type="button" class="deadline-trigger-btn" id="deadline-trigger-btn" style="flex:0 0 auto;"></button>
@@ -994,6 +1352,7 @@ function renderCreateForm(mode){
         btn.classList.add('is-active');
         document.getElementById('time-range-wrap').style.display =
           btn.dataset.value === 'dateonly' ? 'none' : 'block';
+        dateChipTimeMode = btn.dataset.value === 'datetime';
         document.querySelectorAll('#date-chips .chip').forEach(renderDateChipContent);
       });
     });
@@ -1013,6 +1372,7 @@ function renderCreateForm(mode){
       });
     });
     wireProfileGroupSection();
+    dateChipTimeMode = document.querySelector('#date-mode-segmented .segmented-btn.is-active')?.dataset.value === 'datetime';
     currentDeadlinePicker = createDeadlinePickerController();
     const deadlineBtn = document.getElementById('deadline-trigger-btn');
     const refreshDeadlineBtn = () => {
@@ -1036,7 +1396,9 @@ function renderCreateForm(mode){
     container.innerHTML = `
       <div class="card">
         <h2>메뉴·장소 결정 방 만들기</h2>
-        <label>제목</label>
+        <label>내 이름 (참여 화면에 "OO님이 만든 약속" 으로 표시돼요)</label>
+        <input type="text" id="f-creator-name" placeholder="예: 지은" />
+        <label style="margin-top:20px;">제목</label>
         <div class="row" style="gap:8px;">
           <input type="text" id="f-title" placeholder="예: 회식 메뉴 투표" style="flex:1;" />
           <button type="button" class="deadline-trigger-btn" id="deadline-trigger-btn" style="flex:0 0 auto;"></button>
@@ -1130,7 +1492,9 @@ function renderCreateForm(mode){
     container.innerHTML = `
       <div class="card">
         <h2>벌칙뽑기 · 순서정하기 방 만들기</h2>
-        <label>제목</label>
+        <label>내 이름 (참여 화면에 "OO님이 만든 약속" 으로 표시돼요)</label>
+        <input type="text" id="f-creator-name" placeholder="예: 지은" />
+        <label style="margin-top:20px;">제목</label>
         <input type="text" id="f-title" placeholder="예: 오늘 커피 사는 사람 뽑기" />
         <label>주의사항 (선택)</label>
         <input type="text" id="f-notice" placeholder="예: 결과는 되돌릴 수 없어요" />
@@ -1407,8 +1771,9 @@ function createDeadlinePickerController(){
   return { getISOString, getSummaryText, openModal };
 }
 
+let dateChipTimeMode = true; // 현재 폼에서 날짜칩에 시간범위 입력을 보여줄지 여부 (전역 상태)
 function renderDateChipContent(chip){
-  const isDatetime = document.querySelector('.segmented-btn.is-active')?.dataset.value === 'datetime';
+  const isDatetime = dateChipTimeMode;
   const [y,m,d] = chip.dataset.date.split('-');
   if(isDatetime){
     chip.classList.add('chip-datetime');
@@ -1417,13 +1782,13 @@ function renderDateChipContent(chip){
       <input type="time" class="chip-time-from" value="${chip.dataset.start || '09:00'}" />
       <span>~</span>
       <input type="time" class="chip-time-to" value="${chip.dataset.end || '21:00'}" />
-      <button type="button" class="chip-remove">삭제</button>
+      <button type="button" class="chip-remove" aria-label="삭제">×</button>
     `;
     chip.querySelector('.chip-time-from').addEventListener('change', (e)=>{ chip.dataset.start = e.target.value; });
     chip.querySelector('.chip-time-to').addEventListener('change', (e)=>{ chip.dataset.end = e.target.value; });
   } else {
     chip.classList.remove('chip-datetime');
-    chip.innerHTML = `<span>${m}/${d}</span><button type="button" class="chip-remove">삭제</button>`;
+    chip.innerHTML = `<span>${m}/${d}</span><button type="button" class="chip-remove" aria-label="삭제">×</button>`;
   }
   chip.querySelector('.chip-remove').addEventListener('click', ()=>{
     chip.remove();
@@ -1490,8 +1855,9 @@ function renderCalendar(){
   });
 }
 
-function addOptionRow(prefillName = '', namePlaceholder = '항목명 (예: 파스타집)', includeLink = true){
-  const rows = document.getElementById('option-rows');
+function addOptionRow(prefillName = '', namePlaceholder = '항목명 (예: 파스타집)', includeLink = true, containerId = 'option-rows'){
+  const rows = document.getElementById(containerId);
+  if(!rows) return;
   const row = document.createElement('div');
   row.className = 'option-row';
   row.innerHTML = `
@@ -1568,8 +1934,18 @@ async function insertRoomWithFallback(client, payload){
   }
 }
 
+// items(슬롯/후보) 생성이 room 생성 이후 실패했을 때, 슬롯 하나 없는 "고아 방"이 DB에 남지 않도록
+// 방금 만든 room을 롤백(삭제)한다. items는 room에 on delete cascade로 걸려있어 같이 정리됨.
+async function rollbackOrphanRoom(client, roomId){
+  try{
+    await client.from('rooms').delete().eq('id', roomId);
+  }catch(e){ /* 롤백 자체가 실패해도 사용자에게는 이미 원래 에러를 보여줄 것이므로 조용히 무시 */ }
+  localStorage.removeItem(`sched:${roomId}:ownerToken`);
+}
+
 async function submitTimeRoom(){
   const title = document.getElementById('f-title').value.trim();
+  const creatorName = document.getElementById('f-creator-name')?.value.trim() || null;
   const notice = document.getElementById('f-notice')?.value.trim() || null;
   const deadlineISO = currentDeadlinePicker ? currentDeadlinePicker.getISOString() : null;
   const chips = [...document.getElementById('date-chips').children];
@@ -1599,13 +1975,17 @@ async function submitTimeRoom(){
   const client = getClient();
   const ownerToken = generateOwnerToken();
   const { room, error: roomErr } = await insertRoomWithFallback(client,
-    { title, room_type: 'time', deadline: deadlineISO, owner_token: ownerToken, notice });
+    { title, room_type: 'time', deadline: deadlineISO, owner_token: ownerToken, notice, creator_name: creatorName });
   if(roomErr || !room){ showFormError('방 생성 실패: ' + (roomErr?.message || '알 수 없는 오류')); btn.disabled=false; btn.textContent='방 만들기'; return; }
   localStorage.setItem(`sched:${room.id}:ownerToken`, room.owner_token || ownerToken);
 
   const slots = slotsPerDate.map(s => ({ room_id: room.id, ...s }));
   const { error: itemsErr } = await client.from('items').insert(slots);
-  if(itemsErr){ showFormError('슬롯 생성 실패: ' + itemsErr.message); btn.disabled=false; btn.textContent='방 만들기'; return; }
+  if(itemsErr){
+    await rollbackOrphanRoom(client, room.id);
+    showFormError('슬롯 생성 실패: ' + itemsErr.message + ' (방 생성도 함께 취소했어요. 다시 시도해주세요)');
+    btn.disabled=false; btn.textContent='방 만들기'; return;
+  }
 
   await createPreProfiles(client, room.id);
   renderCreateSuccess(room.id);
@@ -1938,6 +2318,7 @@ async function createPreProfiles(client, roomId){
 
 async function submitMenuRoom(){
   const title = document.getElementById('f-title').value.trim();
+  const creatorName = document.getElementById('f-creator-name')?.value.trim() || null;
   const notice = document.getElementById('f-notice')?.value.trim() || null;
   const decideTarget = document.querySelector('#decide-target-segmented .segmented-btn.is-active')?.dataset.value || 'menu';
   const place = decideTarget === 'menu' ? document.getElementById('f-place').value.trim() : '';
@@ -1957,7 +2338,7 @@ async function submitMenuRoom(){
   const client = getClient();
   const ownerToken = generateOwnerToken();
   const { room, error: roomErr } = await insertRoomWithFallback(client,
-    { title, room_type: 'menu', deadline: deadlineISO, place_name: place || null, decide_target: decideTarget, owner_token: ownerToken, notice });
+    { title, room_type: 'menu', deadline: deadlineISO, place_name: place || null, decide_target: decideTarget, owner_token: ownerToken, notice, creator_name: creatorName });
   if(roomErr || !room){ showFormError('방 생성 실패: ' + (roomErr?.message || '알 수 없는 오류')); btn.disabled=false; btn.textContent='방 만들기'; return; }
   localStorage.setItem(`sched:${room.id}:ownerToken`, room.owner_token || ownerToken);
 
@@ -1966,7 +2347,11 @@ async function submitMenuRoom(){
       room_id: room.id, label: o.name || '링크 보기', link: o.link || null, sort_order: i
     }));
     const { error: itemsErr } = await client.from('items').insert(items);
-    if(itemsErr){ showFormError('후보 생성 실패: ' + itemsErr.message); btn.disabled=false; btn.textContent='방 만들기'; return; }
+    if(itemsErr){
+      await rollbackOrphanRoom(client, room.id);
+      showFormError('후보 생성 실패: ' + itemsErr.message + ' (방 생성도 함께 취소했어요. 다시 시도해주세요)');
+      btn.disabled=false; btn.textContent='방 만들기'; return;
+    }
   }
 
   await createPreProfiles(client, room.id);
@@ -1975,6 +2360,7 @@ async function submitMenuRoom(){
 
 async function submitLadderRoom(){
   const title = document.getElementById('f-title').value.trim();
+  const creatorName = document.getElementById('f-creator-name')?.value.trim() || null;
   const notice = document.getElementById('f-notice')?.value.trim() || null;
   const rows = [...document.querySelectorAll('#option-rows .option-row')];
   const options = rows.map(r => ({
@@ -1992,14 +2378,18 @@ async function submitLadderRoom(){
   // 벌칙뽑기·순서정하기는 응답 마감이 필요없어서 형식상 먼 미래로 채워둠(DB 제약상 not null)
   const farDeadline = new Date(Date.now() + 365*24*3600*1000).toISOString();
   const { room, error: roomErr } = await insertRoomWithFallback(client,
-    { title, room_type: 'ladder', deadline: farDeadline, notice });
+    { title, room_type: 'ladder', deadline: farDeadline, notice, creator_name: creatorName });
   if(roomErr || !room){ showFormError('방 생성 실패: ' + (roomErr?.message || '알 수 없는 오류')); btn.disabled=false; btn.textContent='방 만들기'; return; }
 
   const items = options.map((o, i) => ({
     room_id: room.id, label: o.name, link: o.link || null, sort_order: i
   }));
   const { error: itemsErr } = await client.from('items').insert(items);
-  if(itemsErr){ showFormError('항목 생성 실패: ' + itemsErr.message); btn.disabled=false; btn.textContent='방 만들기'; return; }
+  if(itemsErr){
+    await rollbackOrphanRoom(client, room.id);
+    showFormError('항목 생성 실패: ' + itemsErr.message + ' (방 생성도 함께 취소했어요. 다시 시도해주세요)');
+    btn.disabled=false; btn.textContent='방 만들기'; return;
+  }
 
   renderCreateSuccess(room.id);
 }
@@ -2092,7 +2482,7 @@ function renderLadderRoom(room, items, options = {}){
   const shouldAnimate = !!options.animate && isDecided;
 
   app.innerHTML = `
-    ${roomHeaderHtml(room, { metaExtra: `후보 ${items.length}개` })}
+    ${roomHeaderHtml(room, { metaExtra: `후보 ${items.length}개`, showCta: !isDecided })}
     ${noticeBoxHtml(room.notice)}
     <div class="card" style="text-align:center;">
       ${!isDecided ? `
@@ -2174,7 +2564,7 @@ async function renderNamePrompt(room, items){
   const profileColorMap = hasProfiles ? buildAvatarColorMap(profiles.map(p => p.name)) : {};
 
   app.innerHTML = `
-    ${roomHeaderHtml(room, { metaExtra: fmtDeadline(room.deadline) })}
+    ${roomHeaderHtml(room, { metaExtra: fmtDeadline(room.deadline), showCta: true })}
     <div class="card">
       ${hasProfiles ? `
         <label>내 프로필을 선택해주세요</label>
@@ -2266,7 +2656,209 @@ async function getOrCreateParticipant(roomId, baseName){
   throw new Error('이름 중복이 너무 많아요.');
 }
 
+/* ---------------- 약속 정하기 (통합) 투표 페이지 ---------------- */
+async function renderAppointmentVoteForm(room, items, participant){
+  const client = getClient();
+  const { data: myResponses } = await client.from('responses').select('item_id').eq('participant_id', participant.id);
+  const selected = new Set((myResponses || []).map(r => r.item_id));
+
+  const itemIds = items.map(i => i.id);
+  const { data: allResponses } = await client.from('responses').select('item_id')
+    .in('item_id', itemIds.length ? itemIds : ['00000000-0000-0000-0000-000000000000']);
+  const countMap = {};
+  for(const it of items) countMap[it.id] = 0;
+  for(const r of allResponses || []){ if(countMap[r.item_id] != null) countMap[r.item_id]++; }
+
+  const slotItems = items.filter(it => it.category === 'slot');
+  const placeItems = items.filter(it => it.category === 'place');
+  const menuItems = items.filter(it => it.category === 'menu');
+  const hasTimeSlots = slotItems.some(it => it.slot_time != null);
+  let apptCalViewDate = new Date();
+
+  function toggleSel(id){
+    if(selected.has(id)) selected.delete(id); else selected.add(id);
+  }
+
+  function buildApptCalendarHtml(){
+    const candidateDates = new Set(slotItems.map(it => it.slot_date));
+    const year = apptCalViewDate.getFullYear(), month = apptCalViewDate.getMonth();
+    const now = new Date();
+    const isCurrentMonth = year === now.getFullYear() && month === now.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const todayStr = fmtDateStr(now);
+    const startDay = isCurrentMonth ? Math.max(1, now.getDate() - now.getDay()) : 1;
+    const startOffset = new Date(year, month, startDay).getDay();
+    let cells = '';
+    for(let i = 0; i < startOffset; i++) cells += `<div class="vote-cal-day is-empty"></div>`;
+    for(let d = startDay; d <= daysInMonth; d++){
+      const dateStr = fmtDateStr(new Date(year, month, d));
+      const isPast = dateStr < todayStr;
+      const isCandidate = candidateDates.has(dateStr);
+      const voted = slotItems.some(it => it.slot_date === dateStr && selected.has(it.id));
+      let cls = 'vote-cal-day';
+      if(isPast) cls += ' is-disabled';
+      if(isCandidate) cls += ' is-candidate';
+      if(voted) cls += ' is-voted';
+      cells += `<button type="button" class="${cls}" data-date="${dateStr}" ${isPast ? 'disabled' : ''}>${d}</button>`;
+    }
+    return `
+      <div class="calendar-header">
+        <button type="button" class="cal-nav" id="appt-cal-prev">이전달</button>
+        <span>${year}년 ${month + 1}월</span>
+        <button type="button" class="cal-nav" id="appt-cal-next">다음달</button>
+      </div>
+      <div class="calendar-grid">${cells}</div>
+      <div class="vote-cal-legend">
+        <span><i class="legend-dot is-candidate"></i>후보 날짜</span>
+        <span><i class="legend-dot is-voted"></i>내가 투표함</span>
+      </div>
+    `;
+  }
+  function refreshApptCalendar(){
+    const wrap = document.getElementById('appt-calendar-wrap');
+    if(!wrap) return;
+    wrap.innerHTML = buildApptCalendarHtml();
+    attachApptCalendarEvents();
+  }
+  function attachApptCalendarEvents(){
+    const prevBtn = document.getElementById('appt-cal-prev');
+    const nextBtn = document.getElementById('appt-cal-next');
+    if(prevBtn) prevBtn.addEventListener('click', ()=>{ apptCalViewDate.setMonth(apptCalViewDate.getMonth() - 1); refreshApptCalendar(); });
+    if(nextBtn) nextBtn.addEventListener('click', ()=>{ apptCalViewDate.setMonth(apptCalViewDate.getMonth() + 1); refreshApptCalendar(); });
+    document.querySelectorAll('.vote-cal-day[data-date]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        if(!el.classList.contains('is-candidate')) return;
+        const dateStr = el.dataset.date;
+        if(!hasTimeSlots){
+          const it = slotItems.find(i => i.slot_date === dateStr);
+          if(it){ toggleSel(it.id); refreshApptCalendar(); }
+        } else {
+          openApptDateSlotModal(dateStr);
+        }
+      });
+    });
+  }
+  function openApptDateSlotModal(dateStr){
+    const slotsForDate = slotItems.filter(it => it.slot_date === dateStr)
+      .sort((a,b) => (a.slot_time || '').localeCompare(b.slot_time || ''));
+    const [y, m, d] = dateStr.split('-');
+    const overlay = showModal(`
+      <h2>${Number(m)}/${Number(d)} 시간 선택</h2>
+      <div id="appt-date-slot-modal-list">
+        ${slotsForDate.map(s => `
+          <label class="modal-slot-row">
+            <input type="checkbox" data-item-id="${s.id}" ${selected.has(s.id) ? 'checked' : ''} />
+            <span>${escapeHtml(s.label)}</span>
+          </label>
+        `).join('')}
+      </div>
+      <button type="button" class="btn btn-primary" id="appt-date-slot-modal-confirm" style="margin-top:16px;">확인</button>
+    `);
+    overlay.querySelectorAll('input[type=checkbox][data-item-id]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{ toggleSel(cb.dataset.itemId); });
+    });
+    document.getElementById('appt-date-slot-modal-confirm').addEventListener('click', ()=>{
+      closeModal();
+      refreshApptCalendar();
+    });
+  }
+
+  function optionCardsHtml(list, colorPrefix){
+    return `<div class="options-grid">${list.map(it => {
+      const cnt = countMap[it.id] || 0;
+      return `
+        <div class="option-card ${selected.has(it.id) ? 'is-selected' : ''}" data-item-id="${it.id}">
+          <div class="opt-name">${escapeHtml(it.label)}</div>
+          ${it.link ? `<a href="${escapeHtml(it.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">참고 링크</a>` : ''}
+          <div class="opt-foot"><span class="opt-count">${cnt}표</span></div>
+        </div>
+      `;
+    }).join('')}</div>`;
+  }
+  function attachOptionCardEvents(){
+    document.querySelectorAll('.option-card[data-item-id]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        toggleSel(el.dataset.itemId);
+        el.classList.toggle('is-selected');
+      });
+    });
+  }
+
+  const url = shareUrl(room.id);
+  const metaExtra = `<span class="meta-with-avatar">${avatarHtml(participant.name, 18)}${escapeHtml(participant.name)}님 · ${fmtDeadline(room.deadline)}</span>`;
+
+  app.innerHTML = `
+    ${roomHeaderHtml(room, { metaExtra, showCta: true })}
+    ${noticeBoxHtml(room.notice)}
+    <div class="header-actions">
+      <a class="btn btn-outline-accent btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${room.id}/results">결과 보기</a>
+    </div>
+    <div id="toast-area"></div>
+    ${slotItems.length ? `
+      <label style="margin-top:20px;">날짜${hasTimeSlots ? ' · 시간' : ''}</label>
+      <div class="calendar-wrap" id="appt-calendar-wrap" style="margin:8px auto 0;">${buildApptCalendarHtml()}</div>
+    ` : ''}
+    ${placeItems.length ? `
+      <label style="margin-top:20px;">장소</label>
+      <div id="appt-place-cards">${optionCardsHtml(placeItems)}</div>
+    ` : ''}
+    ${menuItems.length ? `
+      <label style="margin-top:20px;">메뉴</label>
+      <div id="appt-menu-cards">${optionCardsHtml(menuItems)}</div>
+    ` : ''}
+    <label style="margin-top:20px;">다른 요구사항이나 특이사항이 있으면 적어주세요 (선택)</label>
+    <input type="text" id="free-text-input" placeholder="예: 저는 매운 건 잘 못 먹어요"
+      value="${escapeHtml(participant.free_text || '')}" />
+    <button class="btn btn-primary" id="vote-submit">${(selected.size > 0 || participant.free_text) ? '수정하기' : '제출하기'}</button>
+  `;
+  attachHeaderCopyBtn(room);
+  if(slotItems.length) attachApptCalendarEvents();
+  attachOptionCardEvents();
+
+  document.getElementById('vote-submit').addEventListener('click', async ()=>{
+    const btn = document.getElementById('vote-submit');
+    const originalLabel = btn.textContent;
+    btn.disabled = true; btn.textContent = '제출 중...';
+    const freeText = document.getElementById('free-text-input').value.trim();
+
+    const { data: existingRows, error: fetchErr } = await client.from('responses').select('item_id').eq('participant_id', participant.id);
+    if(fetchErr){
+      showAlertModal('기존 응답을 불러오지 못했어요. 다시 시도해주세요.\n(' + fetchErr.message + ')');
+      btn.disabled = false; btn.textContent = originalLabel; return;
+    }
+    const existingIds = new Set((existingRows || []).map(r => r.item_id));
+    const toInsert = [...selected].filter(id => !existingIds.has(id));
+    const toDelete = [...existingIds].filter(id => !selected.has(id));
+
+    if(toInsert.length > 0){
+      const { error: insertErr } = await client.from('responses')
+        .insert(toInsert.map(itemId => ({ participant_id: participant.id, item_id: itemId })));
+      if(insertErr){
+        showAlertModal('응답 저장에 실패했어요. 선택은 그대로 있으니 다시 제출해주세요.\n(' + insertErr.message + ')');
+        btn.disabled = false; btn.textContent = originalLabel; return;
+      }
+    }
+    if(toDelete.length > 0){
+      const { error: deleteErr } = await client.from('responses')
+        .delete().eq('participant_id', participant.id).in('item_id', toDelete);
+      if(deleteErr){
+        showAlertModal('일부 이전 선택을 정리하지 못했어요. 새로고침 후 다시 확인해주세요.\n(' + deleteErr.message + ')');
+        btn.disabled = false; btn.textContent = originalLabel; return;
+      }
+    }
+    const { error: freeTextErr } = await client.from('participants').update({ free_text: freeText || null }).eq('id', participant.id);
+    if(freeTextErr){
+      showAlertModal('메모 저장에 실패했어요. 선택 항목은 정상 저장됐어요.\n(' + freeTextErr.message + ')');
+      btn.disabled = false; btn.textContent = originalLabel; return;
+    }
+    location.hash = `#/room/${room.id}/results`;
+  });
+}
+
 async function renderVoteForm(room, items, participant){
+  if(room.room_type === 'appointment'){
+    return renderAppointmentVoteForm(room, items, participant);
+  }
   const client = getClient();
   const { data: myResponses } = await client.from('responses').select('item_id').eq('participant_id', participant.id);
   const selected = new Set((myResponses || []).map(r => r.item_id));
@@ -2385,21 +2977,83 @@ async function renderVoteForm(room, items, participant){
     if(nextBtn) nextBtn.addEventListener('click', ()=>{ voteCalViewDate.setMonth(voteCalViewDate.getMonth() + 1); refreshVoteCalendar(); });
     document.querySelectorAll('.vote-cal-day[data-date]').forEach(el=>{
       el.addEventListener('click', ()=>{
+        if(!el.classList.contains('is-candidate')) return; // 후보 아닌 날짜는 캘린더에서 직접 추가되지 않음 (아래 "+ 다른 날짜 제안" 버튼 이용)
         const dateStr = el.dataset.date;
-        if(el.classList.contains('is-candidate')){
-          if(!hasTimeSlots){
-            const it = items.find(i => i.slot_date === dateStr);
-            if(it){ toggleSlotSelection(it.id); refreshVoteCalendar(); }
-          } else {
-            openDateSlotModal(dateStr);
-          }
-          return;
+        if(!hasTimeSlots){
+          const it = items.find(i => i.slot_date === dateStr);
+          if(it){ toggleSlotSelection(it.id); refreshVoteCalendar(); }
+        } else {
+          openDateSlotModal(dateStr);
         }
-        if(el.disabled) return;
-        showConfirmModal(`${dateStr.replace(/-/g, '.')} 날짜를 후보로 추가하시겠습니까?`, async ()=>{
-          await addCandidateDate(dateStr);
+      });
+    });
+  }
+
+  function openSuggestDateModal(){
+    const candidateDates = new Set(items.map(it => it.slot_date));
+    let viewDate = new Date(); viewDate.setDate(1);
+    let selectedDateStr = null;
+
+    function buildHtml(){
+      return `
+        <h2>다른 날짜 제안</h2>
+        <div class="calendar-wrap" id="sd-cal-wrap" style="margin:0 auto;">
+          <div class="calendar-header">
+            <button type="button" class="cal-nav" id="sd-cal-prev">이전달</button>
+            <span id="sd-cal-month-label"></span>
+            <button type="button" class="cal-nav" id="sd-cal-next">다음달</button>
+          </div>
+          <div class="calendar-grid" id="sd-cal-grid"></div>
+        </div>
+        <button type="button" class="btn btn-primary" id="sd-confirm" style="margin-top:16px;" disabled>날짜를 선택해주세요</button>
+      `;
+    }
+    function renderCal(){
+      const grid = document.getElementById('sd-cal-grid');
+      if(!grid) return;
+      const year = viewDate.getFullYear(), month = viewDate.getMonth();
+      document.getElementById('sd-cal-month-label').textContent = `${year}년 ${month + 1}월`;
+      const now = new Date();
+      document.getElementById('sd-cal-prev').disabled = (year === now.getFullYear() && month === now.getMonth());
+      const firstDay = new Date(year, month, 1);
+      const startOffset = firstDay.getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const todayStr = fmtDateStr(now);
+      let cells = '';
+      for(let i = 0; i < startOffset; i++) cells += `<div class="cal-day is-empty"></div>`;
+      for(let d = 1; d <= daysInMonth; d++){
+        const dateObj = new Date(year, month, d);
+        const dateStr = fmtDateStr(dateObj);
+        const dow = dateObj.getDay();
+        const isPast = dateStr < todayStr;
+        const isExisting = candidateDates.has(dateStr);
+        const isSel = dateStr === selectedDateStr;
+        let cls = 'cal-day';
+        if(isPast || isExisting) cls += ' is-disabled';
+        if(isSel) cls += ' is-selected';
+        if(dow === 0) cls += ' is-sun';
+        cells += `<button type="button" class="${cls}" data-date="${dateStr}" ${(isPast || isExisting) ? 'disabled' : ''}>${d}</button>`;
+      }
+      grid.innerHTML = cells;
+      grid.querySelectorAll('.cal-day[data-date]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          selectedDateStr = btn.dataset.date;
+          renderCal();
+          const confirmBtn = document.getElementById('sd-confirm');
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = `${selectedDateStr.replace(/-/g, '.')} 제안하기`;
         });
       });
+    }
+
+    showModal(buildHtml());
+    renderCal();
+    document.getElementById('sd-cal-prev').addEventListener('click', ()=>{ viewDate.setMonth(viewDate.getMonth() - 1); renderCal(); });
+    document.getElementById('sd-cal-next').addEventListener('click', ()=>{ viewDate.setMonth(viewDate.getMonth() + 1); renderCal(); });
+    document.getElementById('sd-confirm').addEventListener('click', async ()=>{
+      if(!selectedDateStr) return;
+      closeModal();
+      await addCandidateDate(selectedDateStr);
     });
   }
 
@@ -2414,7 +3068,7 @@ async function renderVoteForm(room, items, participant){
     const existingKeys = new Set(items.map(it => `${it.slot_date}|${it.slot_time}`));
     newSlots = newSlots.filter(s => !existingKeys.has(`${s.slot_date}|${s.slot_time}`));
     if(newSlots.length === 0){ showAlertModal('이미 후보에 있는 날짜예요.'); return; }
-    const payload = newSlots.map((s, i) => ({ room_id: room.id, ...s, sort_order: items.length + i }));
+    const payload = newSlots.map((s, i) => ({ room_id: room.id, ...s, sort_order: items.length + i, added_by_participant: true }));
     const { data: newItems, error } = await client.from('items').insert(payload).select();
     if(error){ showAlertModal('추가 실패: ' + error.message); return; }
     newItems.forEach(ni => { items.push(ni); countMap[ni.id] = 0; });
@@ -2439,12 +3093,13 @@ async function renderVoteForm(room, items, participant){
   }
 
   app.innerHTML = `
-    ${roomHeaderHtml(room, { metaExtra, badges })}
+    ${roomHeaderHtml(room, { metaExtra, badges, showCta: true })}
     ${noticeBoxHtml(room.notice)}
     <div class="header-actions">
       <a class="btn btn-outline-accent btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${room.id}/results">결과 보기</a>
     </div>
     ${isTime ? `<div class="calendar-wrap" id="vote-calendar-wrap" style="margin:16px auto 0;">${buildVoteCalendarHtml()}</div>` : ''}
+    ${isTime ? `<button type="button" class="add-option-row" id="suggest-date-btn" style="margin-top:12px;">+ 다른 날짜 제안</button>` : ''}
     <div id="toast-area"></div>
     <div id="vote-body" style="margin-top:16px;">${renderBody()}</div>
     ${!isTime ? '<div class="tie-hint">동점이면 방장이 최종 조율해요</div>' : ''}
@@ -2519,7 +3174,11 @@ async function renderVoteForm(room, items, participant){
     });
   }
   attachRowEvents();
-  if(isTime) attachVoteCalendarEvents();
+  if(isTime){
+    attachVoteCalendarEvents();
+    const suggestBtn = document.getElementById('suggest-date-btn');
+    if(suggestBtn) suggestBtn.addEventListener('click', openSuggestDateModal);
+  }
   document.addEventListener('mouseup', ()=>{ isDragging = false; dragSelectMode = null; });
   document.addEventListener('touchend', ()=>{ isDragging = false; dragSelectMode = null; });
   document.addEventListener('touchmove', (e)=>{
@@ -2545,7 +3204,7 @@ async function renderVoteForm(room, items, participant){
       const payload = isUrl ? { label: '링크 보기', link: val } : { label: val, link: null };
       el.disabled = true;
       const { data: newItem, error } = await client.from('items')
-        .insert({ room_id: room.id, ...payload, sort_order: items.length })
+        .insert({ room_id: room.id, ...payload, sort_order: items.length, added_by_participant: true })
         .select().single();
       if(error){ showAlertModal('추가 실패: ' + error.message); el.disabled = false; return; }
       items.push(newItem);
@@ -2561,19 +3220,339 @@ async function renderVoteForm(room, items, participant){
 
   document.getElementById('vote-submit').addEventListener('click', async ()=>{
     const btn = document.getElementById('vote-submit');
+    const originalLabel = btn.textContent;
     btn.disabled = true; btn.textContent = '제출 중...';
     const freeTextEl = document.getElementById('free-text-input');
     const freeText = freeTextEl ? freeTextEl.value.trim() : '';
-    await client.from('responses').delete().eq('participant_id', participant.id);
-    if(selected.size){
-      await client.from('responses').insert([...selected].map(itemId => ({ participant_id: participant.id, item_id: itemId })));
+
+    // 기존 응답을 먼저 조회해서 "추가할 것"과 "지울 것"을 구분.
+    // 반드시 INSERT(새 선택 반영)가 성공한 뒤에만 DELETE(기존 것 정리)를 실행해서,
+    // 중간에 실패해도 기존 응답이 통째로 사라지는 일이 없도록 함.
+    const { data: existingRows, error: fetchErr } = await client.from('responses').select('item_id').eq('participant_id', participant.id);
+    if(fetchErr){
+      showAlertModal('기존 응답을 불러오지 못했어요. 다시 시도해주세요.\n(' + fetchErr.message + ')');
+      btn.disabled = false; btn.textContent = originalLabel;
+      return;
     }
-    await client.from('participants').update({ free_text: freeText || null }).eq('id', participant.id);
+    const existingIds = new Set((existingRows || []).map(r => r.item_id));
+    const toInsert = [...selected].filter(id => !existingIds.has(id));
+    const toDelete = [...existingIds].filter(id => !selected.has(id));
+
+    if(toInsert.length > 0){
+      const { error: insertErr } = await client.from('responses')
+        .insert(toInsert.map(itemId => ({ participant_id: participant.id, item_id: itemId })));
+      if(insertErr){
+        showAlertModal('응답 저장에 실패했어요. 선택은 그대로 있으니 다시 제출해주세요.\n(' + insertErr.message + ')');
+        btn.disabled = false; btn.textContent = originalLabel;
+        return; // 기존 응답을 지우기 전이라 안전하게 중단
+      }
+    }
+
+    if(toDelete.length > 0){
+      const { error: deleteErr } = await client.from('responses')
+        .delete().eq('participant_id', participant.id).in('item_id', toDelete);
+      if(deleteErr){
+        showAlertModal('일부 이전 선택을 정리하지 못했어요. 새로고침 후 다시 확인해주세요.\n(' + deleteErr.message + ')');
+        btn.disabled = false; btn.textContent = originalLabel;
+        return; // 새 선택은 이미 저장됐지만, 정리가 안 됐다는 걸 명확히 알리고 재시도 유도
+      }
+    }
+
+    const { error: freeTextErr } = await client.from('participants').update({ free_text: freeText || null }).eq('id', participant.id);
+    if(freeTextErr){
+      showAlertModal('메모 저장에 실패했어요. 선택 항목은 정상 저장됐어요.\n(' + freeTextErr.message + ')');
+      btn.disabled = false; btn.textContent = originalLabel;
+      return;
+    }
+
     location.hash = `#/room/${room.id}/results`;
   });
 }
 
 /* ---------------- RESULTS PAGE ---------------- */
+/* ---------------- 약속 정하기 (통합) 결과 페이지 ---------------- */
+async function renderAppointmentResults(room, roomId, isManage){
+  const client = getClient();
+  const { data: items } = await client.from('items').select().eq('room_id', roomId)
+    .order('slot_date', { ascending: true }).order('slot_time', { ascending: true }).order('sort_order', { ascending: true });
+  const { data: participants } = await client.from('participants').select().eq('room_id', roomId);
+  const { data: responses } = await client.from('responses').select('item_id, participant_id')
+    .in('item_id', (items || []).map(i => i.id).length ? items.map(i => i.id) : ['00000000-0000-0000-0000-000000000000']);
+
+  const totalParticipants = (participants || []).length;
+  const nameById = Object.fromEntries((participants || []).map(p => [p.id, p.name]));
+  const resultColorMap = buildAvatarColorMap((participants || []).map(p => p.name));
+  const countMap = {};
+  for(const it of items || []) countMap[it.id] = [];
+  for(const r of responses || []){ if(countMap[r.item_id]) countMap[r.item_id].push(nameById[r.participant_id] || '익명'); }
+  const itemById = Object.fromEntries((items || []).map(it => [it.id, it]));
+  const isPastDeadline = new Date() > new Date(room.deadline);
+  const isOwner = !!room.owner_token && localStorage.getItem(`sched:${roomId}:ownerToken`) === room.owner_token;
+
+  const confirmedIds = Array.isArray(room.confirmed_item_ids) ? room.confirmed_item_ids : [];
+  const confirmedItems = confirmedIds.map(id => itemById[id]).filter(Boolean);
+
+  const respondedIds = new Set((responses || []).map(r => r.participant_id));
+  const votedParticipants = (participants || []).filter(p => respondedIds.has(p.id) || p.free_text);
+  const notVotedParticipants = (participants || []).filter(p => !respondedIds.has(p.id) && !p.free_text);
+  const statusBoardHtml = totalParticipants > 0 ? `
+    <div class="status-board">
+      <div class="status-board-count">${votedParticipants.length}<span class="status-board-total">/${totalParticipants}명 투표</span></div>
+      ${notVotedParticipants.length ? `
+        <div class="status-board-pending">
+          <span class="label-inline">아직 안 한 사람</span>
+          <div class="name-chip-row">${notVotedParticipants.map(p => `<span class="name-chip">${avatarHtml(p.name, 18, resultColorMap)}<span>${escapeHtml(p.name)}</span></span>`).join('')}</div>
+        </div>
+      ` : `<div class="status-board-pending-done">모두 투표 완료!</div>`}
+    </div>
+  ` : '';
+
+  const slotItems = (items || []).filter(it => it.category === 'slot');
+  const placeItems = (items || []).filter(it => it.category === 'place');
+  const menuItems = (items || []).filter(it => it.category === 'menu');
+
+  function namesRow(names){
+    if(!names.length) return '없음';
+    return `<div class="name-chip-row">${names.map(n => `<span class="name-chip">${avatarHtml(n, 18, resultColorMap)}<span>${escapeHtml(n)}</span></span>`).join('')}</div>`;
+  }
+
+  let dateSectionHtml = '';
+  if(slotItems.length){
+    const dateAggMap = {};
+    for(const it of slotItems){
+      if(!dateAggMap[it.slot_date]) dateAggMap[it.slot_date] = { namesSet: new Set(), slots: [] };
+      (countMap[it.id] || []).forEach(n => dateAggMap[it.slot_date].namesSet.add(n));
+      dateAggMap[it.slot_date].slots.push(it);
+    }
+    const dateEntries = Object.entries(dateAggMap).map(([date, agg]) => ({
+      date, count: agg.namesSet.size,
+      slots: agg.slots.sort((a,b) => (a.slot_time||'').localeCompare(b.slot_time||''))
+    })).sort((a,b) => a.date.localeCompare(b.date));
+    let bestDateEntry = dateEntries[0];
+    for(const d of dateEntries) if(d.count > bestDateEntry.count) bestDateEntry = d;
+    const maxSlotCount = Math.max(1, ...slotItems.map(it => (countMap[it.id]||[]).length));
+
+    function slotRowHtml(it){
+      const names = countMap[it.id] || [];
+      const pct = Math.round((names.length / maxSlotCount) * 100);
+      const isTop = names.length > 0 && names.length === maxSlotCount;
+      const ratio = totalParticipants > 0 ? `${names.length}/${totalParticipants}` : `${names.length}명`;
+      const isConfirmed = confirmedIds.includes(it.id);
+      const sourceTag = it.added_by_participant ? `<span class="source-tag source-tag-participant">참여자 추가</span>` : '';
+      return `
+        <div class="result-item ${isTop ? 'is-top' : ''} ${isConfirmed ? 'is-confirm-selected' : ''}" data-slot-id="${it.id}">
+          <div class="bar-bg" style="width:${pct}%"></div>
+          <div class="content">
+            <span class="label">${escapeHtml(it.label)}${isTop ? '<span class="stamp-badge">최다</span>' : ''}</span>
+            <span class="count">${ratio}</span>
+          </div>
+          ${sourceTag}
+          <div class="names">${namesRow(names)}</div>
+        </div>
+      `;
+    }
+    const bestBanner = (bestDateEntry && bestDateEntry.count > 0) ? (() => {
+      const [y,m,d] = bestDateEntry.date.split('-');
+      return `<div class="result-best-date-banner">최다 응답일 <strong>${Number(m)}/${Number(d)}</strong> · ${bestDateEntry.count}명</div>`;
+    })() : '';
+    dateSectionHtml = `
+      <div class="result-date-title" style="background:var(--ink); margin-top:0;">날짜 · 시간</div>
+      ${bestBanner}
+      ${dateEntries.map(entry => {
+        const [y,m,d] = entry.date.split('-');
+        return `<div class="result-date-title">${Number(m)}/${Number(d)} <span class="rd-count">${entry.count}명</span></div>${entry.slots.map(slotRowHtml).join('')}`;
+      }).join('')}
+    `;
+  }
+
+  let placeSectionHtml = '';
+  if(placeItems.length){
+    const placeSorted = [...placeItems].sort((a,b) => (countMap[b.id]||[]).length - (countMap[a.id]||[]).length);
+    const maxPlaceCount = Math.max(1, ...placeItems.map(it => (countMap[it.id]||[]).length));
+    placeSectionHtml = `
+      <div class="result-date-title" style="background:var(--ink); margin-top:20px;">장소</div>
+      <div class="result-item-grid">
+        ${placeSorted.map(it => {
+          const names = countMap[it.id] || [];
+          const pct = Math.round((names.length / maxPlaceCount) * 100);
+          const isTop = names.length > 0 && names.length === maxPlaceCount;
+          const ratio = totalParticipants > 0 ? `${names.length}/${totalParticipants}` : `${names.length}명`;
+          const isConfirmed = confirmedIds.includes(it.id);
+          const sourceTag = it.added_by_participant ? `<span class="source-tag source-tag-participant">참여자 추가</span>` : '';
+          return `
+            <div class="result-item ${isTop ? 'is-top' : ''} ${isConfirmed ? 'is-confirm-selected' : ''}" data-place-id="${it.id}">
+              <div class="bar-bg" style="width:${pct}%"></div>
+              <div class="content">
+                <span class="label">${escapeHtml(it.label)}${it.link ? ` · <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener" style="font-size:14px;color:inherit;">링크</a>` : ''}${isTop ? '<span class="stamp-badge">최다</span>' : ''}</span>
+                <span class="count">${ratio}</span>
+              </div>
+              ${sourceTag}
+              <div class="names">${namesRow(names)}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  let menuSectionHtml = '';
+  if(menuItems.length){
+    const orderMap = {};
+    for(const r of responses || []){
+      const name = nameById[r.participant_id];
+      const item = itemById[r.item_id];
+      if(name && item && item.category === 'menu'){
+        if(!orderMap[name]) orderMap[name] = [];
+        orderMap[name].push(item.label);
+      }
+    }
+    const orderRows = (participants || []).map(p => {
+      const orders = orderMap[p.name] || [];
+      const text = orders.length ? orders.join(', ') : (p.free_text ? p.free_text : '아직 선택 안 함');
+      const isEmpty = orders.length === 0 && !p.free_text;
+      return `
+        <div class="order-row">
+          <div class="order-row-name">${avatarHtml(p.name, 26, resultColorMap)}<span>${escapeHtml(p.name)}</span></div>
+          <div class="order-row-choice ${isEmpty ? 'is-empty' : ''}">${escapeHtml(text)}</div>
+        </div>
+      `;
+    }).join('');
+    const maxMenuCount = Math.max(1, ...menuItems.map(it => (countMap[it.id]||[]).length));
+    const menuSorted = [...menuItems].sort((a,b) => (countMap[b.id]||[]).length - (countMap[a.id]||[]).length);
+    menuSectionHtml = `
+      <div class="order-summary-card" style="margin-top:20px;">
+        <div class="order-summary-title">인원별 주문 현황</div>
+        ${orderRows}
+      </div>
+      <div class="result-date-title" style="background:var(--ink); margin-top:20px;">메뉴별 집계</div>
+      <div class="result-item-grid">
+        ${menuSorted.map(it => {
+          const names = countMap[it.id] || [];
+          const pct = Math.round((names.length / maxMenuCount) * 100);
+          const ratio = totalParticipants > 0 ? `${names.length}/${totalParticipants}` : `${names.length}명`;
+          const sourceTag = it.added_by_participant ? `<span class="source-tag source-tag-participant">참여자 추가</span>` : '';
+          return `
+            <div class="result-item" data-item-id="${it.id}">
+              <div class="bar-bg" style="width:${pct}%"></div>
+              <div class="content">
+                <span class="label">${escapeHtml(it.label)}${it.link ? ` · <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener" style="font-size:14px;color:inherit;">링크</a>` : ''}</span>
+                <span class="count">${ratio}</span>
+              </div>
+              ${sourceTag}
+              <div class="names">${namesRow(names)}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  const freeTexts = (participants || []).filter(p => p.free_text);
+  const freeTextHtml = freeTexts.length ? `
+    <div class="result-date-title" style="background:var(--ink); margin-top:20px;">직접 제안</div>
+    ${freeTexts.map(p => `
+      <div class="result-item" style="cursor:default;">
+        <div class="content"><span class="label" style="display:flex; align-items:center; gap:6px;">${avatarHtml(p.name, 20, resultColorMap)}${escapeHtml(p.name)}</span></div>
+        <div class="names" style="display:block; margin-top:6px;">${escapeHtml(p.free_text)}</div>
+      </div>
+    `).join('')}
+  ` : '';
+
+  const confirmTargets = [];
+  if(slotItems.length && !confirmedIds.some(id => itemById[id]?.category === 'slot')){
+    let best = slotItems[0];
+    for(const it of slotItems) if((countMap[it.id]||[]).length > (countMap[best.id]||[]).length) best = it;
+    confirmTargets.push({ category: 'slot', label: '날짜·시간', item: best });
+  }
+  if(placeItems.length && !confirmedIds.some(id => itemById[id]?.category === 'place')){
+    let best = placeItems[0];
+    for(const it of placeItems) if((countMap[it.id]||[]).length > (countMap[best.id]||[]).length) best = it;
+    confirmTargets.push({ category: 'place', label: '장소', item: best });
+  }
+
+  const confirmedBannerHtml = confirmedItems.length ? `
+    <div class="confirmed-banner">
+      <div class="cb-label">확정됨</div>
+      ${confirmedItems.map(it => `<div class="cb-value">${escapeHtml(it.category === 'slot' ? formatConfirmedTime(it) : it.label)}</div>`).join('')}
+    </div>
+  ` : '';
+
+  app.innerHTML = `
+    ${roomHeaderHtml(room, { metaExtra: `${votedParticipants.length}/${totalParticipants}명 응답` })}
+    ${isManage ? `<div class="badge-row"><span class="pill-badge">방장 전용 관리 페이지</span></div>` : ''}
+    ${statusBoardHtml}
+    ${confirmedBannerHtml}
+    <div class="header-actions">
+      ${!isPastDeadline ? `<a class="btn btn-ghost btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${roomId}">응답하러 가기</a>` : ''}
+      <button class="btn btn-ghost btn-sm" id="refresh-btn">새로고침</button>
+      ${(!isManage && isOwner) ? `<a class="btn btn-outline-accent btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${roomId}/manage">확정 관리로 이동</a>` : ''}
+      ${isManage ? `<a class="btn btn-ghost btn-sm" style="text-decoration:none; display:inline-flex;" href="#/room/${roomId}/results">결과 보기 페이지로 이동</a>` : ''}
+      ${isManage ? `<button type="button" class="btn btn-accent btn-sm" id="share-results-btn" style="margin-top:0;">결과 공유하기</button>` : ''}
+    </div>
+    <div style="margin-top:16px;">
+      ${dateSectionHtml}
+      ${placeSectionHtml}
+      ${menuSectionHtml}
+    </div>
+    ${freeTextHtml}
+    ${(isManage && confirmTargets.length) ? `
+      <div class="tie-hint" style="margin-top:18px;">항목을 클릭하면 확정할 것을 바꿀 수 있어요</div>
+      ${confirmTargets.map(t => `
+        <button class="btn btn-accent" data-confirm-category="${t.category}" data-confirm-item-id="${t.item.id}" style="margin-top:10px;">
+          ${escapeHtml(t.category === 'slot' ? formatConfirmedTime(t.item) : t.item.label)}(으)로 ${t.label} 확정
+        </button>
+      `).join('')}
+    ` : ''}
+    ${(isManage && confirmedItems.length) ? `<button class="btn btn-ghost" id="cancel-confirm-btn" style="margin-top:14px; width:100%;">확정 전부 취소</button>` : ''}
+  `;
+  attachHeaderCopyBtn(room);
+  document.getElementById('refresh-btn').addEventListener('click', ()=> renderResults(roomId, isManage));
+  const shareBtn = document.getElementById('share-results-btn');
+  if(shareBtn) shareBtn.addEventListener('click', (e)=> copyToClipboard(resultsShareUrl(roomId), e.target));
+
+  if(isManage){
+    document.querySelectorAll('[data-slot-id], [data-place-id]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const category = el.dataset.slotId ? 'slot' : 'place';
+        const id = el.dataset.slotId || el.dataset.placeId;
+        const btn = document.querySelector(`[data-confirm-category="${category}"]`);
+        if(!btn) return;
+        document.querySelectorAll(`[data-${category}-id]`).forEach(e2 => e2.classList.remove('is-confirm-selected'));
+        el.classList.add('is-confirm-selected');
+        const it = itemById[id];
+        btn.dataset.confirmItemId = id;
+        btn.textContent = `${it.category === 'slot' ? formatConfirmedTime(it) : it.label}(으)로 ${category === 'slot' ? '날짜·시간' : '장소'} 확정`;
+      });
+    });
+  }
+
+  document.querySelectorAll('[data-confirm-category]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const category = btn.dataset.confirmCategory;
+      const id = btn.dataset.confirmItemId;
+      const it = itemById[id];
+      const label = category === 'slot' ? formatConfirmedTime(it) : it.label;
+      showConfirmModal(`${label}(으)로 확정할까요?`, async ()=>{
+        btn.disabled = true; btn.textContent = '확정 중...';
+        const newConfirmed = [...confirmedIds.filter(cid => itemById[cid]?.category !== category), id];
+        const { error } = await client.from('rooms').update({ confirmed_item_ids: newConfirmed }).eq('id', roomId);
+        if(error){ showAlertModal('확정 실패: ' + error.message); btn.disabled = false; return; }
+        renderResults(roomId, isManage);
+      }, { no: '취소', yes: '확정' });
+    });
+  });
+
+  const cancelBtn = document.getElementById('cancel-confirm-btn');
+  if(cancelBtn){
+    cancelBtn.addEventListener('click', async ()=>{
+      cancelBtn.disabled = true; cancelBtn.textContent = '취소 중...';
+      const { error } = await client.from('rooms').update({ confirmed_item_ids: [] }).eq('id', roomId);
+      if(error){ showAlertModal('취소 실패: ' + error.message); cancelBtn.disabled = false; return; }
+      renderResults(roomId, isManage);
+    });
+  }
+}
+
 async function renderResults(roomId, isManage = false){
   app.innerHTML = `<div class="loading">불러오는 중...</div>`;
   const client = getClient();
@@ -2586,6 +3565,9 @@ async function renderResults(roomId, isManage = false){
   if(room.room_type === 'ladder'){
     location.hash = `#/room/${roomId}`;
     return;
+  }
+  if(room.room_type === 'appointment'){
+    return renderAppointmentResults(room, roomId, isManage);
   }
   const { data: items } = await client.from('items').select().eq('room_id', roomId)
     .order('slot_date', { ascending: true }).order('slot_time', { ascending: true }).order('sort_order', { ascending: true });
@@ -2636,6 +3618,7 @@ async function renderResults(roomId, isManage = false){
     const isFullConsensus = totalParticipants > 0 && names.length === totalParticipants;
     const ratio = totalParticipants > 0 ? `${names.length}/${totalParticipants}` : `${names.length}명`;
     const isConfirmChoice = isManage && !confirmedItem && it.id === confirmSelectedId;
+    const sourceTag = it.added_by_participant ? `<span class="source-tag source-tag-participant">참여자 추가</span>` : '';
     return `
       <div class="result-item ${isTop ? 'is-top' : ''} ${isConfirmChoice ? 'is-confirm-selected' : ''}" data-item-id="${it.id}">
         <div class="bar-bg" style="width:${pct}%"></div>
@@ -2643,6 +3626,7 @@ async function renderResults(roomId, isManage = false){
           <span class="label">${escapeHtml(it.label)}${it.link ? ` · <a href="${escapeHtml(it.link)}" target="_blank" rel="noopener" style="font-size: 14px; color:inherit;">링크</a>` : ''}${isTop ? `<span class="stamp-badge">${isFullConsensus ? '전원 가능 · 최적' : '최다'}</span>` : ''}</span>
           <span class="count">${ratio}</span>
         </div>
+        ${sourceTag}
         <div class="names">${namesRowHtml(names)}</div>
       </div>
     `;
@@ -2795,6 +3779,26 @@ async function renderResults(roomId, isManage = false){
 
   const isOwner = !!room.owner_token && localStorage.getItem(`sched:${roomId}:ownerToken`) === room.owner_token;
   const showConfirmSection = isManage && !isOrderAggregation && !confirmedItem && topItem && items && items.length > 0;
+  function buildTieHintText(){
+    if(!topItem) return '';
+    const topCount = (countMap[topItem.id] || []).length;
+    if(topCount === 0) return '';
+    const tied = items.filter(it => (countMap[it.id] || []).length === topCount);
+    if(tied.length <= 1) return '';
+    if(room.room_type === 'time'){
+      const sameDateTied = tied.filter(it => it.slot_date === topItem.slot_date);
+      if(sameDateTied.length > 1){
+        const dow = ['일','월','화','수','목','금','토'][new Date(topItem.slot_date + 'T00:00:00').getDay()];
+        const [y, m, d] = topItem.slot_date.split('-');
+        const times = sameDateTied.map(it => it.label).join(' / ');
+        return `동률이에요 — ${Number(m)}/${Number(d)}(${dow}) ${times} 중에서 선택해주세요`;
+      }
+      return `동률이에요 — 같은 표를 받은 항목이 ${tied.length}개 있어요. 직접 선택해주세요`;
+    }
+    const labels = tied.map(it => it.label).join(' / ');
+    return `동률이에요 — ${labels} 중에서 선택해주세요`;
+  }
+  const tieHintText = buildTieHintText();
   const isTimeManageReorder = isManage && room.room_type === 'time';
   const mainResultsHtml = isTimeManageReorder ? (bestBannerHtmlPiece + detailPanelHtmlPiece) : bodyHtml;
   const freeTexts = (participants || []).filter(p => p.free_text);
@@ -2830,7 +3834,7 @@ async function renderResults(roomId, isManage = false){
     <div style="margin-top:16px;">${mainResultsHtml}</div>
     ${freeTextHtml}
     ${showConfirmSection ? `
-      <div class="tie-hint" style="margin-top:18px;">항목을 클릭하면 확정할 것을 바꿀 수 있어요</div>
+      <div class="tie-hint" style="margin-top:18px;">${tieHintText || '항목을 클릭하면 확정할 것을 바꿀 수 있어요'}</div>
       <div class="header-actions" style="margin-top:8px; flex-direction:column;">
         <a class="btn btn-ghost" style="text-decoration:none; display:flex; margin-bottom:8px;" href="#/room/${roomId}">내 응답 수정</a>
         <button class="btn btn-accent" id="confirm-btn" style="margin-top:0;">${escapeHtml(room.room_type === 'time' ? formatConfirmedTime(topItem) : topItem.label)}(으)로 확정</button>
@@ -2860,11 +3864,15 @@ async function renderResults(roomId, isManage = false){
 
   const confirmBtn = document.getElementById('confirm-btn');
   if(confirmBtn){
-    confirmBtn.addEventListener('click', async ()=>{
-      confirmBtn.disabled = true; confirmBtn.textContent = '확정 중...';
-      const { error } = await client.from('rooms').update({ confirmed_item_id: confirmSelectedId }).eq('id', roomId);
-      if(error){ showAlertModal('확정 실패: ' + error.message); confirmBtn.disabled = false; return; }
-      renderResults(roomId, isManage);
+    confirmBtn.addEventListener('click', ()=>{
+      const chosenItem = itemById[confirmSelectedId];
+      const chosenLabel = chosenItem ? (room.room_type === 'time' ? formatConfirmedTime(chosenItem) : chosenItem.label) : '';
+      showConfirmModal(`${chosenLabel}(으)로 약속을 확정할까요?`, async ()=>{
+        confirmBtn.disabled = true; confirmBtn.textContent = '확정 중...';
+        const { error } = await client.from('rooms').update({ confirmed_item_id: confirmSelectedId }).eq('id', roomId);
+        if(error){ showAlertModal('확정 실패: ' + error.message); confirmBtn.disabled = false; return; }
+        renderResults(roomId, isManage);
+      }, { no: '취소', yes: '확정' });
     });
   }
 
