@@ -361,22 +361,30 @@
   .accent-text{ color: var(--accent); font-weight: 700; }
 
   /* --- 약속 정하기: 4항목 선택 그리드 --- */
-  .aspect-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .aspect-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
   .aspect-card{
-    border: 1.5px solid var(--line); border-radius: 14px; padding: 22px 14px; text-align:center;
+    border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 10px; text-align:center;
     background: var(--white); cursor:pointer; font-family:inherit;
   }
-  .aspect-card.is-active{ border-color: var(--accent); background: var(--accent-soft); }
-  .aspect-title{ font-weight: 800; font-size: 18px; color: var(--ink); }
+  .aspect-card.is-active{ border-color: var(--accent); background: var(--white); }
+  .aspect-title{ font-weight: 800; font-size: 15px; color: var(--ink); }
   .aspect-card.is-active .aspect-title{ color: var(--accent-deep); }
-  .aspect-sub{ font-size: 13.5px; color: var(--ink-soft); margin-top: 4px; }
+  .aspect-sub{ font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
   .aspect-summary{ margin-top: 18px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
-  .aspect-summary-value{ font-size: 16px; font-weight: 700; color: var(--ink); margin-top: 4px; }
+  .aspect-summary-value{ margin-top: 8px; display:flex; flex-wrap: wrap; gap: 8px; }
+  .aspect-chip{
+    display:inline-block; background: var(--accent); color: var(--white);
+    font-size: 13px; font-weight: 700; padding: 4px 12px; border-radius: 999px;
+  }
 
   /* --- 약속 정하기: 방생성화면 (선택 요약칩 / 구역 구분) --- */
   .selected-aspect-bar{
-    background: var(--accent-soft); border-radius: 14px; padding: 14px 16px; margin-bottom: 16px;
+    display:flex; align-items:center; justify-content:space-between; gap: 10px;
+    background: var(--white); border: 1px solid var(--line); border-radius: 10px;
+    padding: 11px 14px; margin-bottom: 16px;
   }
+  .selected-aspect-bar .label-inline{ margin: 0 8px 0 0; }
+  .selected-aspect-bar-value{ font-size: 14.5px; font-weight: 700; color: var(--ink); }
   .host-title-block{ padding-bottom: 18px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
   .host-title-block input[type=text]{
     border: none; border-bottom: 1.5px solid var(--line-strong); border-radius: 0;
@@ -988,7 +996,7 @@ async function loadRecentRooms(){
 }
 
 function renderAppointmentSelectorStep(container, backBtn, initialAspects){
-  const selectedAspects = new Set(initialAspects || ['date', 'time']);
+  const selectedAspects = new Set(initialAspects || ['date']);
   const aspectDefs = [
     { key: 'date', title: '날짜', sub: '언제?' },
     { key: 'time', title: '시간', sub: '몇 시?' },
@@ -996,10 +1004,10 @@ function renderAppointmentSelectorStep(container, backBtn, initialAspects){
     { key: 'menu', title: '메뉴', sub: '뭐 먹지?' },
   ];
   if(backBtn) backBtn.onclick = ()=>{ location.hash = '#/create'; };
-  function summaryText(){
+  function summaryChipsHtml(){
     const order = ['date', 'time', 'place', 'menu'];
     const labelOf = { date: '날짜', time: '시간', place: '장소', menu: '메뉴' };
-    return order.filter(k => selectedAspects.has(k)).map(k => labelOf[k]).join(' · ');
+    return order.filter(k => selectedAspects.has(k)).map(k => `<span class="aspect-chip">${labelOf[k]}</span>`).join('');
   }
   function render(){
     container.innerHTML = `
@@ -1016,7 +1024,7 @@ function renderAppointmentSelectorStep(container, backBtn, initialAspects){
         ${selectedAspects.size > 0 ? `
           <div class="aspect-summary">
             <div class="label-inline">선택한 항목</div>
-            <div class="aspect-summary-value">${summaryText()}</div>
+            <div class="aspect-summary-value">${summaryChipsHtml()}</div>
           </div>
         ` : ''}
         <button type="button" class="btn btn-primary" id="aspect-next-btn" ${selectedAspects.size === 0 ? 'disabled' : ''}>다음</button>
@@ -1051,10 +1059,11 @@ function renderAppointmentFormStep(container, aspects, backBtn){
 
   container.innerHTML = `
     <div class="selected-aspect-bar">
-      <div class="label-inline" style="margin-bottom:4px;">무엇을 정할까요?에서 선택한 항목</div>
-      <div class="chip-list" style="margin-top:0;">
-        ${selectedAspectOrder.map(k => `<span class="chip chip-readonly">${aspectLabelOf[k]}</span>`).join('')}
+      <div>
+        <span class="label-inline">선택 항목</span>
+        <span class="selected-aspect-bar-value">${selectedAspectOrder.map(k => aspectLabelOf[k]).join(' · ')}</span>
       </div>
+      <button type="button" class="link-plain-btn" id="edit-aspects-btn" style="margin-top:0;">수정</button>
     </div>
     <div class="card">
       <h2>약속 정하기</h2>
@@ -1153,6 +1162,8 @@ function renderAppointmentFormStep(container, aspects, backBtn){
   `;
 
   wireDisclosure('notice-toggle-btn', 'notice-input-wrap', '+ 공지사항 추가', '− 공지사항 접기');
+  const editAspectsBtn = document.getElementById('edit-aspects-btn');
+  if(editAspectsBtn) editAspectsBtn.addEventListener('click', ()=> renderAppointmentSelectorStep(container, backBtn, aspects));
 
   if(hasPlace){
     addOptionRow('', '장소명 (예: OO파스타집, 링크만 입력해도 OK)', true, 'place-option-rows');
@@ -1492,31 +1503,29 @@ function renderCreateForm(mode, backBtn){
     container.innerHTML = `
       <div class="card">
         <h2>벌칙뽑기 · 순서정하기 방 만들기</h2>
-        <label>내 이름 (참여 화면에 "OO님이 만든 약속" 으로 표시돼요)</label>
-        <input type="text" id="f-creator-name" placeholder="예: 지은" />
-        <label style="margin-top:20px;">제목</label>
-        <input type="text" id="f-title" placeholder="예: 오늘 커피 사는 사람 뽑기" />
-        <label>주의사항 (선택)</label>
-        <input type="text" id="f-notice" placeholder="예: 결과는 되돌릴 수 없어요" />
-        <label style="margin-top:20px;">인원수로 빈 칸 만들기</label>
-        <div class="row">
-          <input type="number" id="ladder-count-input" min="2" max="20" value="4" />
-          <button type="button" class="btn btn-ghost btn-sm" id="ladder-count-apply" style="flex:0 0 auto;">칸 만들기</button>
-        </div>
-        <label>참여자 정보 한 번에 입력 (줄바꿈으로 구분)</label>
-        <textarea id="ladder-bulk-input" rows="4" placeholder="예:&#10;지민&#10;현우&#10;서연&#10;도윤"></textarea>
-        <button type="button" class="btn btn-ghost btn-sm" id="ladder-bulk-apply" style="margin-top:8px;">일괄 입력</button>
-
-        <button type="button" class="disclosure-btn-prominent" id="toggle-profiles-btn" style="margin-top:20px;">+ 저장된 참여자 프로필에서 가져오기 (선택)</button>
-        <div id="profiles-section" style="display:none; margin-top:16px;">
-          <div class="row" style="gap:8px;">
-            <button type="button" class="btn btn-ghost btn-sm" id="open-profile-group-btn" style="flex:0 0 auto;">참여자 프로필 관리</button>
+        <div class="host-title-block">
+          <label style="margin-top:0;">주최자 (참여 화면에 "OO님이 만든 약속" 으로 표시돼요!)</label>
+          <input type="text" id="f-creator-name" placeholder="주최자의 이름을 입력해주세요" />
+          <label style="margin-top:20px;">방 제목</label>
+          <input type="text" id="f-title" placeholder="예: 오늘 커피 사는 사람 뽑기" />
+          <div style="margin-top:20px;">
+            <button type="button" class="notice-toggle-link" id="notice-toggle-btn">+ 공지사항 추가</button>
+            <div id="notice-input-wrap" style="display:none; margin-top:14px;">
+              <label style="margin-top:0;">공지사항</label>
+              <input type="text" id="f-notice" placeholder="예: 결과는 되돌릴 수 없어요" />
+            </div>
           </div>
-          <label style="margin-top:14px;">이름 직접 추가 (입력 후 Enter)</label>
-          <input type="text" id="quick-profile-input" placeholder="이름 입력 후 Enter" />
-          <div id="quick-profile-chips" style="margin-top:10px;"></div>
-          <div class="sub" style="margin:8px 0 0;">그룹을 선택하거나 이름을 추가하면 아래 후보 항목에 바로 들어가요.</div>
         </div>
+        <label style="margin-top:20px;">참여자 추가</label>
+        <div class="participant-box" id="participant-box">
+          <div id="participant-box-empty">
+            <button type="button" class="participant-box-plus" id="open-profile-group-btn" title="참여자 프로필 관리">+</button>
+          </div>
+          <div id="quick-profile-chips" style="display:none;"></div>
+          <input type="text" id="quick-profile-input" placeholder="이름 입력 후 Enter" style="margin-top:14px;" />
+          <button type="button" class="link-plain-btn" id="open-profile-group-btn-2" style="display:none;">저장된 그룹에서 가져오기</button>
+        </div>
+        <div class="sub" style="margin:8px 0 0;">그룹을 선택하거나 이름을 추가하면 아래 후보 항목에 바로 들어가요.</div>
 
         <div id="ladder-options-wrap" style="display:none; margin-top:20px;">
           <label>후보 항목</label>
@@ -1528,21 +1537,8 @@ function renderCreateForm(mode, backBtn){
       </div>
     `;
     document.getElementById('opt-add').addEventListener('click', ()=> addOptionRow('', '예: 참여자 이름', false));
-    document.getElementById('ladder-count-apply').addEventListener('click', ()=>{
-      const n = Math.max(2, Math.min(20, parseInt(document.getElementById('ladder-count-input').value, 10) || 2));
-      document.getElementById('option-rows').innerHTML = '';
-      for(let i = 0; i < n; i++) addOptionRow('', '예: 참여자 이름', false);
-      document.getElementById('ladder-options-wrap').style.display = 'block';
-    });
-    document.getElementById('ladder-bulk-apply').addEventListener('click', ()=>{
-      const lines = document.getElementById('ladder-bulk-input').value.split('\n').map(s => s.trim()).filter(Boolean);
-      if(lines.length < 2){ showAlertModal('2명 이상 입력해주세요.'); return; }
-      document.getElementById('option-rows').innerHTML = '';
-      lines.forEach(name => addOptionRow(name, '예: 참여자 이름', false));
-      document.getElementById('ladder-options-wrap').style.display = 'block';
-    });
     wireLadderProfileSection();
-    wireDisclosure('toggle-profiles-btn', 'profiles-section', '+ 저장된 참여자 프로필에서 가져오기 (선택)', '− 접기');
+    wireDisclosure('notice-toggle-btn', 'notice-input-wrap', '+ 공지사항 추가', '− 공지사항 접기');
     document.getElementById('f-submit').addEventListener('click', submitLadderRoom);
   }
 }
